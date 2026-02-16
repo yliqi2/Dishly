@@ -4,7 +4,7 @@ services:
   # MYSQL
   # =====================
   mysql:
-    image: mysql:8.0
+    image: mysql:latest
     container_name: mysql_app
     restart: always
     environment:
@@ -21,7 +21,7 @@ services:
   # LARAVEL
   # =====================
   backend:
-    image: php:8.2-apache
+    image: php:8.4-apache
     container_name: laravel_app
     restart: always
     working_dir: /var/www/html
@@ -46,9 +46,11 @@ services:
   # ANGULAR
   # =====================
   frontend:
-    image: node:20-alpine
+    image: node:latest
     container_name: angular_app
     working_dir: /app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
     volumes:
       - ./dishly-frontend:/app
     ports:
@@ -56,7 +58,7 @@ services:
     command: >
       sh -c "
       npm install &&
-      npm start -- --host 0.0.0.0
+      npm start -- --host 0.0.0.0 --poll 2000
       "
     depends_on:
       - backend
