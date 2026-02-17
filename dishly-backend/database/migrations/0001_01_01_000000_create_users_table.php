@@ -16,9 +16,11 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('email')->unique();
             $table->string('password');
-            $table->date('fecha_registro');
-            $table->enum('rol', ['cliente', 'chef', 'admin']);
             $table->boolean('chef')->default(false);
+            $table->enum('rol', ['cliente', 'admin']);
+            $table->rememberToken();
+            $table->timestamps();
+            
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
