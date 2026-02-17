@@ -1,0 +1,31 @@
+<header class="header">
+    <nav class="nav">
+        <a class="brand" routerLink="/" aria-label="Dishly inicio">
+            <span class="brand-icon-box" aria-hidden="true">
+                <img class="brand-icon" ngSrc="assets/icons/DishlyIcon.svg" width="45" height="45" alt="Dishly logo" priority />
+            </span>
+            <span class="brand-text">
+                <span class="brand-title">DISHLY</span>
+                <span class="brand-subtitle">Recipes · Tutorials</span>
+            </span>
+        </a>
+
+        <ul class="menu">
+            @for (item of navItems; track item.route) {
+                <li>
+                    <a class="menu-link" [routerLink]="item.route">{{ item.label }}</a>
+                </li>
+            }
+        </ul>
+
+        <div class="actions">
+            @if (isAuthenticated()) {
+                <a class="menu-link" routerLink="/profile">Mi perfil</a>
+                <button class="cta" type="button">Logout</button>
+            } @else {
+                <a class="menu-link" routerLink="/register">{{ profileLabel() }}</a>
+                <button class="cta" type="button">Log in</button>
+            }
+        </div>
+    </nav>
+</header>
