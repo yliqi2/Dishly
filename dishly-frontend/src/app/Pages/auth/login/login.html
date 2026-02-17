@@ -1,0 +1,129 @@
+<div class="login-container">
+	<a routerLink="/" class="back-link">
+		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+		</svg>
+		Go back home
+	</a>
+
+	<div class="login-card">
+		<div class="header">
+			<span class="brand-icon-box" aria-hidden="true">
+				<img class="brand-icon" ngSrc="assets/icons/DishlyIcon.svg" width="55" height="55" alt="Dishly logo" priority />
+			</span>
+			<h1 class="title">Welcome Back</h1>
+			<p class="subtitle">Sign in to continue your culinary journey</p>
+		</div>
+
+		<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form">
+			<div class="form-group">
+				<label for="email" class="label">Email</label>
+				<input
+					type="email"
+					id="email"
+					formControlName="email"
+					placeholder="youremail@address.com"
+					class="input"
+					[class.input-error]="email?.invalid && email?.touched"
+				/>
+				@if (email?.invalid && email?.touched) {
+					<span class="error-message">
+						@if (email?.errors?.['required']) {
+							Email is required
+						}
+						@if (email?.errors?.['email']) {
+							Please enter a valid email address
+						}
+					</span>
+				}
+			</div>
+
+			<div class="form-group">
+				<label for="password" class="label">Password</label>
+				<div class="password-wrapper">
+					<input
+						[type]="showPassword() ? 'text' : 'password'"
+						id="password"
+						formControlName="password"
+						placeholder="········"
+						class="input"
+						[class.input-error]="password?.invalid && password?.touched"
+					/>
+					<button
+						type="button"
+						class="toggle-password"
+						(click)="togglePassword()"
+						aria-label="Toggle password visibility"
+					>
+						@if (showPassword()) {
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M2.5 10C2.5 10 5 4.5 10 4.5C15 4.5 17.5 10 17.5 10C17.5 10 15 15.5 10 15.5C5 15.5 2.5 10 2.5 10Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+								<path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						} @else {
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<path d="M14.95 14.95C13.5255 16.0358 11.7904 16.6374 10 16.6667C5 16.6667 2.5 10 2.5 10C3.45556 7.94733 4.80439 6.12235 6.46667 4.63333M8.25 3.53333C8.82379 3.39907 9.41082 3.33195 10 3.33333C15 3.33333 17.5 10 17.5 10C17.0126 11.0692 16.3932 12.0704 15.6583 12.9833M11.7667 11.7667C11.5378 12.0123 11.2617 12.2093 10.9551 12.3459C10.6485 12.4826 10.3176 12.5563 9.98208 12.5627C9.64653 12.569 9.31332 12.5079 9.00153 12.3833C8.68974 12.2587 8.40579 12.0729 8.16791 11.8379C7.93002 11.6029 7.74064 11.3232 7.61214 11.0143C7.48365 10.7054 7.41867 10.3737 7.42079 10.0386C7.42292 9.70348 7.49211 9.37258 7.62446 9.06532C7.7568 8.75806 7.94959 8.48097 8.19 8.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+								<path d="M2.5 2.5L17.5 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+							</svg>
+						}
+					</button>
+				</div>
+				@if (password?.invalid && password?.touched) {
+					<span class="error-message">
+						@if (password?.errors?.['required']) {
+							Password is required
+						}
+						@if (password?.errors?.['minlength']) {
+							Password must be at least 6 characters
+						}
+					</span>
+				}
+			</div>
+
+			<div class="form-footer">
+				<label class="remember-me">
+					<input type="checkbox" formControlName="rememberMe" />
+					<span>Remember me</span>
+				</label>
+				<a routerLink="/forgot-password" class="forgot-link">
+					Did you forget your password?
+				</a>
+			</div>
+
+			<button type="submit" class="btn-submit" [disabled]="loginForm.invalid">
+				Log In
+			</button>
+
+			<div class="divider">
+				<span>Or continue with</span>
+			</div>
+
+			<div class="social-buttons">
+				<button type="button" class="btn-social">
+					<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path d="M18.1711 8.36788H17.5V8.33329H10V11.6666H14.7096C14.0225 13.607 12.1762 15 10 15C7.23875 15 5 12.7612 5 9.99996C5 7.23871 7.23875 4.99996 10 4.99996C11.2746 4.99996 12.4342 5.48079 13.3171 6.26621L15.6742 3.90913C14.1858 2.52204 12.1933 1.66663 10 1.66663C5.39791 1.66663 1.66666 5.39788 1.66666 9.99996C1.66666 14.602 5.39791 18.3333 10 18.3333C14.6021 18.3333 18.3333 14.602 18.3333 9.99996C18.3333 9.44121 18.2758 8.89579 18.1711 8.36788Z" fill="#FFC107"/>
+						<path d="M2.6275 6.12121L5.36542 8.12954C6.10625 6.29537 7.90042 4.99996 10 4.99996C11.2746 4.99996 12.4342 5.48079 13.3171 6.26621L15.6742 3.90913C14.1858 2.52204 12.1933 1.66663 10 1.66663C6.79917 1.66663 4.02333 3.47371 2.6275 6.12121Z" fill="#FF3D00"/>
+						<path d="M10 18.3333C12.1525 18.3333 14.1083 17.5095 15.5867 16.1704L13.0092 13.9879C12.1615 14.6464 11.1089 15.0008 10 15C7.83251 15 5.99209 13.6179 5.29876 11.6891L2.58126 13.783C3.96043 16.4816 6.76126 18.3333 10 18.3333Z" fill="#4CAF50"/>
+						<path d="M18.1713 8.36796H17.5V8.33337H10V11.6667H14.7096C14.3809 12.5902 13.7889 13.3972 13.0079 13.9879L13.0092 13.9871L15.5867 16.1696C15.4092 16.3313 18.3333 14.1667 18.3333 10C18.3333 9.44129 18.2758 8.89587 18.1713 8.36796Z" fill="#1976D2"/>
+					</svg>
+					Google
+				</button>
+				<button type="button" class="btn-social">
+					<svg width="20" height="20" viewBox="0 0 384 512" fill="#1F2937" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-60 20.7-85.8 20.7-25.8 0-48.3-20.6-77.9-20.6-39.2 0-77.1 23.3-101.4 59.5-40.4 60.5-35.6 150.3 15.6 222.1 19.3 27.2 42.1 57.7 73.1 57.7 28.5 0 39.5-18.4 75.2-18.4 35.8 0 45.8 18.4 75.8 18.4 31.1 0 52.8-30.1 72.1-57.3 13.9-19.6 19.6-30.8 29.3-47.5-36.7-16.4-56.7-47.5-56.7-84.7zM245.5 111.4c16.2-19.6 27.1-46.9 24.1-74.4-23.4 1.1-51.7 15.6-68.4 34.6-15.5 17.5-28.5 45.3-25.2 72.3 26.1 1.9 53.4-12.9 69.5-32.5z"/>
+                    </svg>
+					Apple
+				</button>
+			</div>
+		</form>
+
+		<div class="register-prompt">
+			<span>You don't have an account?</span>
+			<a routerLink="/register" class="register-link">Register Now</a>
+		</div>
+	</div>
+
+	<button class="help-button" aria-label="Help">
+		<span>?</span>
+	</button>
+</div>

@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, signal, effect, inject } from '@angular/core';
+import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { Header } from './Core/Layout/header/header';
+import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -9,5 +10,16 @@ import { Header } from './Core/Layout/header/header';
   styleUrl: './app.css'
 })
 export class App {
+  private router = inject(Router);
   protected readonly title = signal('dishly-frontend');
+  protected readonly showHeader = signal(true);
+
+  constructor() {
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        const authRoutes = ['/login', '/register'];
+        this.showHeader.set(!authRoutes.some(route => event.url.startsWith(route)));
+      });
+  }
 }

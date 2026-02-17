@@ -2,7 +2,7 @@
     <nav class="nav">
         <a class="brand" routerLink="/" aria-label="Dishly inicio">
             <span class="brand-icon-box" aria-hidden="true">
-                <img class="brand-icon" ngSrc="assets/icons/DishlyIcon.svg" width="45" height="45" alt="Dishly logo" priority />
+                <img class="brand-icon" ngSrc="assets/icons/DishlyIcon.svg" width="55" height="55" alt="Dishly logo" priority />
             </span>
             <span class="brand-text">
                 <span class="brand-title">DISHLY</span>
@@ -23,8 +23,13 @@
                 <a class="menu-link" routerLink="/profile">Mi perfil</a>
                 <button class="cta" type="button">Logout</button>
             } @else {
-                <a class="menu-link" routerLink="/register">{{ profileLabel() }}</a>
-                <button class="cta" type="button">Log in</button>
+                <a class="menu-link" routerLink="/register">Register</a>
+                
+                <a routerLink="/login">
+                    <button class="cta" type="button">
+                        Log in
+                    </button>
+                </a>
             }
         </div>
     </nav>

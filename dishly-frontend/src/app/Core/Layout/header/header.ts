@@ -18,10 +18,6 @@ export class Header {
     { label: 'Dishly AI', route: '/dishly-ai' },
   ];
 
-  protected readonly profileLabel = computed(() =>
-    this.isAuthenticated() ? 'Mi perfil' : 'Register',
-  );
-
   protected toggleAuthForDemo(): void {
     this.isAuthenticated.update((value) => !value);
   }

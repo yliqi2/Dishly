@@ -1,6 +1,6 @@
 .header {
 	border-bottom: 1px solid #ececec;
-	background: #FFFFFF;
+	background: var(--background);
 }
 
 .nav {
@@ -26,7 +26,7 @@
 	width: 55px;
 	height: 55px;
 	border-radius: 14px;
-	background: #FD8923;
+	background: var(--highlight);
 	display: grid;
 	place-items: center;
 }
@@ -44,15 +44,17 @@
 }
 
 .brand-title {
-	color: #FD8923;
-	font-weight: 700;
+	font-family: var(--font-display);
+	color: var(--highlight);
+	font-weight: var(--font-display-extrabold);
 	font-size: 20px;
 	line-height: 1;
 	letter-spacing: 0.5px;
 }
 
 .brand-subtitle {
-	color: #4b5563;
+	color: var(--PrimaryText);
+	font-family: var(--font-display);
 	font-size: 14px;
 	line-height: 1.2;
 	margin-top: 4px;
@@ -69,14 +71,14 @@
 }
 
 .menu-link {
-	color: #1f2937;
+	color: var(--PrimaryText);
 	text-decoration: none;
 	font-size: 17px;
 	font-weight: 500;
 }
 
 .menu-link:hover {
-	color: #f7921e;
+	color: var(--highlight);
 }
 
 .actions {
@@ -89,7 +91,7 @@
 .cta {
 	border: 0;
 	border-radius: 16px;
-	background: #f7921e;
+	background: var(--highlight);
 	color: #fff;
 	font-size: 18px;
 	font-weight: 700;
