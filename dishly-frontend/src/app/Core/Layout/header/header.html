@@ -21,7 +21,7 @@
         <div class="actions">
             @if (isAuthenticated()) {
                 <a class="menu-link" routerLink="/profile">Mi perfil</a>
-                <button class="cta" type="button">Logout</button>
+                <button class="cta" type="button" (click)="logout()">Logout</button>
             } @else {
                 <a class="menu-link" routerLink="/register">Register</a>
                 

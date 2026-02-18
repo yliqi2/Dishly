@@ -10,12 +10,17 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
       - "${MYSQL_PORT}:3306"
+    networks:
+      - dishly-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # =====================
   # LARAVEL
@@ -29,39 +34,36 @@ services:
       - ./dishly-backend:/var/www/html
       - ./docker/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - "${BACKEND_PORT}:80"
+    networks:
+      - dishly-network
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=${MYSQL_DATABASE}
+      - DB_USERNAME=root
+      - DB_PASSWORD=${MYSQL_ROOT_PASSWORD}
     command: >
       bash -c "
-      apt-get update &&
-      apt-get install -y libzip-dev unzip git &&
-      docker-php-ext-install pdo pdo_mysql &&
-      a2enmod rewrite &&
-      php artisan migrate --force &&
+      apt-get update -qq &&
+      apt-get install -y -qq libzip-dev unzip git curl > /dev/null 2>&1 &&
+      docker-php-ext-install -j4 pdo pdo_mysql zip > /dev/null 2>&1 &&
+      a2enmod rewrite > /dev/null 2>&1 &&
+      curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer > /dev/null 2>&1 &&
+      [ ! -f /var/www/html/.env ] && cp /var/www/html/.env.example /var/www/html/.env || true &&
+      [ ! -f /var/www/html/vendor/autoload.php ] && composer install --no-interaction > /dev/null 2>&1 && php artisan key:generate > /dev/null 2>&1 || true &&
+      php artisan migrate --force > /dev/null 2>&1 &&
+      echo 'Server started' &&
       apache2-foreground
       "
 
-  # =====================
-  # ANGULAR
-  # =====================
-  frontend:
-    image: node:latest
-    container_name: angular_app
-    working_dir: /app
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    volumes:
-      - ./dishly-frontend:/app
-    ports:
-      - "${FRONTEND_PORT}:4200"
-    command: >
-      sh -c "
-      npm install &&
-      npm start -- --host 0.0.0.0 --poll 2000
-      "
-    depends_on:
-      - backend
 
 volumes:
   mysql_data:
+
+networks:
+  dishly-network:
+    driver: bridge

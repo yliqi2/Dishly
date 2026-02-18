@@ -1,6 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, inject } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { AuthServices } from '../../../Pages/auth/Services/auth-services';
+import { map } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-header',
@@ -10,7 +13,14 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Header {
-  protected readonly isAuthenticated = signal(false);
+  private authService = inject(AuthServices);
+
+  protected readonly isAuthenticated = toSignal(
+    this.authService.user$.pipe(
+      map(user => !!user)
+    ),
+    { initialValue: false }
+  );
 
   protected readonly navItems = [
     { label: 'Home', route: '/' },
@@ -18,7 +28,7 @@ export class Header {
     { label: 'Dishly AI', route: '/dishly-ai' },
   ];
 
-  protected toggleAuthForDemo(): void {
-    this.isAuthenticated.update((value) => !value);
+  protected logout(): void {
+    this.authService.logout();
   }
 }

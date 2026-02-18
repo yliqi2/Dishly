@@ -1,7 +1,8 @@
 import { Component, signal, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
+import { AuthServices } from '../Services/auth-services';
 
 @Component({
   selector: 'app-register',
@@ -11,14 +12,18 @@ import { NgOptimizedImage } from '@angular/common';
 })
 export class Register {
   private fb = inject(FormBuilder);
+  private authService = inject(AuthServices);
+  private router = inject(Router);
   
   showPassword = signal(false);
   showConfirmPassword = signal(false);
+  isLoading = signal(false);
+  errorMessage = signal<string | null>(null);
   
   registerForm: FormGroup = this.fb.group({
-    username: ['', [Validators.required, Validators.minLength(3)]],
+    username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', [Validators.required]],
     acceptTerms: [false, [Validators.requiredTrue]]
   }, { validators: this.passwordMatchValidator });
@@ -60,8 +65,25 @@ export class Register {
 
   onSubmit() {
     if (this.registerForm.valid) {
-      console.log('Form submitted:', this.registerForm.value);
-      // Aquí iría tu lógica de registro
+      this.isLoading.set(true);
+      this.errorMessage.set(null);
+
+      const userData = {
+        name: this.registerForm.get('username')?.value,
+        email: this.registerForm.get('email')?.value,
+        password: this.registerForm.get('password')?.value
+      };
+
+      this.authService.register(userData).subscribe({
+        next: (response) => {
+          this.isLoading.set(false);
+          this.router.navigate(['/']);
+        },
+        error: (error) => {
+          this.isLoading.set(false);
+          this.errorMessage.set(error.error?.message || 'Registration failed. Please try again.');
+        }
+      });
     }
   }
 }
