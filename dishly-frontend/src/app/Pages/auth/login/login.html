@@ -73,12 +73,15 @@
 						@if (password?.errors?.['required']) {
 							Password is required
 						}
-						@if (password?.errors?.['minlength']) {
-							Password must be at least 8 characters
-						}
 					</span>
 				}
 			</div>
+
+			@if (errorMessage()) {
+				<div class="error-message">
+					{{ errorMessage() }}
+				</div>
+			}
 
 			<div class="form-footer">
 				<label class="remember-me">

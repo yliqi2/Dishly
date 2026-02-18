@@ -198,13 +198,13 @@
                 <tbody>
                     @foreach ($users as $user)
                         <tr>
-                            <td>{{ $user->id }}</td>
-                            <td>{{ $user->name }}</td>
+                            <td>{{ $user->id_usuario }}</td>
+                            <td>{{ $user->nombre }}</td>
                             <td>{{ $user->email }}</td>
                             <td>
                                 <div class="acciones">
-                                    <button class="btn-editar" onclick="editUser({{ $user->id }})">Editar</button>
-                                    <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline;">
+                                    <button class="btn-editar" onclick="editUser({{ $user->id_usuario }})">Editar</button>
+                                    <form action="{{ route('users.destroy', $user->id_usuario) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn-eliminar" onclick="return confirm('¿Estás seguro?')">Eliminar</button>

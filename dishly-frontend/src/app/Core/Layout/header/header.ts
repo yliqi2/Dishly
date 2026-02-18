@@ -2,8 +2,13 @@ import { ChangeDetectionStrategy, Component, computed, signal, inject } from '@a
 import { NgOptimizedImage } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthServices } from '../../../Pages/auth/Services/auth-services';
-import { map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
+
+type AuthUser = {
+  nombre?: string;
+  name?: string;
+  email?: string;
+};
 
 @Component({
   selector: 'app-header',
@@ -15,12 +20,13 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class Header {
   private authService = inject(AuthServices);
 
-  protected readonly isAuthenticated = toSignal(
-    this.authService.user$.pipe(
-      map(user => !!user)
-    ),
-    { initialValue: false }
-  );
+  protected readonly menuOpen = signal(false);
+
+  private readonly user = toSignal<AuthUser | null>(this.authService.user$, { initialValue: null });
+
+  protected readonly isAuthenticated = computed(() => !!this.user());
+  protected readonly displayName = computed(() => this.user()?.nombre || this.user()?.name || 'User');
+  protected readonly userInitial = computed(() => this.displayName().charAt(0).toUpperCase());
 
   protected readonly navItems = [
     { label: 'Home', route: '/' },
@@ -28,7 +34,16 @@ export class Header {
     { label: 'Dishly AI', route: '/dishly-ai' },
   ];
 
+  protected toggleMenu(): void {
+    this.menuOpen.update(value => !value);
+  }
+
+  protected closeMenu(): void {
+    this.menuOpen.set(false);
+  }
+
   protected logout(): void {
+    this.closeMenu();
     this.authService.logout();
   }
 }

@@ -36,22 +36,35 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      mysql:
-        condition: service_healthy
     ports:
       - "${BACKEND_PORT}:80"
     networks:
       - dishly-network
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=${MYSQL_DATABASE}
+      - DB_USERNAME=root
+      - DB_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=http://localhost:${BACKEND_PORT}
     command: >
       bash -c "
-      apt-get update -qq &&
-      apt-get install -y -qq libzip-dev unzip git curl > /dev/null 2>&1 &&
-      docker-php-ext-install -j4 pdo pdo_mysql zip > /dev/null 2>&1 &&
-      a2enmod rewrite > /dev/null 2>&1 &&
-      curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer > /dev/null 2>&1 &&
+      if [ ! -f /usr/local/lib/php/extensions/*/pdo_mysql.so ]; then
+        apt-get update -qq &&
+        apt-get install -y -qq libzip-dev unzip git curl &&
+        docker-php-ext-install -j4 pdo pdo_mysql zip &&
+        a2enmod rewrite;
+      fi &&
+      if [ ! -f /usr/local/bin/composer ]; then
+        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer;
+      fi &&
       [ ! -f /var/www/html/.env ] && cp /var/www/html/.env.example /var/www/html/.env || true &&
-      [ ! -f /var/www/html/vendor/autoload.php ] && composer install --no-interaction > /dev/null 2>&1 && php artisan key:generate > /dev/null 2>&1 || true &&
-      php artisan migrate --force > /dev/null 2>&1 &&
+      [ ! -f /var/www/html/vendor/autoload.php ] && composer install --no-interaction && php artisan key:generate || true &&
+      [ ! -f /var/www/html/bootstrap/cache/config.php ] && php artisan config:cache || true &&
+      [ ! -f /var/www/html/bootstrap/cache/routes-v7.php ] && php artisan route:cache || true &&
+      [ ! -f /var/www/html/bootstrap/cache/views.php ] && php artisan view:cache || true &&
       echo 'Server started' &&
       apache2-foreground
       "

@@ -18,10 +18,14 @@ class AuthController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
+        $nombre = $request->input('name', $request->input('nombre'));
+
         $user = User::create([
-            'name' => $request->name,
+            'nombre' => $nombre,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'rol' => 'cliente',
+            'chef' => false,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -36,7 +40,7 @@ class AuthController extends Controller
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
-                'message' => 'Invalid login details'
+                'message' => 'Your email or password is incorrect. Please try again.'
             ], 401);
         }
 
@@ -66,11 +70,13 @@ class AuthController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id_usuario,
             'password' => 'nullable|string|min:8',
         ]);
 
-        $user->name = $request->name;
+        $nombre = $request->input('name', $request->input('nombre'));
+
+        $user->nombre = $nombre;
         $user->email = $request->email;
 
         if ($request->filled('password')) {

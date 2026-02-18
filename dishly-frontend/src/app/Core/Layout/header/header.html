@@ -20,8 +20,33 @@
 
         <div class="actions">
             @if (isAuthenticated()) {
-                <a class="menu-link" routerLink="/profile">Mi perfil</a>
-                <button class="cta" type="button" (click)="logout()">Logout</button>
+                <div class="user-menu" [class.open]="menuOpen()">
+                    <button
+                        class="user-trigger"
+                        type="button"
+                        (click)="toggleMenu()"
+                        aria-haspopup="true"
+                        [attr.aria-expanded]="menuOpen()"
+                    >
+                        <span class="avatar" aria-hidden="true">{{ userInitial() }}</span>
+                        <span class="user-meta">
+                            <span class="user-name">{{ displayName() }}</span>
+                            <span class="user-subtitle">My profile</span>
+                        </span>
+                        <span class="chevron" [class.open]="menuOpen()" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                    </button>
+
+                    @if (menuOpen()) {
+                        <div class="user-dropdown" role="menu">
+                            <a class="dropdown-link" routerLink="/profile" (click)="closeMenu()" role="menuitem">Mi perfil</a>
+                            <button class="dropdown-button" type="button" (click)="logout()" role="menuitem">Logout</button>
+                        </div>
+                    }
+                </div>
             } @else {
                 <a class="menu-link" routerLink="/register">Register</a>
                 
