@@ -19,7 +19,17 @@ export class AuthServices {
   }
 
   register(user: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, user);
+    return this.http.post(`${this.apiUrl}/register`, user).pipe(
+      tap((response: any) => {
+        if (response.access_token) {
+          localStorage.setItem('token', response.access_token);
+          if (response.user) {
+            localStorage.setItem('user', JSON.stringify(response.user));
+            this.userSubject.next(response.user);
+          }
+        }
+      })
+    );
   }
 
   login(credentials: any): Observable<any> {
