@@ -81,6 +81,15 @@
 	transition: color 0.2s ease;
 }
 
+.menu-link--active {
+	color: var(--highlight);
+	font-weight: 700;
+}
+
+.menu-link--active .menu-link__icon {
+	color: var(--highlight);
+}
+
 .menu-link:hover {
 	color: var(--highlight);
 }
@@ -346,6 +355,7 @@
 		grid-template-columns: 1fr auto;
 		gap: 16px;
 		padding: 0 16px;
+		position: relative;
 	}
 
 	.hamburger {
@@ -355,8 +365,8 @@
 
 	.nav-content {
 		display: none;
-		position: fixed;
-		top: 88px;
+		position: absolute;
+		top: 100%;
 		left: 0;
 		right: 0;
 		background: var(--background);
@@ -452,7 +462,7 @@
 	}
 
 	.nav-content {
-		top: 72px;
+		top: 100%;
 		padding: 20px 12px;
 	}
 
@@ -537,7 +547,7 @@
 	}
 
 	.nav-content {
-		top: 64px;
+		top: 100%;
 		padding: 16px 8px;
 	}
 

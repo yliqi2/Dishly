@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, signal, inject } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthServices } from '../../../Pages/auth/Services/auth-services';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -12,7 +12,7 @@ type AuthUser = {
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, NgOptimizedImage],
+  imports: [RouterLink, RouterLinkActive, NgOptimizedImage],
   templateUrl: './header.html',
   styleUrl: './header.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
