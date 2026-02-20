@@ -2,10 +2,11 @@ import { Component, signal, effect, inject } from '@angular/core';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { Header } from './Core/Layout/header/header';
 import { filter } from 'rxjs';
+import { Footer } from './Core/Layout/footer/footer';
 
 @Component({
   selector: 'app-root',
-  imports: [Header, RouterOutlet],
+  imports: [Header, Footer, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

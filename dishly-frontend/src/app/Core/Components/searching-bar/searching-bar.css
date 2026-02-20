@@ -1,3 +1,14 @@
+.search-bar,
+:host {
+	max-width: 800px;
+}
+
+:host {
+	display: block;
+	width: 100%;
+	margin: 0 auto;
+}
+
 .search-bar {
 	display: flex;
 	align-items: center;
@@ -6,8 +17,8 @@
 	border-radius: 50px;
 	padding: 8px 8px 8px 24px;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-	max-width: 800px;
 	width: 100%;
+	box-sizing: border-box;
 }
 
 .search-bar__input {
@@ -18,6 +29,7 @@
 	padding: 8px 16px;
 	color: #333;
 	background: transparent;
+	min-width: 0;
 }
 
 .search-bar__input::placeholder {
@@ -50,4 +62,99 @@
 .search-bar__icon {
 	width: 24px;
 	height: 24px;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+	:host {
+		max-width: 680px;
+	}
+
+	.search-bar {
+		padding: 6px 6px 6px 20px;
+	}
+
+	.search-bar__input {
+		font-size: 15px;
+		padding: 6px 12px;
+	}
+
+	.search-bar__button {
+		width: 44px;
+		height: 44px;
+	}
+
+	.search-bar__icon {
+		width: 22px;
+		height: 22px;
+	}
+}
+
+/* Móvil grande */
+@media (max-width: 425px) {
+	.search-bar {
+		padding: 6px 6px 6px 18px;
+		max-width: 100%;
+	}
+
+	.search-bar__input {
+		font-size: 14px;
+		padding: 4px 10px;
+	}
+
+	.search-bar__button {
+		width: 40px;
+		height: 40px;
+	}
+
+	.search-bar__icon {
+		width: 20px;
+		height: 20px;
+	}
+}
+
+/* Móvil mediano */
+@media (max-width: 375px) {
+	.search-bar {
+		padding: 5px 5px 5px 16px;
+		max-width: 100%;
+	}
+
+	.search-bar__input {
+		font-size: 13px;
+		padding: 4px 8px;
+	}
+
+	.search-bar__button {
+		width: 38px;
+		height: 38px;
+	}
+
+	.search-bar__icon {
+		width: 18px;
+		height: 18px;
+	}
+}
+
+/* Móvil pequeño */
+@media (max-width: 320px) {
+	.search-bar {
+		padding: 4px 4px 4px 14px;
+		max-width: 100%;
+	}
+
+	.search-bar__input {
+		font-size: 12px;
+		padding: 3px 6px;
+	}
+
+	.search-bar__button {
+		width: 36px;
+		height: 36px;
+	}
+
+	.search-bar__icon {
+		width: 16px;
+		height: 16px;
+	}
 }

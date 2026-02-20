@@ -1,4 +1,11 @@
-@if (showHeader()) {
-	<app-header />
-}
-<router-outlet />
+<div class="app-shell">
+	@if (showHeader()) {
+		<app-header />
+	}
+	<main class="app-main">
+		<router-outlet />
+	</main>
+	@if (showHeader()) {
+		<app-footer />
+	}
+</div>

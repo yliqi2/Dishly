@@ -21,6 +21,7 @@ export class Header {
   private authService = inject(AuthServices);
 
   protected readonly menuOpen = signal(false);
+  protected readonly mobileMenuOpen = signal(false);
 
   private readonly user = toSignal<AuthUser | null>(this.authService.user$, { initialValue: null });
 
@@ -43,8 +44,17 @@ export class Header {
     this.menuOpen.set(false);
   }
 
+  protected toggleMobileMenu(): void {
+    this.mobileMenuOpen.update(value => !value);
+  }
+
+  protected closeMobileMenu(): void {
+    this.mobileMenuOpen.set(false);
+  }
+
   protected logout(): void {
     this.closeMenu();
+    this.closeMobileMenu();
     this.authService.logout();
   }
 }

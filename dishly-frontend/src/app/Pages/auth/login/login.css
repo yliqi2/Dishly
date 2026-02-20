@@ -339,9 +339,42 @@
 	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
-@media (max-width: 640px) {
+/* Tablet */
+@media (max-width: 768px) {
 	.login-container {
-		padding: 20px;
+		padding: 24px 16px;
+	}
+
+	.back-link {
+		top: 24px;
+		left: 24px;
+		font-size: 14px;
+	}
+
+	.login-card {
+		padding: 40px 32px;
+		max-width: 520px;
+	}
+
+	.title {
+		font-size: 30px;
+	}
+
+	.help-button {
+		top: 24px;
+		right: 24px;
+		bottom: auto;
+		width: 52px;
+		height: 52px;
+		font-size: 22px;
+	}
+
+}
+
+/* Móvil grande */
+@media (max-width: 425px) {
+	.login-container {
+		padding: 20px 12px 96px;
 	}
 
 	.back-link {
@@ -350,11 +383,26 @@
 	}
 
 	.login-card {
-		padding: 32px 24px;
+		padding: 32px 24px 72px;
+		max-height: calc(100vh - 140px);
+	}
+
+	.brand-icon-box {
+		width: 50px;
+		height: 50px;
+	}
+
+	.brand-icon {
+		width: 32px;
+		height: 32px;
 	}
 
 	.title {
-		font-size: 28px;
+		font-size: 26px;
+	}
+
+	.subtitle {
+		font-size: 15px;
 	}
 
 	.social-buttons {
@@ -362,10 +410,117 @@
 	}
 
 	.help-button {
-		bottom: 20px;
+		position: fixed;
+		top: 20px;
 		right: 20px;
-		width: 48px;
-		height: 48px;
+		bottom: auto;
+		width: 46px;
+		height: 46px;
 		font-size: 20px;
 	}
+
+}
+
+/* Móvil mediano */
+@media (max-width: 375px) {
+	.login-card {
+		padding: 28px 20px;
+	}
+
+	.brand-icon-box {
+		width: 56px;
+		height: 56px;
+	}
+
+	.brand-icon {
+		width: 40px;
+		height: 40px;
+	}
+
+	.title {
+		font-size: 24px;
+	}
+
+	.subtitle {
+		font-size: 14px;
+	}
+
+	.input {
+		padding: 12px 14px;
+		font-size: 14px;
+	}
+
+	.btn-submit {
+		padding: 12px 18px;
+		font-size: 15px;
+	}
+
+	.btn-social {
+		padding: 10px 14px;
+		font-size: 14px;
+	}
+
+}
+
+/* Móvil pequeño */
+@media (max-width: 320px) {
+	.login-container {
+		padding: 16px 8px 88px;
+	}
+
+	.back-link {
+		top: 16px;
+		left: 16px;
+		font-size: 13px;
+	}
+
+	.login-card {
+		padding: 24px 16px 64px;
+		border-radius: 20px;
+		max-height: calc(100vh - 128px);
+	}
+
+	.brand-icon-box {
+		width: 52px;
+		height: 52px;
+	}
+
+	.brand-icon {
+		width: 36px;
+		height: 36px;
+	}
+
+	.title {
+		font-size: 22px;
+	}
+
+	.subtitle {
+		font-size: 13px;
+	}
+
+	.input {
+		padding: 10px 12px;
+		font-size: 13px;
+	}
+
+	.btn-submit {
+		padding: 10px 16px;
+		font-size: 14px;
+	}
+
+	.btn-social {
+		padding: 8px 12px;
+		font-size: 13px;
+	}
+
+	.help-button {
+		position: fixed;
+		top: 16px;
+		right: 16px;
+		bottom: auto;
+		width: 42px;
+		height: 42px;
+		font-size: 18px;
+	}
+
 }
