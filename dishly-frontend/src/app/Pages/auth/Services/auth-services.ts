@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { isPlatformBrowser } from '@angular/common';
 import { Observable, tap, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -7,24 +8,48 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthServices {
-  private apiUrl = 'http://localhost:8080/api'; 
-  private userSubject = new BehaviorSubject<any>(this.getUserFromStorage());
+  private apiUrl = '/api';
+  private http = inject(HttpClient);
+  private router = inject(Router);
+  private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private userSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
   user$ = this.userSubject.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) { }
+  private getStorage(): Storage | null {
+    return this.isBrowser ? localStorage : null;
+  }
 
-  private getUserFromStorage(): any {
-    const user = localStorage.getItem('user');
+  private getItem(key: string): string | null {
+    const storage = this.getStorage();
+    return storage ? storage.getItem(key) : null;
+  }
+
+  private setItem(key: string, value: string): void {
+    const storage = this.getStorage();
+    if (storage) {
+      storage.setItem(key, value);
+    }
+  }
+
+  private removeItem(key: string): void {
+    const storage = this.getStorage();
+    if (storage) {
+      storage.removeItem(key);
+    }
+  }
+
+  private getUserFromStorage(): User | null {
+    const user = this.getItem('user');
     return user ? JSON.parse(user) : null;
   }
 
-  register(user: any): Observable<any> {
+  register(user: RegisterPayload): Observable<AuthResponse> {
     return this.http.post(`${this.apiUrl}/register`, user).pipe(
-      tap((response: any) => {
+      tap((response: AuthResponse) => {
         if (response.access_token) {
-          localStorage.setItem('token', response.access_token);
+          this.setItem('token', response.access_token);
           if (response.user) {
-            localStorage.setItem('user', JSON.stringify(response.user));
+            this.setItem('user', JSON.stringify(response.user));
             this.userSubject.next(response.user);
           }
         }
@@ -32,13 +57,13 @@ export class AuthServices {
     );
   }
 
-  login(credentials: any): Observable<any> {
+  login(credentials: LoginPayload): Observable<AuthResponse> {
     return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
-      tap((response: any) => {
+      tap((response: AuthResponse) => {
         if (response.access_token) {
-          localStorage.setItem('token', response.access_token);
+          this.setItem('token', response.access_token);
           if (response.user) {
-            localStorage.setItem('user', JSON.stringify(response.user));
+            this.setItem('user', JSON.stringify(response.user));
             this.userSubject.next(response.user);
           }
         }
@@ -47,7 +72,7 @@ export class AuthServices {
   }
 
   logout(): void {
-    const token = localStorage.getItem('token');
+    const token = this.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     this.http.post(`${this.apiUrl}/logout`, {}, { headers }).subscribe({
@@ -61,18 +86,18 @@ export class AuthServices {
   }
 
   private clearAuth() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    this.removeItem('token');
+    this.removeItem('user');
     this.userSubject.next(null);
     this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return this.getItem('token');
   }
 
-  getUser(): any {
-    const user = localStorage.getItem('user');
+  getUser(): User | null {
+    const user = this.getItem('user');
     return user ? JSON.parse(user) : null;
   }
 
@@ -80,16 +105,26 @@ export class AuthServices {
     return !!this.getToken();
   }
 
-  updateProfile(data: any): Observable<any> {
+  updateProfile(data: UpdateProfilePayload): Observable<AuthResponse> {
     const token = this.getToken();
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.put(`${this.apiUrl}/profile`, data, { headers }).pipe(
-      tap((response: any) => {
+      tap((response: AuthResponse) => {
         if (response.user) {
-          localStorage.setItem('user', JSON.stringify(response.user));
+          this.setItem('user', JSON.stringify(response.user));
           this.userSubject.next(response.user);
         }
       })
     );
   }
 }
+
+type User = Record<string, unknown>;
+type RegisterPayload = Record<string, unknown>;
+type LoginPayload = Record<string, unknown>;
+type UpdateProfilePayload = Record<string, unknown>;
+
+type AuthResponse = {
+  access_token?: string;
+  user?: User;
+};

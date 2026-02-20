@@ -61,6 +61,12 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": [
+              "localhost",
+              "servomechanically-nonaffecting-stephanie.ngrok-free.dev"
+            ]
+          },
           "configurations": {
             "production": {
               "buildTarget": "dishly-frontend:build:production"

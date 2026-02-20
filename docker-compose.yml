@@ -82,10 +82,27 @@ services:
     command: >
       sh -c "
       npm install &&
-      npm start -- --host 0.0.0.0 --poll 2000
+      npm start -- --host 0.0.0.0 --port 4200 --poll 2000 --proxy-config proxy.conf.json
       "
     depends_on:
       - backend
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok_tunnel
+    restart: unless-stopped
+    command: start --all --config /etc/ngrok.yml
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    volumes:
+      - "./docker/ngrok.yml:/etc/ngrok.yml"
+    ports:
+      - "4040:4040"
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - dishly-network
 
 volumes:
   mysql_data:

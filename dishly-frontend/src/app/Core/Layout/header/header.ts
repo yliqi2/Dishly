@@ -32,6 +32,7 @@ export class Header {
     { label: 'Home', route: '/' },
     { label: 'Recipes', route: '/recipes' },
     { label: 'Dishly AI', route: '/dishly-ai' },
+    { label: 'Forum', route: '/forum' },
   ];
 
   protected toggleMenu(): void {

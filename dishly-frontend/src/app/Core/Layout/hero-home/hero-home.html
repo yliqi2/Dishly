@@ -1,1 +1,15 @@
-<p>hero-home works!</p>
+<section class="hero" aria-label="Dishly hero">
+	<img
+		class="hero__image"
+		src="assets/images/hero_homepage.png"
+		alt="Fresh ingredients and cooking inspiration"
+	/>
+	<div class="hero__content">
+		<h1 class="hero__title">
+			Master the Culinary<br>
+			Art with Exclusive<br>
+			Recipes
+		</h1>
+		<app-searching-bar (searchQuery)="onSearch($event)" />
+	</div>
+</section>

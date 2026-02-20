@@ -11,7 +11,7 @@ import { filter } from 'rxjs';
 })
 export class App {
   private router = inject(Router);
-  protected readonly title = signal('dishly-frontend');
+  protected readonly title = signal('Dishly');
   protected readonly showHeader = signal(true);
 
   constructor() {

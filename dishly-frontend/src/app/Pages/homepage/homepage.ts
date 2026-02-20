@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { HeroHome } from '../../Core/Layout/hero-home/hero-home';
 
 @Component({
   selector: 'app-homepage',
-  imports: [],
+  imports: [HeroHome],
   templateUrl: './homepage.html',
   styleUrl: './homepage.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Homepage {
 

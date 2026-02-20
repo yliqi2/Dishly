@@ -1,0 +1,6 @@
+version: "2"
+tunnels:
+  frontend:
+    proto: http
+    addr: frontend:4200
+    hostname: servomechanically-nonaffecting-stephanie.ngrok-free.dev
