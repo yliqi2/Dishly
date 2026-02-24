@@ -2,6 +2,17 @@
 	display: block;
 }
 
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(18px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
 :host::before {
 	content: '';
 	position: fixed;
@@ -55,6 +66,8 @@
 	max-width: 440px;
 	max-height: calc(100vh - 20vh);
 	overflow-y: auto;
+	animation: fadeIn 0.60s cubic-bezier(.22,.9,.35,1);
+	will-change: transform, opacity;
 }
 
 .header {

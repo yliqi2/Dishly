@@ -3,6 +3,7 @@ import { Homepage } from './Pages/homepage/homepage';
 import { Login } from './Pages/auth/login/login';
 import { Register } from './Pages/auth/register/register';
 import { Recipes } from './Pages/recipes/recipes';
+import { Upload } from './Pages/upload/upload';
 
 export const routes: Routes = [
     {
@@ -20,6 +21,10 @@ export const routes: Routes = [
     {
         path: 'recipes',
         component: Recipes
+    },  
+    {
+        path: 'upload',
+        component: Upload
     }
 
 ];

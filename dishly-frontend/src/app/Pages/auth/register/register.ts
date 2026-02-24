@@ -8,7 +8,7 @@ import { AuthServices } from '../Services/auth-services';
   selector: 'app-register',
   imports: [ReactiveFormsModule, RouterLink, NgOptimizedImage],
   templateUrl: './register.html',
-  styleUrl: './register.css',
+  styleUrls: ['./register.css'],
 })
 export class Register {
   private fb = inject(FormBuilder);
@@ -21,7 +21,7 @@ export class Register {
   errorMessage = signal<string | null>(null);
   
   registerForm: FormGroup = this.fb.group({
-    username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
+    username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(10)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', [Validators.required]],

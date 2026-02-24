@@ -339,6 +339,22 @@
 	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); /* Empieza 20px más abajo */
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);    /* Termina en su posición original */
+  }
+}
+/* Aplicación a la tarjeta */
+.login-card {
+  animation: fadeIn 0.5s ease-out; /* Dura medio segundo con una curva suave */
+}
+
+
 /* Tablet */
 @media (max-width: 768px) {
 	.login-container {

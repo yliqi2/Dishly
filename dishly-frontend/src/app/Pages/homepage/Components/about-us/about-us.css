@@ -46,7 +46,6 @@
 	margin-bottom: 20px;
 }
 
-/* Simple hover animations */
 .feature {
 	transition: transform 220ms cubic-bezier(.22,.9,.35,1), box-shadow 220ms ease;
 }
