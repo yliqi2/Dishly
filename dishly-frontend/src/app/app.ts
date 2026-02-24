@@ -6,9 +6,10 @@ import { Footer } from './Core/Layout/footer/footer';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [Header, Footer, RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css']
 })
 export class App {
   private router = inject(Router);

@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, signal, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, inject, NgModule } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthServices } from '../../../Pages/auth/Services/auth-services';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { LucideAngularModule } from 'lucide-angular';
 
 type AuthUser = {
   nombre?: string;
@@ -12,7 +13,7 @@ type AuthUser = {
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, RouterLinkActive, NgOptimizedImage],
+  imports: [RouterLink, RouterLinkActive, NgOptimizedImage, LucideAngularModule],
   templateUrl: './header.html',
   styleUrl: './header.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
