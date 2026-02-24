@@ -1,0 +1,115 @@
+
+.about-us {
+	padding: 56px 20px;
+}
+
+.about-inner {
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.about-title {
+	font-size: 40px;
+	margin: 0 0 12px 0;
+	color: var(--PrimaryText);
+	font-family: var(--font-display);
+	font-weight: var(--font-display-extrabold);
+}
+
+.about-underline {
+	width: 250px;
+	height: 4px;
+	background: var(--highlight);
+	margin-bottom: 40px;
+}
+
+.features {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 48px 48px;
+	align-items: start;
+}
+
+.feature {
+	text-align: center;
+	padding: 12px;
+}
+
+.feature-icon {
+	width: 88px;
+	height: 88px;
+	border-radius: 14px;
+	background: var(--highlight);
+	display: inline-grid;
+	place-items: center;
+	color: #fff;
+	margin-bottom: 20px;
+}
+
+/* Simple hover animations */
+.feature {
+	transition: transform 220ms cubic-bezier(.22,.9,.35,1), box-shadow 220ms ease;
+}
+
+.feature:hover {
+	transform: translateY(-8px);
+}
+
+.feature-icon {
+	transition: transform 260ms cubic-bezier(.22,.9,.35,1), box-shadow 260ms ease, background 200ms ease;
+}
+
+.feature:hover .feature-icon {
+	transform: translateY(-6px) scale(1.03);
+	box-shadow: 0 12px 30px rgba(19,22,36,0.08);
+}
+
+.feature-svg {
+	width: 44px;
+	height: 44px;
+	color: #fff;
+}
+
+/* Also target the rendered SVG inside the lucide-webcomponent to ensure size */
+.feature-icon lucide-icon svg {
+	width: 44px;
+	height: 44px;
+	display: block;
+}
+
+.feature-title {
+	transition: color 180ms ease, transform 180ms ease;
+}
+
+.feature:hover .feature-title {
+	color: var(--PrimaryText);
+	transform: translateY(-2px);
+}
+
+.feature-title {
+	font-size: 20px;
+	margin: 0 0 12px 0;
+	color: var(--PrimaryText);
+	font-weight: 700;
+}
+
+.feature-desc {
+	margin: 0 auto;
+	color: var(--SecondaryText);
+	max-width: 320px;
+	line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+	.features {
+		grid-template-columns: 1fr;
+		gap: 32px;
+	}
+	.about-title {
+		font-size: 32px;
+	}
+	.about-underline {
+		width: 200px;
+	}
+}
+

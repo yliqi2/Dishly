@@ -11,7 +11,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
-import { LucideAngularModule, ShoppingCart, Upload } from 'lucide-angular';
+import { Cpu, LucideAngularModule, ShieldCheck, ShoppingCart, TrendingUp, Upload } from 'lucide-angular';
 
 
 export const appConfig: ApplicationConfig = {
@@ -22,7 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     provideHttpClient(),
     importProvidersFrom(
-      LucideAngularModule.pick({ ShoppingCart, Upload })
+      LucideAngularModule.pick({ ShoppingCart, Upload, TrendingUp, Cpu, ShieldCheck })
     )
   ]
 };
