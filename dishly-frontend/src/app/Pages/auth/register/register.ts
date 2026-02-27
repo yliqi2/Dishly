@@ -81,7 +81,19 @@ export class Register {
         },
         error: (error) => {
           this.isLoading.set(false);
-          this.errorMessage.set(error.error?.message || 'Registration failed. Please try again.');
+          
+          // Check for specific error messages from the backend
+          if (error.error?.message) {
+            this.errorMessage.set(error.error.message);
+          } else if (error.status === 422 && error.error?.errors?.email) {
+            // Laravel validation error for duplicate email
+            this.errorMessage.set('This email address is already registered.');
+          } else if (error.status === 409) {
+            // Conflict error - duplicate email
+            this.errorMessage.set('This email address is already registered.');
+          } else {
+            this.errorMessage.set('Registration failed. Please try again.');
+          }
         }
       });
     }

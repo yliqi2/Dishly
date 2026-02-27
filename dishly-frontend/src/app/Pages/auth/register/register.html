@@ -146,6 +146,12 @@
 				}
 			</div>
 
+			@if (errorMessage()) {
+				<div class="error-message">
+					{{ errorMessage() }}
+				</div>
+			}
+
 			<div class="form-footer">
 				<label class="terms-accept">
 					<input type="checkbox" formControlName="acceptTerms" />
