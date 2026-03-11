@@ -66,7 +66,7 @@ class AuthController extends Controller
             Auth::guard('api')->logout();
 
             return response()->json([
-                'message' => 'This account has been deleted.'
+                'message' => 'Your email or password is incorrect. Please try again.'
             ], 401);
         }
 
@@ -113,27 +113,6 @@ class AuthController extends Controller
         ]);
     }
 
-    public function deactivateAccount(Request $request)
-    {
-        try {
-            /** @var User $user */
-            $user = $request->user();
-
-            $user->update([
-                'is_active' => false,
-                'email' => 'deleted_' . $user->id_usuario,
-            ]);
-
-            return response()->json([
-                'message' => 'Account deleted successfully',
-            ]);
-        } catch (Throwable $e) {
-            return response()->json([
-                'message' => 'Couldn\'t delete account',
-                'errors' => ['server' => [$e->getMessage()]],
-            ], 500);
-        }
-    }
 
     public function uploadIcon(Request $request)
     {

@@ -51,6 +51,7 @@ export class EditProfile {
   protected readonly isDeleting = signal(false);
   protected readonly showCurrentPassword = signal(false);
   protected readonly showNewPassword = signal(false);
+  protected readonly showConfirmPassword = signal(false);
 
   protected readonly personalForm: FormGroup;
   protected readonly passwordForm: FormGroup;
@@ -70,8 +71,9 @@ export class EditProfile {
     });
 
     this.passwordForm = this.fb.group({
-      currentPassword: [''],
-      newPassword: ['', [Validators.minLength(8)]]
+      currentPassword: ['', [Validators.required]],
+      newPassword: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', [Validators.required, Validators.minLength(8)]]
     });
   }
 
@@ -90,6 +92,7 @@ export class EditProfile {
     if (errors['email']) return 'Please enter a valid email.';
     if (errors['minlength']) return `Minimum ${errors['minlength'].requiredLength} characters.`;
     if (errors['maxlength']) return `Maximum ${errors['maxlength'].requiredLength} characters.`;
+    if (errors['mismatch']) return 'Passwords mismatch.';
     return null;
   }
 
@@ -125,14 +128,15 @@ export class EditProfile {
   protected savePassword(): void {
     this.passwordError.set('');
     this.passwordSuccess.set('');
-    const { currentPassword, newPassword } = this.passwordForm.getRawValue();
-    if (!newPassword?.trim()) {
-      this.passwordError.set('Enter a new password to update.');
+    const { currentPassword, newPassword, confirmPassword } = this.passwordForm.getRawValue();
+    if (this.passwordForm.invalid) {
+      this.passwordForm.markAllAsTouched();
+      this.passwordError.set('Please complete all password fields correctly.');
       return;
     }
-    if (newPassword.length < 8) {
-      this.passwordForm.get('newPassword')?.markAsTouched();
-      this.passwordError.set('New password must be at least 8 characters.');
+    if ((newPassword ?? '') !== (confirmPassword ?? '')) {
+      this.passwordForm.get('confirmPassword')?.setErrors({ mismatch: true });
+      this.passwordForm.get('confirmPassword')?.markAsTouched();
       return;
     }
     if (!currentPassword?.trim()) {
@@ -177,7 +181,7 @@ export class EditProfile {
       this.passwordError.set('');
       this.passwordSuccess.set('');
     }
-    this.passwordForm.reset({ currentPassword: '', newPassword: '' });
+    this.passwordForm.reset({ currentPassword: '', newPassword: '', confirmPassword: '' });
     this.passwordForm.markAsPristine();
     this.passwordForm.markAsUntouched();
   }
@@ -206,6 +210,10 @@ export class EditProfile {
 
   protected toggleNewPasswordVisibility(): void {
     this.showNewPassword.update((v) => !v);
+  }
+
+  protected toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword.update((v) => !v);
   }
 
   protected openIconPicker(): void {

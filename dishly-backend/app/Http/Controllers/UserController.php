@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -19,7 +20,13 @@ class UserController extends Controller
 
             $validated = $request->validate([
                 'name' => 'sometimes|string|max:255',
-                'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id_usuario . ',id_usuario',
+                'email' => [
+                    'sometimes',
+                    'string',
+                    'email',
+                    'max:255',
+                    Rule::unique('users', 'email')->ignore($user->id_usuario, 'id_usuario')->where('is_active', true),
+                ],
             ], [
                 'email.unique' => 'This email is already in use.',
                 'email.email' => 'Please provide a valid email address.',
@@ -93,6 +100,26 @@ class UserController extends Controller
         } catch (Throwable $e) {
             return response()->json([
                 'message' => 'Could not update password',
+                'errors' => ['server' => [$e->getMessage()]],
+            ], 500);
+        }
+    }
+
+    public function deactivateAccount(Request $request)
+    {
+        try {
+            /** @var User $user */
+            $user = Auth::guard('api')->user();
+
+            $user->update(['is_active' => false, 'email' => null]);
+            Auth::guard('api')->logout();
+
+            return response()->json([
+                'message' => 'Account deleted successfully.',
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Couldn\'t delete account',
                 'errors' => ['server' => [$e->getMessage()]],
             ], 500);
         }

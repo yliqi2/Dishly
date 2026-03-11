@@ -22,6 +22,12 @@
 	text-decoration: none;
 }
 
+.brand:focus-visible {
+	outline: 3px solid var(--highlight);
+	outline-offset: 4px;
+	border-radius: 10px;
+}
+
 .brand-icon-box {
 	width: 55px;
 	height: 55px;
@@ -97,6 +103,12 @@
 .menu-link:hover .menu-link__icon {
 	color: var(--highlight);
 	transform: translateY(-2px);
+}
+
+.menu-link:focus-visible {
+	outline: 3px solid var(--highlight);
+	outline-offset: 4px;
+	border-radius: 6px;
 }
 
 .actions {

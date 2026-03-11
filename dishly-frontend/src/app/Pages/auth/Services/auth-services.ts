@@ -178,7 +178,7 @@ export class AuthServices {
   }
 
   deactivateAccount(): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(`${this.apiUrl}/profile`).pipe(
+    return this.http.put<{ message: string }>(`${this.apiUrl}/profile/deactivateAccount`, {}).pipe(
       tap(() => {
         this.clearAuth();
       })

@@ -137,6 +137,12 @@
 	box-shadow: 0 0 0 3px var(--highlight-focus);
 }
 
+.input:focus-visible {
+	outline: 3px solid var(--highlight);
+	outline-offset: 4px;
+	border-radius: 10px;
+}
+
 .input::placeholder {
 	color: var(--gray-600);
 }
@@ -148,6 +154,26 @@
 .input-error:focus {
 	border-color: var(--danger-alt);
 	box-shadow: 0 0 0 3px var(--danger-focus);
+}
+
+.input-error:focus-visible {
+	outline: 3px solid var(--danger-alt);
+	outline-offset: 4px;
+	border-radius: 10px;
+}
+
+.back-link:focus-visible,
+.forgot-link:focus-visible,
+.register-link:focus-visible {
+	outline: 3px solid var(--highlight);
+	outline-offset: 4px;
+	border-radius: 6px;
+}
+
+.toggle-password:focus-visible {
+	outline: 3px solid var(--highlight);
+	outline-offset: 4px;
+	border-radius: 6px;
 }
 
 .password-wrapper {
@@ -199,13 +225,19 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	flex-wrap: wrap;
 	width: 100%;
 	margin-top: 4px;
 	gap: 12px;
 }
 
+.form-footer .remember-me {
+	min-width: 0;
+}
+
 .form-footer .forgot-link {
 	flex-shrink: 0;
+	text-align: right;
 }
 
 .remember-me {
@@ -373,6 +405,14 @@
 		font-size: 30px;
 	}
 
+	.form-footer {
+		gap: 10px;
+	}
+
+	.forgot-link {
+		font-size: 15px;
+	}
+
 	.help-button {
 		top: 24px;
 		right: 24px;
@@ -418,6 +458,16 @@
 		font-size: 16px;
 	}
 
+	.form-footer {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 10px;
+	}
+
+	.form-footer .forgot-link {
+		text-align: center;
+	}
+
 	.social-buttons {
 		grid-template-columns: 1fr;
 	}
@@ -456,6 +506,15 @@
 
 	.subtitle {
 		font-size: 16px;
+	}
+
+	.form-footer {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.form-footer .forgot-link {
+		text-align: center;
 	}
 
 	.input {

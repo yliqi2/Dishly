@@ -75,9 +75,9 @@
             <input id="edit-currentPassword" [type]="showCurrentPassword() ? 'text' : 'password'" formControlName="currentPassword" placeholder="Enter current password" />
             <button type="button" class="password-toggle" (click)="toggleCurrentPasswordVisibility()" [attr.aria-label]="showCurrentPassword() ? 'Hide password' : 'Show password'">
               @if (showCurrentPassword()) {
-                <lucide-icon name="eye-off" size="18" strokeWidth="2"></lucide-icon>
-              } @else {
                 <lucide-icon name="eye" size="18" strokeWidth="2"></lucide-icon>
+              } @else {
+                <lucide-icon name="eye-off" size="18" strokeWidth="2"></lucide-icon>
               }
             </button>
           </div>
@@ -88,14 +88,30 @@
             <input id="edit-newPassword" [type]="showNewPassword() ? 'text' : 'password'" formControlName="newPassword" placeholder="Enter new password" [attr.aria-describedby]="controlError('password', 'newPassword') ? 'new-password-error' : null" [attr.aria-invalid]="!!controlError('password', 'newPassword')" />
             <button type="button" class="password-toggle" (click)="toggleNewPasswordVisibility()" [attr.aria-label]="showNewPassword() ? 'Hide password' : 'Show password'">
               @if (showNewPassword()) {
-                <lucide-icon name="eye-off" size="18" strokeWidth="2"></lucide-icon>
-              } @else {
                 <lucide-icon name="eye" size="18" strokeWidth="2"></lucide-icon>
+              } @else {
+                <lucide-icon name="eye-off" size="18" strokeWidth="2"></lucide-icon>
               }
             </button>
           </div>
           @if (controlError('password', 'newPassword'); as err) {
             <p id="new-password-error" class="edit-error" role="status" aria-live="polite"><span class="error-prefix">Error:</span> {{ err }}</p>
+          }
+        </div>
+        <div class="edit-field">
+          <label for="edit-confirmPassword">Confirm Password</label>
+          <div class="password-wrap">
+            <input id="edit-confirmPassword" [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword" placeholder="Confirm new password" [attr.aria-describedby]="controlError('password', 'confirmPassword') ? 'confirm-password-error' : null" [attr.aria-invalid]="!!controlError('password', 'confirmPassword')" />
+            <button type="button" class="password-toggle" (click)="toggleConfirmPasswordVisibility()" [attr.aria-label]="showConfirmPassword() ? 'Hide confirm password' : 'Show confirm password'">
+              @if (showConfirmPassword()) {
+                <lucide-icon name="eye" size="18" strokeWidth="2"></lucide-icon>
+              } @else {
+                <lucide-icon name="eye-off" size="18" strokeWidth="2"></lucide-icon>
+              }
+            </button>
+          </div>
+          @if (controlError('password', 'confirmPassword'); as err) {
+            <p id="confirm-password-error" class="edit-error" role="status" aria-live="polite"><span class="error-prefix">Error:</span> {{ err }}</p>
           }
         </div>
         @if (passwordError()) {
@@ -119,23 +135,23 @@
 
     <section class="edit-section edit-section-danger">
       <h2 class="edit-section-title">Danger Zone</h2>
-      <p class="edit-section-desc">Permanent actions cannot be undone.</p>
-      <div class="danger-block">
+      <p class="edit-section-desc">Actions here are permanent and cannot be undone.</p>
+      <section class="danger-card" aria-labelledby="danger-title">
         <div>
-          <h3 class="danger-title">Delete Account</h3>
+          <h3 id="danger-title" class="danger-title">Delete your Account</h3>
           <p class="danger-desc">Permanently delete your profile and all data.</p>
           @if (deleteError()) {
-            <p class="edit-error" role="status" aria-live="polite"><span class="error-prefix">Error:</span> {{ deleteError() }}</p>
+            <p id="delete-error" class="danger-error" role="status" aria-live="polite">{{ deleteError() }}</p>
           }
         </div>
-        <button type="button" class="btn-danger btn-sm" [disabled]="isDeleting()" (click)="deleteAccount()" [attr.aria-busy]="isDeleting()">
+        <button type="button" class="btn-danger btn-sm" [disabled]="isDeleting()" (click)="deleteAccount()" [attr.aria-describedby]="deleteError() ? 'delete-error' : null" [attr.aria-busy]="isDeleting()">
           @if (isDeleting()) {
             <span class="btn-loading-icon" aria-hidden="true"></span>
           } @else {
             Delete Account
           }
         </button>
-      </div>
+      </section>
     </section>
   </div>
 </main>

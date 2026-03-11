@@ -148,3 +148,20 @@ body {
 	overflow-x: hidden;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+	outline: 3px solid var(--highlight);
+	outline-offset: 4px;
+	border-radius: 6px;
+}
+
+.btn-danger:focus-visible {
+	outline: 3px solid var(--danger-alt);
+	outline-offset: 4px;
+	border-radius: 10px;
+}
+

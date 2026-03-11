@@ -19,6 +19,6 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/profile', [AuthController::class, 'updateProfile']);
     Route::put('/profile/personalinfo', [UserController::class, 'updatePersonalInfo']);
     Route::put('/profile/updatePassword', [UserController::class, 'updatePassword']);
-    Route::delete('/profile', [AuthController::class, 'deactivateAccount']);
+    Route::put('/profile/deactivateAccount', [UserController::class, 'deactivateAccount']);
     Route::post('/profile/upload-icon', [AuthController::class, 'uploadIcon']);
 });
