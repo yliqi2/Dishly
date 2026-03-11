@@ -1,11 +1,12 @@
 
 .about-us {
-	padding: 56px 20px;
+	padding: 56px 0;
 }
 
 .about-inner {
 	max-width: 1200px;
 	margin: 0 auto;
+	padding: 0 20px;
 }
 
 .about-title {

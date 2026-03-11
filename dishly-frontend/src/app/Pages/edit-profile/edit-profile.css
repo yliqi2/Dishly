@@ -1,24 +1,13 @@
 .edit-profile-main {
   min-height: 100vh;
   background: var(--secondaryBackground);
-  padding: 32px 0 48px;
+  padding: 0 0 48px;
   box-sizing: border-box;
 }
 
 .edit-profile-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
   width: 100%;
   box-sizing: border-box;
-}
-
-.edit-profile-title {
-  font-family: var(--font-display);
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--PrimaryText);
-  margin: 0 0 28px;
 }
 
 .edit-section {
@@ -289,7 +278,7 @@
 
 @media (max-width: 520px) {
   .edit-profile-main {
-    padding: 16px 12px 32px;
+    padding: 0 0 32px;
   }
 
   .edit-section {

@@ -5,7 +5,7 @@
   place-items: center;
   background: var(--AuthGradient);
   font-family: var(--font-sans);
-  padding: 24px;
+  padding: 24px 16px;
 }
 .card {
   background: var(--background);

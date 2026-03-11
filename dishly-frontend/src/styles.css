@@ -165,3 +165,45 @@ textarea:focus-visible,
 	border-radius: 10px;
 }
 
+.page-container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.page-header {
+	padding: 32px 20px 8px;
+}
+
+.page-header__inner {
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.page-title {
+	font-size: 40px;
+	margin: 0 0 12px 0;
+	color: var(--PrimaryText);
+	font-family: var(--font-display);
+	font-weight: var(--font-display-extrabold);
+}
+
+.page-underline {
+	width: 220px;
+	height: 4px;
+	background: var(--highlight);
+	margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+	.page-header {
+		padding: 24px 16px 4px;
+	}
+
+	.page-container {
+		padding: 0 16px;
+	}
+}
+
