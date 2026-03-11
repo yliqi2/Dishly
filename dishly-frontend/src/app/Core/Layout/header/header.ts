@@ -9,6 +9,9 @@ type AuthUser = {
   nombre?: string;
   name?: string;
   email?: string;
+  icon_path?: string | null;
+  updated_at?: string;
+  chef?: boolean;
 };
 
 @Component({
@@ -23,12 +26,19 @@ export class Header {
 
   protected readonly menuOpen = signal(false);
   protected readonly mobileMenuOpen = signal(false);
+  protected readonly isLoggingOut = signal(false);
 
   private readonly user = toSignal<AuthUser | null>(this.authService.user$, { initialValue: null });
 
   protected readonly isAuthenticated = computed(() => !!this.user());
   protected readonly displayName = computed(() => this.user()?.nombre || this.user()?.name || 'User');
+  protected readonly chef = computed(() => this.user()?.chef ?? false);
   protected readonly userInitial = computed(() => this.displayName().charAt(0).toUpperCase());
+  protected readonly iconUrl = computed(() => {
+    const u = this.user() ?? (this.authService.getUser() as AuthUser | null);
+    if (!u?.icon_path) return null;
+    return this.authService.getAssetUrl(u.icon_path, u.updated_at);
+  });
 
   protected readonly navItems = [
     { label: 'Home', route: '/' },
@@ -54,6 +64,7 @@ export class Header {
   }
 
   protected logout(): void {
+    this.isLoggingOut.set(true);
     this.closeMenu();
     this.closeMobileMenu();
     this.authService.logout();

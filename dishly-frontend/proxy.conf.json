@@ -4,5 +4,11 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
+  },
+  "/users": {
+    "target": "http://backend",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }

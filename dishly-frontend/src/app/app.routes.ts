@@ -9,6 +9,7 @@ import { Forum } from './Pages/forum/forum';
 import { Cart } from './Pages/cart/cart';
 import { AuthGuard } from './Guards/auth.guard';
 import { Profile } from './Pages/profile/profile';
+import { EditProfile } from './Pages/edit-profile/edit-profile';
 import { NotFound } from './Pages/not-found/not-found';
 
 export const routes: Routes = [
@@ -48,8 +49,17 @@ export const routes: Routes = [
     },
     {
         path: 'profile',
-        component: Profile,
-        canActivate: [AuthGuard]
+        canActivate: [AuthGuard],
+        children: [
+            {
+                path: '',
+                component: Profile
+            },
+            {
+                path: 'edit',
+                component: EditProfile
+            }
+        ]
     },
     {
         path: '**',
