@@ -1,0 +1,17 @@
+.app-shell {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.app-main {
+	max-width: var(--layout-max-width);
+	margin: 0 auto;
+	padding: 0 var(--layout-gutter);
+	width: 100%;
+	box-sizing: border-box;
+}
+
+app-footer {
+	margin-top: auto;
+}

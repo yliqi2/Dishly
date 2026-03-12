@@ -1,0 +1,31 @@
+<div class="profile-card">
+  <div class="profile-hero">
+    <div class="profile-avatar" aria-hidden="true">
+      @if (iconUrl() && !iconLoadError(); as url) {
+        <img [src]="url" alt="Profile icon" (error)="iconLoadError.set(true)" />
+      } @else {
+        <span class="profile-avatar-initial">{{ displayName().charAt(0).toUpperCase() }}</span>
+      }
+    </div>
+    <div class="profile-hero-info">
+      <h3 class="profile-username">
+        {{ displayName() }}
+        @if (chef()) {
+          <lucide-icon name="chef-hat" class="profile-chef-hat" size="18" strokeWidth="2"></lucide-icon>
+        } @else {
+          <lucide-icon name="check-circle" class="profile-check" size="18" strokeWidth="2"></lucide-icon>
+        }
+      </h3>
+      <p class="profile-meta">{{ memberSince() }}</p>
+    </div>
+    <a routerLink="/profile/edit" class="btn-primary btn-sm">Edit profile</a>
+  </div>
+
+  <div class="profile-email-block">
+    <lucide-icon name="mail" class="profile-email-icon" size="20" strokeWidth="2"></lucide-icon>
+    <div>
+      <span class="profile-email-label">Email</span>
+      <p class="profile-email-value">{{ email() }}</p>
+    </div>
+  </div>
+</div>
