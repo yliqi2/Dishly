@@ -128,7 +128,6 @@ a.btn-sm {
 	border-radius: 50%;
 	animation: btn-spin 0.7s linear infinite;
 	vertical-align: middle;
-	margin-right: 8px;
 }
 @keyframes btn-spin {
 	to { transform: rotate(360deg); }
