@@ -1,11 +1,12 @@
 
 .about-us {
-	padding: 56px 20px;
+	padding: 56px 0;
 }
 
 .about-inner {
-	max-width: 1200px;
+	max-width: var(--layout-max-width);
 	margin: 0 auto;
+	padding: 0;
 }
 
 .about-title {
@@ -42,7 +43,7 @@
 	background: var(--highlight);
 	display: inline-grid;
 	place-items: center;
-	color: #fff;
+	color: var(--on-highlight);
 	margin-bottom: 20px;
 }
 
@@ -60,13 +61,13 @@
 
 .feature:hover .feature-icon {
 	transform: translateY(-6px) scale(1.03);
-	box-shadow: 0 12px 30px rgba(19,22,36,0.08);
+	box-shadow: 0 12px 30px var(--shadow-dark-md);
 }
 
 .feature-svg {
 	width: 44px;
 	height: 44px;
-	color: #fff;
+	color: var(--on-highlight);
 }
 
 /* Also target the rendered SVG inside the lucide-webcomponent to ensure size */

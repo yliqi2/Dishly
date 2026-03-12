@@ -6,7 +6,6 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
@@ -15,28 +14,38 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        $now = now();
 
         DB::table('users')->insert([
             [
-                'nombre' => 'Pau Guiu',
+                'nombre' => 'Pau',
                 'email' => 'pau@gmail.com',
                 'password' => Hash::make('12345678'),
                 'chef' => false,
                 'rol' => 'cliente',
+                'icon_path' => null,
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
             [
-                'nombre' => 'Liqi Y',
+                'nombre' => 'Liqi',
                 'email' => 'liqi@gmail.com',
                 'password' => Hash::make('12345678'),
                 'chef' => false,
-                'rol' => 'cliente',
+                'rol' => 'admin',
+                'icon_path' => 'users/icons/2.png',
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
             [
-                'nombre' => 'Marc B',
+                'nombre' => 'Marc',
                 'email' => 'marc@gmail.com',
                 'password' => Hash::make('12345678'),
-                'chef' => false,
-                'rol' => 'cliente',
+                'chef' => true,
+                'rol' => 'admin',
+                'icon_path' => 'users/icons/3.png',
+                'created_at' => $now,
+                'updated_at' => $now,
             ],
         ]);
     }

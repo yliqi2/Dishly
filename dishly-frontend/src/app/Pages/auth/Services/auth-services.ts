@@ -1,5 +1,5 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { Observable, tap, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
@@ -57,7 +57,7 @@ export class AuthServices {
     );
   }
 
-  login(credentials: LoginPayload): Observable<AuthResponse> {
+  login(credentials: LoginPayload, rememberMe: boolean = false): Observable<AuthResponse> {
     return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
       tap((response: AuthResponse) => {
         if (response.access_token) {
@@ -66,16 +66,37 @@ export class AuthServices {
             this.setItem('user', JSON.stringify(response.user));
             this.userSubject.next(response.user);
           }
+          if (rememberMe) {
+            this.setRememberedCredentials(credentials.email ?? '', credentials.password ?? '');
+          } else {
+            this.clearRememberedCredentials();
+          }
         }
       })
     );
   }
 
-  logout(): void {
-    const token = this.getItem('token');
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  getRememberedCredentials(): { email: string; password: string } | null {
+    const raw = this.getItem('rememberedCredentials');
+    if (!raw) return null;
+    try {
+      const data = JSON.parse(raw) as { email: string; password: string };
+      return data?.email != null && data?.password != null ? data : null;
+    } catch {
+      return null;
+    }
+  }
 
-    this.http.post(`${this.apiUrl}/logout`, {}, { headers }).subscribe({
+  setRememberedCredentials(email: string, password: string): void {
+    this.setItem('rememberedCredentials', JSON.stringify({ email, password }));
+  }
+
+  clearRememberedCredentials(): void {
+    this.removeItem('rememberedCredentials');
+  }
+
+  logout(): void {
+    this.http.post(`${this.apiUrl}/logout`, {}).subscribe({
       next: () => {
         this.clearAuth();
       },
@@ -85,11 +106,15 @@ export class AuthServices {
     });
   }
 
-  private clearAuth() {
+  private clearAuth(): void {
     this.removeItem('token');
     this.removeItem('user');
     this.userSubject.next(null);
     this.router.navigate(['/login']);
+  }
+
+  clearSessionAndRedirect(): void {
+    this.clearAuth();
   }
 
   getToken(): string | null {
@@ -106,9 +131,7 @@ export class AuthServices {
   }
 
   updateProfile(data: UpdateProfilePayload): Observable<AuthResponse> {
-    const token = this.getToken();
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.put(`${this.apiUrl}/profile`, data, { headers }).pipe(
+    return this.http.put<AuthResponse>(`${this.apiUrl}/profile`, data).pipe(
       tap((response: AuthResponse) => {
         if (response.user) {
           this.setItem('user', JSON.stringify(response.user));
@@ -117,12 +140,56 @@ export class AuthServices {
       })
     );
   }
+
+  updatePersonalInfo(data: { name: string; email: string }): Observable<AuthResponse> {
+    return this.http.put<AuthResponse>(`${this.apiUrl}/profile/personalinfo`, data).pipe(
+      tap((response: AuthResponse) => {
+        if (response.user) {
+          this.setItem('user', JSON.stringify(response.user));
+          this.userSubject.next(response.user);
+        }
+      })
+    );
+  }
+
+  updatePassword(data: { current_password: string; new_password: string }): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(`${this.apiUrl}/profile/updatePassword`, data);
+  }
+
+  getAssetUrl(path: string, cacheBust?: string): string {
+    const p = path.startsWith('/') ? path.slice(1) : path;
+    const url = `/${p}`;
+    return cacheBust ? `${url}?v=${encodeURIComponent(cacheBust)}` : url;
+  }
+
+  uploadIcon(file: File): Observable<AuthResponse> {
+    const formData = new FormData();
+    const ext = (file.name.split('.').pop()?.toLowerCase() ?? 'png').replace(/[^a-z0-9]/g, '') || 'png';
+    formData.append('icon', file, `icon.${ext}`);
+    return this.http.post<AuthResponse>(`${this.apiUrl}/profile/upload-icon`, formData).pipe(
+      tap((response: AuthResponse) => {
+        if (response.user) {
+          const user = { ...response.user, updated_at: new Date().toISOString() };
+          this.setItem('user', JSON.stringify(user));
+          this.userSubject.next(user);
+        }
+      })
+    );
+  }
+
+  deactivateAccount(): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(`${this.apiUrl}/profile/deactivateAccount`, {}).pipe(
+      tap(() => {
+        this.clearAuth();
+      })
+    );
+  }
 }
 
 type User = Record<string, unknown>;
 type RegisterPayload = Record<string, unknown>;
-type LoginPayload = Record<string, unknown>;
-type UpdateProfilePayload = Record<string, unknown>;
+type LoginPayload = { email?: string; password?: string };
+type UpdateProfilePayload = { name?: string; email?: string; password?: string; current_password?: string };
 
 type AuthResponse = {
   access_token?: string;

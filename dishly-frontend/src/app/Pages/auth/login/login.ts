@@ -20,9 +20,9 @@ export class Login {
   errorMessage = signal<string | null>(null);
   
   loginForm: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required]],
-    rememberMe: [false]
+    email: [(this.authService.getRememberedCredentials()?.email ?? ''), [Validators.required, Validators.email]],
+    password: [(this.authService.getRememberedCredentials()?.password ?? ''), [Validators.required]],
+    rememberMe: [!!this.authService.getRememberedCredentials()]
   });
 
   get email() {
@@ -33,30 +33,50 @@ export class Login {
     return this.loginForm.get('password');
   }
 
+  isFieldInvalid(fieldName: string): boolean {
+    const control = this.loginForm.get(fieldName);
+    return !!(control && control.invalid && control.touched);
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const control = this.loginForm.get(fieldName);
+    if (!control || !control.errors || !control.touched) return '';
+
+    const errors = control.errors;
+    if (errors['required']) return 'This field is required';
+    if (errors['email']) return 'Please enter a valid email address';
+    if (errors['minlength']) return `Minimum ${errors['minlength'].requiredLength} characters`;
+    return 'Unknown error';
+  }
+
   togglePassword() {
     this.showPassword.update(value => !value);
   }
 
   onSubmit() {
-    if (this.loginForm.valid) {
-      this.isLoading.set(true);
-      this.errorMessage.set(null);
-
-      const credentials = {
-        email: this.loginForm.get('email')?.value,
-        password: this.loginForm.get('password')?.value
-      };
-
-      this.authService.login(credentials).subscribe({
-        next: (response) => {
-          this.isLoading.set(false);
-          this.router.navigate(['/']);
-        },
-        error: (error) => {
-          this.isLoading.set(false);
-          this.errorMessage.set(error.error?.message || 'Login failed. Please try again.');
-        }
-      });
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
     }
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+
+    const credentials = {
+      email: this.loginForm.get('email')?.value,
+      password: this.loginForm.get('password')?.value
+    };
+    const rememberMe = this.loginForm.get('rememberMe')?.value ?? false;
+
+    this.authService.login(credentials, rememberMe).subscribe({
+      next: (response) => {
+        this.isLoading.set(false);
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        const msg = (Object.values(err?.error?.errors ?? {}) as string[][]).flat()[0];
+        this.errorMessage.set(msg ?? err?.error?.message ?? 'Login failed. Please try again.');
+      }
+    });
   }
 }

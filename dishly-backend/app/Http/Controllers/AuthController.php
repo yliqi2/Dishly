@@ -6,7 +6,10 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Throwable;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -14,7 +17,13 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:10',
-            'email' => 'required|string|email|max:255|unique:users',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->where('is_active', true),
+            ],
             'password' => 'required|string|min:8',
         ]);
 
@@ -28,7 +37,7 @@ class AuthController extends Controller
             'chef' => false,
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = JWTAuth::fromUser($user);
 
         return response()->json([
             'access_token' => $token,
@@ -39,15 +48,27 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        $credentials = $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+
+        if (!$token = Auth::guard('api')->attempt($credentials)) {
             return response()->json([
                 'message' => 'Your email or password is incorrect. Please try again.'
             ], 401);
         }
 
-        $user = User::where('email', $request['email'])->firstOrFail();
+        /** @var User $user */
+        $user = Auth::guard('api')->user();
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        if (!$user->is_active) {
+            Auth::guard('api')->logout();
+
+            return response()->json([
+                'message' => 'Your email or password is incorrect. Please try again.'
+            ], 401);
+        }
 
         return response()->json([
             'access_token' => $token,
@@ -58,7 +79,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::guard('api')->logout();
 
         return response()->json([
             'message' => 'Logged out successfully'
@@ -90,5 +111,53 @@ class AuthController extends Controller
             'message' => 'Profile updated successfully',
             'user' => $user
         ]);
+    }
+
+
+    public function uploadIcon(Request $request)
+    {
+        try {
+            /** @var User $user */
+            $user = $request->user();
+
+            $request->validate([
+                'icon' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            ], [
+                'icon.required' => 'Icon image is required.',
+                'icon.image' => 'File must be an image.',
+                'icon.mimes' => 'Icon must be jpeg, png, jpg, gif, or webp.',
+                'icon.max' => 'Icon must be less than 10MB.',
+            ]);
+
+            $file = $request->file('icon');
+            $ext = $file->getClientOriginalExtension();
+            $filename = $user->id_usuario . '.' . $ext;
+            $publicPath = public_path('users/icons');
+
+            if (!file_exists($publicPath)) {
+                mkdir($publicPath, 0755, true);
+            }
+
+            $oldPath = $user->icon_path ? public_path(ltrim($user->icon_path, '/')) : null;
+            if ($oldPath && file_exists($oldPath)) {
+                unlink($oldPath);
+            }
+
+            $file->move($publicPath, $filename);
+            $user->icon_path = 'users/icons/' . $filename;
+            $user->save();
+
+            return response()->json([
+                'message' => 'Icon uploaded successfully.',
+                'user' => $user->fresh(),
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $e->errors()], 422);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Couldn\'t upload icon',
+                'errors' => ['icon' => [$e->getMessage()]],
+            ], 500);
+        }
     }
 }
