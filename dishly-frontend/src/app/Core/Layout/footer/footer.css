@@ -6,16 +6,16 @@
 }
 
 .footer__container {
-	max-width: 1200px;
+	max-width: var(--layout-max-width);
 	margin: 0 auto;
-	padding: 0;
+	padding: 0 var(--layout-gutter);
 }
 
 .footer__grid {
 	display: grid;
 	grid-template-columns: 2fr 1fr 1fr 1fr;
 	gap: 48px;
-	margin: 0 20px 48px;
+	margin: 0 0 48px 0;
 }
 
 .footer__brand {
@@ -78,7 +78,7 @@
 	justify-content: space-between;
 	align-items: center;
 	padding-top: 32px;
-	margin: 0 20px;
+	margin: 0;
 	border-top: 1px solid #333;
 }
 
@@ -119,7 +119,7 @@
 	.footer__grid {
 		grid-template-columns: 1fr 1fr;
 		gap: 32px;
-		margin: 0 16px 32px;
+		margin: 0 0 32px 0;
 		justify-items: center;
 	}
 
@@ -133,7 +133,7 @@
 		flex-direction: column;
 		gap: 20px;
 		padding-top: 24px;
-		margin: 0 16px;
+		margin: 0;
 	}
 
 	.footer__copyright {

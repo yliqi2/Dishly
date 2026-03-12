@@ -1,6 +1,6 @@
 .edit-profile-main {
   min-height: 100vh;
-  background: var(--secondaryBackground);
+  background: var(--background);
   padding: 0 0 48px;
   box-sizing: border-box;
 }

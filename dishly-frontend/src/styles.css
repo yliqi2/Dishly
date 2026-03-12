@@ -54,6 +54,9 @@
 
 	/* Gradients */
 	--AuthGradient: linear-gradient(90deg, #FFEEE0 40%, #FFFFFF 100%);
+
+	--layout-max-width: 1400px;
+	--layout-gutter: 24px;
 }
 
 /* Botones estilo Xuxemons: solo clases propias con nombres tipo Bootstrap, sin framework Bootstrap */
@@ -166,20 +169,20 @@ textarea:focus-visible,
 }
 
 .page-container {
-	max-width: 1200px;
-	margin: 0 auto;
-	padding: 0 20px;
+	max-width: 100%;
+	margin: 0;
+	padding: 0;
 	width: 100%;
 	box-sizing: border-box;
 }
 
 .page-header {
-	padding: 32px 20px 8px;
+	padding: 32px 0 8px;
 }
 
 .page-header__inner {
-	max-width: 1200px;
-	margin: 0 auto;
+	max-width: 100%;
+	margin: 0;
 }
 
 .page-title {
@@ -198,12 +201,12 @@ textarea:focus-visible,
 }
 
 @media (max-width: 768px) {
-	.page-header {
-		padding: 24px 16px 4px;
+	:root {
+		--layout-gutter: 16px;
 	}
 
-	.page-container {
-		padding: 0 16px;
+	.page-header {
+		padding: 24px 0 4px;
 	}
 }
 

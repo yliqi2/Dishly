@@ -4,9 +4,9 @@
 }
 
 .about-inner {
-	max-width: 1200px;
+	max-width: var(--layout-max-width);
 	margin: 0 auto;
-	padding: 0 20px;
+	padding: 0;
 }
 
 .about-title {

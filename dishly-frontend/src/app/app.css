@@ -5,7 +5,11 @@
 }
 
 .app-main {
-	flex: 1 0 auto;
+	max-width: var(--layout-max-width);
+	margin: 0 auto;
+	padding: 0 var(--layout-gutter);
+	width: 100%;
+	box-sizing: border-box;
 }
 
 app-footer {
