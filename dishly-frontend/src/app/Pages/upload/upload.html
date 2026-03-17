@@ -1,9 +1,182 @@
-<section class="page-header page-container">
+<section class="page-header page-container gradient-bg">
   <div class="page-header__inner">
-    <h1 class="page-title">Upload Recipe</h1>
+    <h1 class="page-title">Upload your Recipe</h1>
     <div class="page-underline" aria-hidden="true"></div>
   </div>
 </section>
 
 <section class="page-container">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-4">
+    <article class="upload-card p-4 p-md-5">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="upload-title m-0"><i class="bi bi-image me-2"></i>Recipe Photos</h2>
+        <span class="badge rounded-pill count-badge">{{ photoCount }}/{{ maxPhotos }}</span>
+      </div>
+
+      <input
+        id="uploadPhotos"
+        class="d-none"
+        type="file"
+        multiple
+        accept="image/*"
+        (change)="onPhotosSelected($event)"
+      />
+
+      <p class="text-secondary mb-0 mt-1">Click any slot to upload photos. Choose which one will be the cover.</p>
+      @if (photosError$ | async) {
+        <p class="text-danger small mb-0 mt-1"><i class="bi bi-exclamation-circle me-1"></i>You must upload at least one photo.</p>
+      }
+
+      @if (vm$ | async; as vm) {
+        <div class="row g-2 mt-3">
+          <div class="col-12 col-md-7">
+            @if (vm.photos.length > 0) {
+              <div class="preview-item bento-cover">
+                <img [src]="vm.photos[vm.coverIndex].url" alt="Portada" class="w-100 h-100 object-fit-cover" />
+                <button type="button" class="btn btn-sm btn-light preview-remove" (click)="removePhoto(vm.coverIndex)">
+                  <i class="bi bi-x"></i>
+                </button>
+                <span class="cover-label"><i class="bi bi-star-fill me-1"></i>Cover</span>
+              </div>
+            } @else {
+              <label for="uploadPhotos" class="bento-cover bento-placeholder bento-placeholder--cover">
+                <i class="bi bi-upload"></i>
+                <span class="mt-2 small fw-semibold">Cover</span>
+              </label>
+            }
+          </div>
+
+          <div class="col-12 col-md-5">
+            <div class="bento-thumbs">
+                @for (item of vm.nonCoverItems; track item.photo.url) {
+                <div class="preview-item">
+                  <img [src]="item.photo.url" alt="Foto de receta" class="w-100 h-100 object-fit-cover" />
+                  <button type="button" class="btn btn-sm btn-light preview-remove" (click)="removePhoto(item.originalIndex)">
+                    <i class="bi bi-x"></i>
+                  </button>
+                  <button type="button" class="btn btn-sm cover-btn" (click)="selectCover(item.originalIndex)">
+                    Set as cover
+                  </button>
+                </div>
+              }
+                @for (p of vm.placeholders; track $index) {
+                <label for="uploadPhotos" class="bento-placeholder">
+                  <i class="bi bi-upload"></i>
+                </label>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </article>
+
+    <article class="upload-card p-4 p-md-5">
+      <h2 class="upload-title mb-4"><i class="bi bi-stars me-2"></i>Basic Information</h2>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold" for="titulo">Recipe Title *</label>
+        <input id="titulo" class="form-control input-soft" formControlName="titulo" placeholder="E.g.: Traditional Carbonara Pasta" />
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-semibold" for="descripcion">Description *</label>
+        <textarea
+          id="descripcion"
+          class="form-control input-soft"
+          rows="4"
+          formControlName="descripcion"
+          placeholder="Describe your recipe... What makes it special?"
+        ></textarea>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold" for="tiempoPreparacion">Prep Time *</label>
+          <input id="tiempoPreparacion" type="number" class="form-control input-soft" formControlName="tiempo_preparacion" min="1" />
+        </div>
+
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold" for="unidadTiempo">Time Unit *</label>
+          <select id="unidadTiempo" class="form-select input-soft" formControlName="tiempo_preparacion_unidad">
+            <option value="minutes">Minutes</option>
+            <option value="hours">Hours</option>
+          </select>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold" for="porciones">Servings *</label>
+          <input id="porciones" type="number" class="form-control input-soft" formControlName="porciones" min="1" />
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label fw-semibold">Difficulty Level *</label>
+        <div class="row g-2">
+          <div class="col-12 col-md-4">
+            <button type="button" class="btn btn-difficulty w-100" [class.is-active]="(selectedDifficulty$ | async) === 'easy'" (click)="setDifficulty('easy')">
+              <i class="bi bi-award"></i>
+              <span>Easy</span>
+            </button>
+          </div>
+          <div class="col-12 col-md-4">
+            <button type="button" class="btn btn-difficulty w-100" [class.is-active]="(selectedDifficulty$ | async) === 'medium'" (click)="setDifficulty('medium')">
+              <i class="bi bi-award"></i>
+              <span>Medium</span>
+            </button>
+          </div>
+          <div class="col-12 col-md-4">
+            <button type="button" class="btn btn-difficulty w-100" [class.is-active]="(selectedDifficulty$ | async) === 'hard'" (click)="setDifficulty('hard')">
+              <i class="bi bi-award"></i>
+              <span>Hard</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="upload-card p-4 p-md-5">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="upload-title m-0"><i class="bi bi-tools me-2"></i>Ingredients</h2>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="addIngredient()">
+          <i class="bi bi-plus-lg me-1"></i>Add
+        </button>
+      </div>
+
+      <div formArrayName="ingredientes" class="d-flex flex-column gap-3">
+        @for (ingredient of ingredientes.controls; track ingredient; let i = $index) {
+          <div class="row g-2 align-items-center" [formGroupName]="i">
+            <div class="col-12 col-md-1">
+              <span class="ingredient-badge">{{ i + 1 }}</span>
+            </div>
+            <div class="col-12 col-md-3">
+              <input class="form-control input-soft" formControlName="cantidad" placeholder="Amount" />
+            </div>
+            <div class="col-12 col-md-7">
+              <input class="form-control input-soft" formControlName="nombre" placeholder="Ingredient name" />
+            </div>
+            <div class="col-12 col-md-1 text-md-end">
+              <button type="button" class="btn btn-link text-secondary" (click)="removeIngredient(i)">−</button>
+            </div>
+          </div>
+        }
+      </div>
+    </article>
+
+    <article class="upload-card p-4 p-md-5">
+      <h2 class="upload-title mb-3"><i class="bi bi-clipboard-check me-2"></i>Preparation Instructions *</h2>
+      <textarea
+        class="form-control input-soft"
+        rows="7"
+        formControlName="instrucciones"
+        placeholder="Describe step by step how to prepare your recipe..."
+      ></textarea>
+    </article>
+
+    <div class="d-flex justify-content-end gap-2 pb-3">
+      <button type="button" class="btn btn-outline-secondary px-4">Cancel</button>
+      <button type="submit" class="btn btn-publish px-4" [disabled]="submitting$ | async">
+        <i class="bi bi-send me-1"></i>Publish Recipe
+      </button>
+    </div>
+  </form>
 </section>
