@@ -1,6 +1,6 @@
 
 .about-us {
-	padding: 56px 0;
+	padding: var(--layout-gutter) 0;
 }
 
 .about-inner {
@@ -21,7 +21,7 @@
 	width: 250px;
 	height: 4px;
 	background: var(--highlight);
-	margin-bottom: 40px;
+	margin: 0 0 var(--layout-gutter) 0;
 }
 
 .features {
