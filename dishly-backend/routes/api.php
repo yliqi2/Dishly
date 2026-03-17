@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\UserController;
 
 Route::get('/user', function (Request $request) {
@@ -21,4 +22,5 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/profile/updatePassword', [UserController::class, 'updatePassword']);
     Route::put('/profile/deactivateAccount', [UserController::class, 'deactivateAccount']);
     Route::post('/profile/upload-icon', [AuthController::class, 'uploadIcon']);
+    Route::post('/recetas/upload', [RecetaController::class, 'store']);
 });

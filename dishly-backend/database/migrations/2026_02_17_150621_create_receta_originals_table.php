@@ -16,9 +16,17 @@ return new class extends Migration
             $table->string('titulo');
             $table->text('descripcion');
             $table->integer('tiempo_preparacion');
+            $table->enum('tiempo_preparacion_unidad', ['minutes', 'hours'])->default('minutes');
+            $table->enum('dificultad', ['easy', 'medium', 'hard'])->default('easy');
+            $table->unsignedSmallInteger('porciones')->default(1);
+            $table->string('imagen_1')->nullable();
+            $table->string('imagen_2')->nullable();
+            $table->string('imagen_3')->nullable();
+            $table->string('imagen_4')->nullable();
+            $table->string('imagen_5')->nullable();
             $table->date('fecha_creacion');
             $table->unsignedInteger('id_autor');
-
+            
             $table->foreign('id_autor')->references('id_usuario')->on('users');
         });
     }
