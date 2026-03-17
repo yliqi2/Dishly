@@ -113,21 +113,30 @@
         <label class="form-label fw-semibold">Difficulty Level *</label>
         <div class="row g-2">
           <div class="col-12 col-md-4">
-            <button type="button" class="btn btn-difficulty w-100" [class.is-active]="(selectedDifficulty$ | async) === 'easy'" (click)="setDifficulty('easy')">
-              <i class="bi bi-award"></i>
-              <span>Easy</span>
+            <button type="button" class="btn btn-difficulty btn-difficulty--easy w-100" [class.is-active]="(selectedDifficulty$ | async) === 'easy'" (click)="setDifficulty('easy')">
+              <div class="difficulty-hats" aria-hidden="true">
+                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+              </div>
+              <span class="difficulty-pill">Easy</span>
             </button>
           </div>
           <div class="col-12 col-md-4">
-            <button type="button" class="btn btn-difficulty w-100" [class.is-active]="(selectedDifficulty$ | async) === 'medium'" (click)="setDifficulty('medium')">
-              <i class="bi bi-award"></i>
-              <span>Medium</span>
+            <button type="button" class="btn btn-difficulty btn-difficulty--medium w-100" [class.is-active]="(selectedDifficulty$ | async) === 'medium'" (click)="setDifficulty('medium')">
+              <div class="difficulty-hats" aria-hidden="true">
+                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+              </div>
+              <span class="difficulty-pill">Medium</span>
             </button>
           </div>
           <div class="col-12 col-md-4">
-            <button type="button" class="btn btn-difficulty w-100" [class.is-active]="(selectedDifficulty$ | async) === 'hard'" (click)="setDifficulty('hard')">
-              <i class="bi bi-award"></i>
-              <span>Hard</span>
+            <button type="button" class="btn btn-difficulty btn-difficulty--hard w-100" [class.is-active]="(selectedDifficulty$ | async) === 'hard'" (click)="setDifficulty('hard')">
+              <div class="difficulty-hats" aria-hidden="true">
+                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+              </div>
+              <span class="difficulty-pill">Hard</span>
             </button>
           </div>
         </div>

@@ -166,32 +166,119 @@
 	background: var(--background);
 }
 
+.input-with-icon,
+.select-wrap {
+	position: relative;
+}
+
+.input-prefix {
+	position: absolute;
+	left: 0.85rem;
+	top: 50%;
+	transform: translateY(-50%);
+	color: var(--gray-500);
+	pointer-events: none;
+	font-size: 0.95rem;
+	z-index: 2;
+}
+
+.input-with-icon .input-soft,
+.select-wrap .input-soft {
+	padding-left: 2.35rem;
+}
+
+.input-soft-select {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	border-width: 2px;
+	font-weight: 600;
+	background: var(--background);
+	padding-right: 2.3rem;
+}
+
+.select-caret {
+	position: absolute;
+	right: 0.85rem;
+	top: 50%;
+	transform: translateY(-50%);
+	color: var(--highlight-hover);
+	pointer-events: none;
+	font-size: 0.9rem;
+}
+
 .btn-difficulty {
-	border: 1px solid var(--gray-300);
+	border: 2px solid var(--gray-300);
 	border-radius: 14px;
 	background: var(--background);
 	color: var(--PrimaryText);
-	min-height: 72px;
-	display: inline-flex;
+	min-height: 88px;
+	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: 0.5rem;
+	gap: 0.45rem;
+	opacity: 0.86;
+	transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
 }
 
-.btn-difficulty .bi {
-	color: var(--gray-500);
+.difficulty-hats {
+	display: inline-flex;
+	align-items: flex-end;
+	justify-content: center;
+	gap: 0.25rem;
+	min-height: 20px;
+}
+
+.chef-hat-img {
+	width: 18px;
+	height: 18px;
+	object-fit: contain;
+	opacity: 0.78;
+	filter: brightness(0) saturate(100%);
 }
 
 .btn-difficulty:hover {
 	border-color: var(--highlight);
-	background: var(--highlight-focus-subtle);
+	background: var(--gray-100);
+	opacity: 0.94;
 }
 
 .btn-difficulty.is-active {
 	border-color: var(--highlight);
-	background: var(--highlight-focus);
+	background: color-mix(in srgb, var(--highlight) 18%, var(--background));
 	color: var(--PrimaryText);
-	box-shadow: inset 0 0 0 1px var(--highlight-focus-strong);
+	box-shadow: inset 0 0 0 1px var(--highlight-focus-strong), 0 6px 16px var(--shadow-sm);
+	opacity: 1;
+	transform: translateY(-1px);
+}
+
+.btn-difficulty.is-active .chef-hat-img {
+	opacity: 1;
+	filter: brightness(0) saturate(100%);
+}
+
+.difficulty-pill {
+	border-radius: 999px;
+	padding: 0.2rem 0.8rem;
+	font-weight: 700;
+	line-height: 1.2;
+	font-size: 0.98rem;
+}
+
+.btn-difficulty--easy .difficulty-pill {
+	background: #d7f3df;
+	color: #177245;
+}
+
+.btn-difficulty--medium .difficulty-pill {
+	background: #f9ecb8;
+	color: #8a6400;
+}
+
+.btn-difficulty--hard .difficulty-pill {
+	background: #f8d1d4;
+	color: #a41f28;
 }
 
 .ingredient-badge {
