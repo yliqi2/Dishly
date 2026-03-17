@@ -18,7 +18,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 40px 20px;
+	padding: 40px var(--layout-gutter);
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -31,7 +31,7 @@
 .back-link {
 	position: absolute;
 	top: 40px;
-	left: 40px;
+	left: var(--layout-gutter);
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -390,12 +390,12 @@
 /* Tablet */
 @media (max-width: 768px) {
 	.login-container {
-		padding: 24px 16px;
+		padding: 24px var(--layout-gutter);
 	}
 
 	.back-link {
 		top: 24px;
-		left: 24px;
+		left: var(--layout-gutter);
 		font-size: 16px;
 	}
 
@@ -430,12 +430,12 @@
 /* Móvil grande */
 @media (max-width: 425px) {
 	.login-container {
-		padding: 20px 12px 96px;
+		padding: 20px var(--layout-gutter) 96px;
 	}
 
 	.back-link {
 		top: 20px;
-		left: 20px;
+		left: var(--layout-gutter);
 	}
 
 	.login-card {
@@ -535,12 +535,12 @@
 /* Móvil pequeño */
 @media (max-width: 320px) {
 	.login-container {
-		padding: 16px 8px 88px;
+		padding: 16px var(--layout-gutter) 88px;
 	}
 
 	.back-link {
 		top: 16px;
-		left: 16px;
+		left: var(--layout-gutter);
 		font-size: 16px;
 	}
 

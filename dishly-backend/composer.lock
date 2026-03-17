@@ -6414,6 +6414,7 @@
         },
         {
             "name": "laravel/boost",
+<<<<<<< HEAD
             "version": "v2.3.2",
             "source": {
                 "type": "git",
@@ -6424,6 +6425,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/laravel/boost/zipball/5759fc7534d92d2dc6d7f672790a6c7a52d5448a",
                 "reference": "5759fc7534d92d2dc6d7f672790a6c7a52d5448a",
+=======
+            "version": "v2.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/boost.git",
+                "reference": "ab0aa26e0c2a134b67867eb8191d022509b1074d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/boost/zipball/ab0aa26e0c2a134b67867eb8191d022509b1074d",
+                "reference": "ab0aa26e0c2a134b67867eb8191d022509b1074d",
+>>>>>>> a2cff2017bbdeddf25f7049263673be6add4b8f2
                 "shasum": ""
             },
             "require": {
@@ -6476,7 +6489,11 @@
                 "issues": "https://github.com/laravel/boost/issues",
                 "source": "https://github.com/laravel/boost"
             },
+<<<<<<< HEAD
             "time": "2026-03-16T18:05:32+00:00"
+=======
+            "time": "2026-03-17T14:55:00+00:00"
+>>>>>>> a2cff2017bbdeddf25f7049263673be6add4b8f2
         },
         {
             "name": "laravel/mcp",
