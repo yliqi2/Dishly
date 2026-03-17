@@ -168,20 +168,26 @@ textarea:focus-visible,
 }
 
 .page-container {
-	max-width: 100%;
-	margin: 0;
-	padding: 0;
+	max-width: var(--layout-max-width);
+	margin: 0 auto;
+	padding: 0 var(--layout-gutter);
 	width: 100%;
 	box-sizing: border-box;
 }
 
+.page-container--no-gutter {
+	padding-left: 0;
+	padding-right: 0;
+}
+
 .page-header {
-	padding: 32px 0 8px;
+	padding: var(--layout-gutter) 0;
 }
 
 .page-header__inner {
 	max-width: 100%;
 	margin: 0;
+	padding: 0;
 }
 
 .page-title {
@@ -196,16 +202,12 @@ textarea:focus-visible,
 	width: 220px;
 	height: 4px;
 	background: var(--highlight);
-	margin-bottom: 24px;
+	margin: 0;
 }
 
 @media (max-width: 768px) {
 	:root {
 		--layout-gutter: 16px;
-	}
-
-	.page-header {
-		padding: 24px 0 4px;
 	}
 }
 
