@@ -2,7 +2,8 @@ import { Routes } from '@angular/router';
 import { Homepage } from './Pages/homepage/homepage';
 import { Login } from './Pages/auth/login/login';
 import { Register } from './Pages/auth/register/register';
-import { Recipes } from './Pages/recipes/recipes';
+import { SearchRecipes } from './Pages/recipes/search-recipes/search-recipes';
+import { RecipeDetail } from './Pages/recipes/recipe-detail/recipe-detail';
 import { Upload } from './Pages/upload/upload';
 import { DishlyAi } from './Pages/dishly-ai/dishly-ai';
 import { Forum } from './Pages/forum/forum';
@@ -27,8 +28,11 @@ export const routes: Routes = [
     },
     {
         path: 'recipes',
-        component: Recipes
-    },  
+        children: [
+            { path: '', component: SearchRecipes },
+            { path: ':id', component: RecipeDetail }
+        ]
+    },
     {
         path: 'dishly-ai',
         component: DishlyAi

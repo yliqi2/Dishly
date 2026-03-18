@@ -1,0 +1,244 @@
+.search-page-container {
+  background-color: white;
+  min-height: 100vh;
+}
+
+.text-highlight {
+  color: #FD8923;
+}
+
+.filter-card {
+  border: 1px solid #f0f0f0 !important;
+  background-color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+  position: sticky;
+  top: 100px;
+}
+
+.filter-section {
+  border-bottom: 1px solid #f8f8f8;
+  padding-bottom: 20px;
+}
+
+.filter-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.filter-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #FD8923;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.filter-label {
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+  color: #2D3436;
+}
+
+.form-select-custom {
+  background-color: #f9f9f9;
+  border: 1px solid #eee !important;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.2s ease;
+}
+
+.form-select-custom:focus {
+  border-color: #FD8923 !important;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(253, 137, 35, 0.1);
+}
+
+.filter-tag {
+  background-color: #f9f9f9 !important;
+  border: 1px solid #eee !important;
+  color: #555;
+  font-weight: 500;
+  font-size: 0.8rem;
+  padding: 4px 12px !important;
+  transition: all 0.2s ease;
+}
+
+.filter-tag:hover {
+  background-color: #fff !important;
+  border-color: #FD8923 !important;
+  color: #FD8923;
+  transform: translateY(-1px);
+}
+
+.btn-add-tag {
+  width: 28px;
+  height: 28px;
+  background-color: #FFF4EB;
+  color: #FD8923;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-add-tag:hover {
+  background-color: #FD8923;
+  color: white;
+  transform: scale(1.1);
+}
+
+.price-box {
+  background-color: #f9f9f9 !important;
+  border: 1px solid #eee !important;
+  color: #FD8923;
+  font-size: 0.85rem;
+  width: 70px;
+  text-align: center;
+}
+
+.custom-range {
+  height: 6px;
+  padding: 0;
+  background: #f0f0f0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.custom-range::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  background: #FD8923;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  border-radius: 50%;
+  appearance: none;
+  transition: transform 0.1s ease;
+}
+
+.custom-range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.custom-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #FD8923;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  border-radius: 50%;
+  transition: transform 0.1s ease;
+}
+
+.star-filter {
+  transition: transform 0.2s ease;
+}
+
+.dropdown-search-container .input-group {
+  background-color: white !important;
+  border: 1px solid #eee !important;
+  border-radius: 10px !important;
+  transition: all 0.2s ease;
+}
+
+.dropdown-search-container .input-group:focus-within {
+  border-color: #FD8923 !important;
+  box-shadow: 0 0 0 3px rgba(253, 137, 35, 0.1) !important;
+}
+
+.dropdown-search-container .form-control {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #2D3436;
+}
+
+.dropdown-menu-custom {
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+  border: 1px solid #f0f0f0 !important;
+}
+
+.dropdown-item-custom {
+  transition: all 0.2s ease;
+  color: #555;
+  cursor: pointer;
+}
+
+.dropdown-item-custom:hover {
+  background-color: #FFF4EB !important;
+  color: #FD8923;
+  padding-left: 20px !important;
+}
+
+/* Recipe Card Styles */
+.recipe-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-color: #ececec !important;
+}
+
+.recipe-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+}
+
+.recipe-img-container {
+  height: 220px;
+  overflow: hidden;
+}
+
+.recipe-img {
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge-item {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-orange {
+  background-color: #FD8923;
+  color: white;
+}
+
+.badge-white {
+  background-color: white;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.rating-box {
+  border: 1px solid #eee;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.btn-view-recipe {
+  background-color: #FD8923;
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-view-recipe:hover {
+  background-color: #ffc107;
+  color: #000;
+  transform: scale(1.02);
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+  .search-page-container {
+    padding-top: 20px;
+  }
+}

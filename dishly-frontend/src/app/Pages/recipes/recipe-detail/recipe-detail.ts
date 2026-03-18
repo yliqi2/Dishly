@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
-  selector: 'app-recipes',
+  selector: 'app-recipe-detail',
   standalone: true,
   imports: [CommonModule, LucideAngularModule],
-  templateUrl: './recipes.html',
-  styleUrl: './recipes.css',
+  templateUrl: './recipe-detail.html',
+  styleUrl: './recipe-detail.css',
 })
-export class Recipes {
+export class RecipeDetail {
   recipe = {
     author: {
       name: 'Franchesco',
@@ -22,7 +22,7 @@ export class Recipes {
     thumbnails: [
       'https://images.unsplash.com/photo-1612874742237-6526221588e3?q=80&w=2071&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=2000&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1473093226795-af9932fe5856?q=80&w=2094&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1473093226795-af9932fe5855?q=80&w=2094&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=2132&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1558985250-27a406d64cb3?q=80&w=2070&auto=format&fit=crop'
     ],
