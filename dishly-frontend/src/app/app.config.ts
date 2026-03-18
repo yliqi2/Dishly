@@ -13,6 +13,8 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { authInterceptor } from './Core/interceptors/auth-interceptor';
 
 import {
+  ChevronLeft,
+  ChevronRight,
   ChefHat,
   Cpu,
   Crown,
@@ -26,7 +28,14 @@ import {
   ShoppingCart,
   TrendingUp,
   Upload,
-  User
+  User,
+  Clock,
+  Users,
+  Flame,
+  Star,
+  Heart,
+  ClipboardList,
+  Send
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -38,6 +47,8 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     importProvidersFrom(
       LucideAngularModule.pick({
+        ChevronLeft,
+        ChevronRight,
         ChefHat,
         Cpu,
         Crown,
@@ -50,7 +61,14 @@ export const appConfig: ApplicationConfig = {
         ShoppingCart,
         TrendingUp,
         Upload,
-        User
+        User,
+        Clock,
+        Users,
+        Flame,
+        Star,
+        Heart,
+        ClipboardList,
+        Send
       })
     )
   ]
