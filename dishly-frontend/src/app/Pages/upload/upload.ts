@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject, OnDestroy, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import {
   AbstractControl,
   FormArray,
@@ -13,6 +14,7 @@ import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { UploadPreview } from '../../Core/Interfaces/UploadPreview';
 import { Categoria } from '../../Core/Services/Categoria/categoria';
 import { CategoriaItem } from '../../Core/Interfaces/CategoriaItem';
+import { Router } from '@angular/router';
 
 type DifficultyLevel = 'easy' | 'medium' | 'hard';
 type TimeUnit = 'minutes' | 'hours';
@@ -26,11 +28,14 @@ type TimeUnit = 'minutes' | 'hours';
 })
 export class Upload implements OnDestroy, OnInit {
   readonly maxPhotos = 5;
+  readonly ingredientUnits = ['g', 'kg', 'mg', 'l', 'ml'] as const;
 
   readonly photos$ = new BehaviorSubject<UploadPreview[]>([]);
   readonly selectedDifficulty$ = new BehaviorSubject<DifficultyLevel>('easy');
   readonly coverIndex$ = new BehaviorSubject<number>(0);
   private readonly categoriaService = inject(Categoria);
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
   readonly categorias$ = new BehaviorSubject<CategoriaItem[]>([]);
 
   selectedCategories: CategoriaItem[] = [];
@@ -52,6 +57,8 @@ export class Upload implements OnDestroy, OnInit {
   );
   readonly photosError$ = new BehaviorSubject<boolean>(false);
   readonly submitting$ = new BehaviorSubject<boolean>(false);
+  readonly submitError$ = new BehaviorSubject<string | null>(null);
+  readonly submitSuccess$ = new BehaviorSubject<string | null>(null);
 
   private readonly integerValidator = (control: AbstractControl): ValidationErrors | null => {
     const v = control.value;
@@ -179,6 +186,7 @@ export class Upload implements OnDestroy, OnInit {
     return this.fb.group({
       cantidad: [null, [Validators.required, Validators.min(0.001)]],
       nombre: ['', [Validators.required]],
+      unidad: ['g', [Validators.required]],
     });
   }
 
@@ -328,7 +336,13 @@ export class Upload implements OnDestroy, OnInit {
   }
 
   onSubmit(): void {
+    if (this.submitting$.value) return;
+
     this.form.markAllAsTouched();
+    this.submitError$.next(null);
+    this.submitSuccess$.next(null);
+    this.photosError$.next(false);
+
     if (this.photoCount === 0) {
       this.photosError$.next(true);
     }
@@ -338,21 +352,86 @@ export class Upload implements OnDestroy, OnInit {
 
     this.submitting$.next(true);
 
-    const photos = this.photos$.value.map((item) => item.file.name);
+    const photos = this.photos$.value.map((item) => item.file);
     const coverIndex = this.coverIndex$.value;
     const cover = photos[coverIndex];
     const orderedPhotos = cover
       ? [cover, ...photos.filter((_, i) => i !== coverIndex)]
       : photos;
 
-    const payload = {
-      ...this.form.value,
-      imagenes: orderedPhotos,
-      portada: cover ?? null,
-    };
+    const raw = this.form.getRawValue();
+    const formData = new FormData();
+    formData.append('titulo', String(raw.titulo ?? '').trim());
+    formData.append('descripcion', String(raw.descripcion ?? '').trim());
+    formData.append('instrucciones', String(raw.instrucciones ?? '').trim());
+    formData.append('tiempo_preparacion', String(raw.tiempo_preparacion ?? 1));
+    formData.append('tiempo_preparacion_unidad', String(raw.tiempo_preparacion_unidad ?? 'minutes'));
+    formData.append('dificultad', String(raw.dificultad ?? 'easy'));
+    formData.append('porciones', String(raw.porciones ?? 1));
 
-    console.log('Recipe payload (backend call pending):', payload);
-    this.submitting$.next(false);
+    const priceRaw = raw.price;
+    if (priceRaw !== null && priceRaw !== undefined && String(priceRaw).trim() !== '') {
+      formData.append('price', String(priceRaw).trim());
+    }
+
+    const categorias = Array.isArray(raw.categoria) ? raw.categoria : [];
+    categorias.forEach((id: unknown) => {
+      formData.append('categorias[]', String(id));
+    });
+
+    const ingredientes = Array.isArray(raw.ingredientes) ? raw.ingredientes : [];
+    ingredientes.forEach((ing: any, index: number) => {
+      formData.append(`ingredientes[${index}][nombre]`, String(ing?.nombre ?? '').trim());
+      formData.append(`ingredientes[${index}][cantidad]`, String(ing?.cantidad ?? ''));
+      formData.append(`ingredientes[${index}][unidad]`, String(ing?.unidad ?? 'g'));
+    });
+
+    orderedPhotos.forEach((file) => {
+      formData.append('imagenes[]', file, file.name);
+    });
+
+    this.http.post('/api/recetas/upload', formData).subscribe({
+      next: () => {
+        this.submitSuccess$.next('Recipe uploaded successfully.');
+        this.resetFormAfterSuccess();
+        this.submitting$.next(false);
+      },
+      error: (err) => {
+        const errors = err?.error?.errors as Record<string, string[]> | undefined;
+        const firstError = errors ? Object.values(errors).flat()[0] : null;
+        this.submitError$.next(firstError ?? err?.error?.message ?? 'Could not upload recipe.');
+        this.submitting$.next(false);
+      },
+    });
+  }
+
+  onCancel(): void {
+    this.router.navigateByUrl('/recipes');
+  }
+
+  private resetFormAfterSuccess(): void {
+    for (const item of this.photos$.value) {
+      URL.revokeObjectURL(item.url);
+    }
+
+    this.photos$.next([]);
+    this.coverIndex$.next(0);
+    this.selectedCategories = [];
+    this.categorySearch = '';
+    this.filteredCategorias = this.categorias$.value;
+    this.selectedDifficulty$.next('easy');
+    this.form.reset({
+      titulo: '',
+      descripcion: '',
+      tiempo_preparacion: 30,
+      tiempo_preparacion_unidad: 'minutes',
+      porciones: 4,
+      dificultad: 'easy',
+      instrucciones: '',
+      price: null,
+      categoria: [],
+    });
+    this.form.setControl('ingredientes', this.fb.array([this.createIngredientGroup(), this.createIngredientGroup()]));
   }
 
   ngOnDestroy(): void {
@@ -364,11 +443,12 @@ export class Upload implements OnDestroy, OnInit {
   ngOnInit(): void {
     this.categoriaService.getAll().subscribe({
       next: (cats) => {
-        console.log('Categories:', cats);
         this.categorias$.next(cats);
         this.filteredCategorias = cats;
       },
-      error: (err) => console.error('Error loading categories:', err),
+      error: () => {
+        this.submitError$.next('Could not load categories.');
+      },
     });
   }
 }

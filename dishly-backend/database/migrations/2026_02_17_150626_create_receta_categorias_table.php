@@ -16,8 +16,8 @@ return new class extends Migration
             $table->unsignedInteger('id_categoria');
 
             $table->primary(['id_receta', 'id_categoria']);
-            $table->foreign('id_receta')->references('id_receta')->on('receta_original');
-            $table->foreign('id_categoria')->references('id_categoria')->on('categoria');
+            $table->foreign('id_receta')->references('id_receta')->on('receta_original')->onDelete('cascade');
+            $table->foreign('id_categoria')->references('id_categoria')->on('categoria')->onDelete('cascade');
         });
     }
 

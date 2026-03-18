@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use App\Models\RecetaOriginal;
+use Illuminate\Support\Str;
+use Throwable;
 
 class RecetaController extends Controller
 {
@@ -17,87 +20,156 @@ class RecetaController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'titulo' => ['required', 'string', 'max:255'],
-            'descripcion' => ['required', 'string'],
-            'instrucciones' => ['required', 'string'],
-            'tiempo_preparacion' => ['required', 'integer', 'min:1'],
-            'tiempo_preparacion_unidad' => ['required', Rule::in(['minutes', 'hours'])],
-            'dificultad' => ['required', Rule::in(['easy', 'medium', 'hard'])],
-            'porciones' => ['required', 'integer', 'min:1'],
-            'price' => ['nullable', 'regex:/^\d+([\,\.]\d{1,2})?$/'],
-            'imagenes' => ['nullable', 'array', 'max:5'],
-            'imagenes.*' => ['string', 'max:2048'],
-            'categorias' => ['nullable', 'array'],
-            'categorias.*' => ['integer', 'exists:categoria,id_categoria', 'distinct'],
-            'ingredientes' => ['nullable', 'array'],
-            'ingredientes.*.id_ingrediente' => ['required', 'integer', 'exists:ingrediente,id_ingrediente', 'distinct'],
-            'ingredientes.*.cantidad' => ['required', 'numeric', 'gt:0'],
-        ]);
+        try {
+            $data = $request->validate([
+                'titulo' => ['required', 'string', 'max:255'],
+                'descripcion' => ['required', 'string'],
+                'instrucciones' => ['required', 'string'],
+                'tiempo_preparacion' => ['required', 'integer', 'min:1'],
+                'tiempo_preparacion_unidad' => ['required', Rule::in(['minutes', 'hours'])],
+                'dificultad' => ['required', Rule::in(['easy', 'medium', 'hard'])],
+                'porciones' => ['required', 'integer', 'min:1'],
+                'price' => ['nullable', 'regex:/^\d+([\,\.]\d{1,2})?$/'],
+                'imagenes' => ['required', 'array', 'min:1', 'max:5'],
+                'imagenes.*' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:10240'],
+                'categorias' => ['required', 'array', 'min:1'],
+                'categorias.*' => ['integer', 'exists:categoria,id_categoria', 'distinct'],
+                'ingredientes' => ['required', 'array', 'min:1'],
+                'ingredientes.*.nombre' => ['required', 'string', 'max:255', 'distinct'],
+                'ingredientes.*.cantidad' => ['required', 'numeric', 'gt:0'],
+                'ingredientes.*.unidad' => ['required', Rule::in(['g', 'kg', 'mg', 'l', 'ml'])],
+            ]);
 
-        $authorId = optional($request->user())->id_usuario ?? $request->input('id_autor');
-        if (!$authorId) {
-            return response()->json([
-                'message' => 'Author is required.',
-            ], 422);
-        }
+            $authorId = optional($request->user())->id_usuario ?? $request->input('id_autor');
+            if (!$authorId) {
+                return response()->json([
+                    'message' => 'Author is required.',
+                ], 422);
+            }
 
-        $images = array_values($data['imagenes'] ?? []);
-        $categories = $data['categorias'] ?? [];
-        $ingredients = $data['ingredientes'] ?? [];
+            $categories = array_values($data['categorias'] ?? []);
+            $ingredients = array_values($data['ingredientes'] ?? []);
+            $imagePaths = $this->storeUploadedImages($request);
 
-        $recipe = DB::transaction(function () use ($data, $authorId, $images, $categories, $ingredients) {
-            $receta = new RecetaOriginal();
-            $receta->titulo = $data['titulo'];
-            $receta->descripcion = $data['descripcion'];
-            $receta->instrucciones = $data['instrucciones'];
-            $receta->tiempo_preparacion = $data['tiempo_preparacion'];
-            $receta->tiempo_preparacion_unidad = $data['tiempo_preparacion_unidad'];
-            $receta->dificultad = $data['dificultad'];
-            $receta->porciones = $data['porciones'];
-            $receta->price = isset($data['price'])
-                ? str_replace(',', '.', $data['price'])
-                : null;
-            $receta->imagen_1 = $images[0] ?? null;
-            $receta->imagen_2 = $images[1] ?? null;
-            $receta->imagen_3 = $images[2] ?? null;
-            $receta->imagen_4 = $images[3] ?? null;
-            $receta->imagen_5 = $images[4] ?? null;
-            $receta->fecha_creacion = now()->toDateString();
-            $receta->id_autor = $authorId;
-            $receta->save();
+            $recipe = DB::transaction(function () use ($data, $authorId, $imagePaths, $categories, $ingredients) {
+                $receta = new RecetaOriginal();
+                $receta->titulo = trim((string) $data['titulo']);
+                $receta->descripcion = trim((string) $data['descripcion']);
+                $receta->instrucciones = trim((string) $data['instrucciones']);
+                $receta->tiempo_preparacion = (int) $data['tiempo_preparacion'];
+                $receta->tiempo_preparacion_unidad = $data['tiempo_preparacion_unidad'];
+                $receta->dificultad = $data['dificultad'];
+                $receta->porciones = (int) $data['porciones'];
+                $receta->price = isset($data['price']) && $data['price'] !== ''
+                    ? str_replace(',', '.', (string) $data['price'])
+                    : null;
+                $receta->imagen_1 = $imagePaths[0] ?? null;
+                $receta->imagen_2 = $imagePaths[1] ?? null;
+                $receta->imagen_3 = $imagePaths[2] ?? null;
+                $receta->imagen_4 = $imagePaths[3] ?? null;
+                $receta->imagen_5 = $imagePaths[4] ?? null;
+                $receta->fecha_creacion = now()->toDateString();
+                $receta->id_autor = $authorId;
+                $receta->save();
 
-            if (!empty($categories)) {
                 $categoriaRows = array_map(function ($idCategoria) use ($receta) {
                     return [
                         'id_receta' => $receta->id_receta,
-                        'id_categoria' => $idCategoria,
+                        'id_categoria' => (int) $idCategoria,
                     ];
-                }, $categories);
-
+                }, array_values(array_unique($categories)));
                 DB::table('receta_categoria')->insert($categoriaRows);
-            }
 
-            if (!empty($ingredients)) {
-                $ingredienteRows = array_map(function ($item) use ($receta) {
-                    return [
+                $rowsByIngredientId = [];
+                foreach ($ingredients as $item) {
+                    $ingredientName = trim((string) $item['nombre']);
+                    $ingredientId = $this->resolveIngredientId($ingredientName);
+                    $unit = $item['unidad'];
+                    $qty = (float) $item['cantidad'];
+
+                    if (isset($rowsByIngredientId[$ingredientId])) {
+                        if ($rowsByIngredientId[$ingredientId]['unidad'] !== $unit) {
+                            throw ValidationException::withMessages([
+                                'ingredientes' => ['The same ingredient cannot use multiple units in one recipe.'],
+                            ]);
+                        }
+                        $rowsByIngredientId[$ingredientId]['cantidad'] += $qty;
+                        continue;
+                    }
+
+                    $rowsByIngredientId[$ingredientId] = [
                         'id_receta' => $receta->id_receta,
-                        'id_ingrediente' => $item['id_ingrediente'],
-                        'cantidad' => $item['cantidad'],
+                        'id_ingrediente' => $ingredientId,
+                        'cantidad' => $qty,
+                        'unidad' => $unit,
                     ];
-                }, $ingredients);
+                }
 
-                DB::table('receta_ingrediente')->insert($ingredienteRows);
-            }
+                DB::table('receta_ingrediente')->insert(array_values($rowsByIngredientId));
 
-            return $receta;
-        });
+                return $receta;
+            });
 
-        return response()->json([
-            'message' => 'Recipe created successfully.',
-            'recipe' => $recipe,
-            'categorias' => $categories,
-            'ingredientes' => $ingredients,
-        ], 201);
+            return response()->json([
+                'message' => 'Recipe created successfully.',
+                'recipe' => $recipe,
+                'categorias' => $categories,
+                'ingredientes' => $ingredients,
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not create recipe',
+                'errors' => [
+                    'server' => [$e->getMessage()],
+                ],
+            ], 500);
+        }
+    }
+
+    private function resolveIngredientId(string $name): int
+    {
+        $normalized = trim($name);
+        if ($normalized === '') {
+            throw ValidationException::withMessages([
+                'ingredientes' => ['Ingredient name cannot be empty.'],
+            ]);
+        }
+
+        $existing = DB::table('ingrediente')
+            ->whereRaw('LOWER(nombre) = ?', [Str::lower($normalized)])
+            ->value('id_ingrediente');
+
+        if ($existing) {
+            return (int) $existing;
+        }
+
+        return (int) DB::table('ingrediente')->insertGetId([
+            'nombre' => $normalized,
+        ]);
+    }
+
+    private function storeUploadedImages(Request $request): array
+    {
+        $files = $request->file('imagenes', []);
+        $storedPaths = [];
+        $publicPath = public_path('recipes');
+
+        if (!file_exists($publicPath)) {
+            mkdir($publicPath, 0755, true);
+        }
+
+        foreach ($files as $file) {
+            $ext = strtolower((string) $file->getClientOriginalExtension());
+            $filename = Str::lower(Str::random(24)) . '.' . $ext;
+            $file->move($publicPath, $filename);
+            $storedPaths[] = 'recipes/' . $filename;
+        }
+
+        return $storedPaths;
     }
 }

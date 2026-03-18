@@ -36,10 +36,10 @@
             @if (vm.photos.length > 0) {
               <div class="preview-item bento-cover">
                 <img [src]="vm.photos[vm.coverIndex].url" alt="Cover" class="w-100 h-100 object-fit-cover" />
-                <button type="button" class="btn btn-sm btn-light preview-remove" (click)="removePhoto(vm.coverIndex)">
-                  <i class="bi bi-x"></i>
+                <button type="button" class="btn btn-sm btn-danger preview-remove" (click)="removePhoto(vm.coverIndex)" aria-label="Eliminar imagen subida">
+                  <i class="bi bi-trash"></i>
                 </button>
-                <span class="cover-label"><i class="bi bi-star-fill me-1"></i>Cover</span>
+                <span class="cover-label badge rounded-pill">Cover</span>
               </div>
             } @else {
               <button
@@ -60,8 +60,8 @@
                 @for (item of vm.nonCoverItems; track item.photo.url) {
                 <div class="preview-item">
                   <img [src]="item.photo.url" alt="Recipe photo" class="w-100 h-100 object-fit-cover" />
-                  <button type="button" class="btn btn-sm btn-light preview-remove" (click)="removePhoto(item.originalIndex)">
-                    <i class="bi bi-x"></i>
+                  <button type="button" class="btn btn-sm btn-danger preview-remove" (click)="removePhoto(item.originalIndex)" aria-label="Eliminar imagen subida">
+                    <i class="bi bi-trash"></i>
                   </button>
                   <button type="button" class="btn btn-sm cover-btn" (click)="selectCover(item.originalIndex)">
                     Set as cover
@@ -276,7 +276,9 @@
               [attr.aria-describedby]="getError('dificultad') ? 'upload-dificultad-error' : null"
             >
               <div class="difficulty-hats" aria-hidden="true">
-                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon Chef" />
+                <span class="chef-hat-badge" aria-hidden="true">
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon Chef" />
+                </span>
               </div>
               <span class="difficulty-pill">Easy</span>
             </button>
@@ -290,8 +292,12 @@
               [attr.aria-describedby]="getError('dificultad') ? 'upload-dificultad-error' : null"
             >
               <div class="difficulty-hats" aria-hidden="true">
-                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon chef x2" />
-                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                <span class="chef-hat-badge" aria-hidden="true">
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon chef x2" />
+                </span>
+                <span class="chef-hat-badge" aria-hidden="true">
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                </span>
               </div>
               <span class="difficulty-pill">Medium</span>
             </button>
@@ -305,9 +311,15 @@
               [attr.aria-describedby]="getError('dificultad') ? 'upload-dificultad-error' : null"
             >
               <div class="difficulty-hats" aria-hidden="true">
-                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon chef x3" />
-                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
-                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                <span class="chef-hat-badge" aria-hidden="true">
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon chef x3" />
+                </span>
+                <span class="chef-hat-badge" aria-hidden="true">
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                </span>
+                <span class="chef-hat-badge" aria-hidden="true">
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                </span>
               </div>
               <span class="difficulty-pill">Hard</span>
             </button>
@@ -456,6 +468,22 @@
                   />
                 </div>
               </div>
+              <div class="ingredient-field ingredient-field--unit">
+                <label for="upload-ingrediente-unidad-{{ i }}" class="visually-hidden">Ingredient unit</label>
+                <div class="select-wrap">
+                  <select
+                    id="upload-ingrediente-unidad-{{ i }}"
+                    class="form-control input-soft input-soft-select"
+                    formControlName="unidad"
+                    [attr.aria-invalid]="isFieldInvalid('unidad', ingredient)"
+                  >
+                    @for (unit of ingredientUnits; track unit) {
+                      <option [value]="unit">{{ unit }}</option>
+                    }
+                  </select>
+                  <span class="select-caret"><i class="bi bi-chevron-down"></i></span>
+                </div>
+              </div>
             </div>
             <div class="ingredients-remove-wrap">
               <button
@@ -497,10 +525,25 @@
       }
     </article>
 
+    @if (submitError$ | async; as submitError) {
+      <div class="alert alert-danger mb-0" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>{{ submitError }}
+      </div>
+    }
+    @if (submitSuccess$ | async; as submitSuccess) {
+      <div class="alert alert-success mb-0" role="status" aria-live="polite">
+        <i class="bi bi-check-circle me-2"></i>{{ submitSuccess }}
+      </div>
+    }
+
     <div class="d-flex justify-content-end gap-2 pb-3">
-      <button type="button" class="btn btn-outline-secondary px-4 ingredients-action-btn ingredients-cancel-btn">Cancel</button>
+      <button type="button" class="btn btn-outline-secondary px-4 ingredients-action-btn ingredients-cancel-btn" (click)="onCancel()">Cancel</button>
       <button type="submit" class="btn btn-publish px-4 ingredients-action-btn" [disabled]="submitting$ | async">
-        Publish Recipe
+        @if (submitting$ | async) {
+          Publishing...
+        } @else {
+          Publish Recipe
+        }
       </button>
     </div>
   </form>

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('ingrediente', function (Blueprint $table) {
             $table->increments('id_ingrediente');
-            $table->string('nombre');
+            $table->string('nombre')->unique();
         });
     }
 
