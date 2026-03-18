@@ -167,21 +167,26 @@ textarea:focus-visible,
 	border-radius: 10px;
 }
 
+
 .page-container {
-	max-width: 100%;
-	margin: 0;
-	padding: 0;
+	margin: 0 auto;
 	width: 100%;
 	box-sizing: border-box;
 }
 
+.page-container--no-gutter {
+	padding-left: 0;
+	padding-right: 0;
+}
+
 .page-header {
-	padding: 32px 0 8px;
+	padding: var(--layout-gutter) 0;
 }
 
 .page-header__inner {
 	max-width: 100%;
 	margin: 0;
+	padding: 0;
 }
 
 .page-title {
@@ -193,19 +198,15 @@ textarea:focus-visible,
 }
 
 .page-underline {
-	width: 220px;
+	width: 15%;
 	height: 4px;
 	background: var(--highlight);
-	margin-bottom: 24px;
+	margin: 0;
 }
 
 @media (max-width: 768px) {
 	:root {
 		--layout-gutter: 16px;
-	}
-
-	.page-header {
-		padding: 24px 0 4px;
 	}
 }
 

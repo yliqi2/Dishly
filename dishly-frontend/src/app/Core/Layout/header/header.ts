@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, signal, inject, NgModule } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthServices } from '../../../Pages/auth/Services/auth-services';
+import { AuthServices } from '../../Services/Auth/auth-services';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LucideAngularModule } from 'lucide-angular';
 
