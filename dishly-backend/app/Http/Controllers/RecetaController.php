@@ -25,6 +25,7 @@ class RecetaController extends Controller
             'tiempo_preparacion_unidad' => ['required', Rule::in(['minutes', 'hours'])],
             'dificultad' => ['required', Rule::in(['easy', 'medium', 'hard'])],
             'porciones' => ['required', 'integer', 'min:1'],
+            'price' => ['nullable', 'regex:/^\d+([\,\.]\d{1,2})?$/'],
             'imagenes' => ['nullable', 'array', 'max:5'],
             'imagenes.*' => ['string', 'max:2048'],
             'categorias' => ['nullable', 'array'],
@@ -54,6 +55,9 @@ class RecetaController extends Controller
             $receta->tiempo_preparacion_unidad = $data['tiempo_preparacion_unidad'];
             $receta->dificultad = $data['dificultad'];
             $receta->porciones = $data['porciones'];
+            $receta->price = isset($data['price'])
+                ? str_replace(',', '.', $data['price'])
+                : null;
             $receta->imagen_1 = $images[0] ?? null;
             $receta->imagen_2 = $images[1] ?? null;
             $receta->imagen_3 = $images[2] ?? null;

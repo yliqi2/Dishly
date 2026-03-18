@@ -61,7 +61,7 @@
 
 .brand-subtitle {
 	color: #b0b0b0;
-	font-size: 13px;
+	font-size: 16px;
 	margin-top: 4px;
 }
 
@@ -69,7 +69,7 @@
 	color: #b0b0b0;
 	line-height: 1.6;
 	margin: 0;
-	font-size: 14px;
+	font-size: 16px;
 }
 
 
@@ -84,7 +84,7 @@
 
 .footer__copyright {
 	color: #888;
-	font-size: 14px;
+	font-size: 16px;
 	margin: 0;
 }
 
@@ -101,7 +101,7 @@
 	align-items: center;
 	justify-content: center;
 	text-decoration: none;
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: 600;
 }
 
@@ -171,15 +171,15 @@
 	}
 
 	.brand-subtitle {
-		font-size: 12px;
+		font-size: 16px;
 	}
 
 	.footer__description {
-		font-size: 13px;
+		font-size: 16px;
 	}
 
 	.footer__copyright {
-		font-size: 13px;
+		font-size: 16px;
 	}
 
 	.footer__social {
@@ -219,11 +219,11 @@
 	}
 
 	.footer__description {
-		font-size: 12px;
+		font-size: 16px;
 	}
 
 	.footer__copyright {
-		font-size: 12px;
+		font-size: 16px;
 	}
 }
 
@@ -250,19 +250,19 @@
 	}
 
 	.brand-title {
-		font-size: 15px;
+		font-size: 16px;
 	}
 
 	.brand-subtitle {
-		font-size: 11px;
+		font-size: 16px;
 	}
 
 	.footer__description {
-		font-size: 11px;
+		font-size: 16px;
 	}
 
 	.footer__copyright {
-		font-size: 11px;
+		font-size: 16px;
 	}
 
 	.footer__social {

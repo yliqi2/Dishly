@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -15,6 +15,7 @@ import { Categoria } from '../../Core/Services/Categoria/categoria';
 import { CategoriaItem } from '../../Core/Interfaces/CategoriaItem';
 
 type DifficultyLevel = 'easy' | 'medium' | 'hard';
+type TimeUnit = 'minutes' | 'hours';
 
 
 @Component({
@@ -32,10 +33,11 @@ export class Upload implements OnDestroy, OnInit {
   private readonly categoriaService = inject(Categoria);
   readonly categorias$ = new BehaviorSubject<CategoriaItem[]>([]);
 
-  // ── Category dropdown state ──────────────────────────────
   selectedCategories: CategoriaItem[] = [];
   categoryOpen = false;
   categorySearch = '';
+  filteredCategorias: CategoriaItem[] = [];
+  timeUnitOpen = false;
 
   readonly vm$ = combineLatest([this.photos$, this.coverIndex$]).pipe(
     map(([photos, coverIndex]) => {
@@ -57,6 +59,20 @@ export class Upload implements OnDestroy, OnInit {
     return Number.isInteger(Number(v)) ? null : { integer: true };
   };
 
+  private readonly priceValidator = (control: AbstractControl): ValidationErrors | null => {
+    const v = control.value;
+    if (v === null || v === '') return null;
+
+    const raw = String(v).trim().replace(',', '.');
+    const okFormat = /^\d+(\.\d{1,2})?$/.test(raw);
+    if (!okFormat) return { price_invalid: true };
+
+    const n = Number(raw);
+    if (n !== n || Math.abs(n) === Infinity) return { price_invalid: true };
+
+    return null;
+  };
+
   readonly form: FormGroup;
 
   constructor(private readonly fb: FormBuilder) {
@@ -68,13 +84,77 @@ export class Upload implements OnDestroy, OnInit {
       porciones: [4, [Validators.required, Validators.min(1), this.integerValidator]],
       dificultad: ['easy', [Validators.required]],
       instrucciones: ['', [Validators.required]],
-      ingredientes: this.fb.array([this.createIngredientGroup()]),
+      price: [null, [this.priceValidator]],
+      ingredientes: this.fb.array([this.createIngredientGroup(), this.createIngredientGroup()]),
       categoria: [[], [Validators.required]],
     });
   }
 
+  isFieldInvalid(fieldName: string, parent?: AbstractControl | null): boolean {
+    const control = parent ? parent.get(fieldName) : this.form.get(fieldName);
+    return !!(control && control.invalid && control.touched);
+  }
+
+  getError(fieldName: string, parent?: AbstractControl | null): string {
+    const control = parent ? parent.get(fieldName) : this.form.get(fieldName);
+    if (!control || !control.errors || !control.touched) {
+      return '';
+    }
+
+    const errors = control.errors;
+
+    if (errors['required']) {
+      switch (fieldName) {
+        case 'titulo':
+          return 'Title is required.';
+        case 'descripcion':
+          return 'Description is required.';
+        case 'tiempo_preparacion':
+          return 'Prep time is required.';
+        case 'porciones':
+          return 'Servings is required.';
+        case 'instrucciones':
+          return 'Instructions are required.';
+        case 'categoria':
+          return 'Select at least one category.';
+        case 'cantidad':
+          return 'Required.';
+        case 'nombre':
+          return 'Ingredient name is required.';
+        default:
+          return 'This field is required.';
+      }
+    }
+
+    if (errors['price_invalid']) {
+      return 'Please enter a valid price (max 2 decimals).';
+    }
+
+    if (errors['maxlength']) {
+      return `Maximum ${errors['maxlength'].requiredLength} characters.`;
+    }
+
+    if (errors['min']) {
+      if (fieldName === 'cantidad') return 'Must be greater than 0.';
+      return `Must be at least ${errors['min'].min}.`;
+    }
+
+    if (errors['integer']) {
+      return 'Must be a whole number.';
+    }
+
+    return 'Invalid value.';
+  }
+
   get ingredientes(): FormArray<FormGroup> {
     return this.form.get('ingredientes') as FormArray<FormGroup>;
+  }
+
+  getIngredientsErrorMessage(): string {
+    if (!this.ingredientes.invalid || !this.ingredientes.touched) {
+      return '';
+    }
+    return 'All ingredient fields must be filled.';
   }
 
   get photoCount(): number {
@@ -85,11 +165,10 @@ export class Upload implements OnDestroy, OnInit {
     return this.photoCount < this.maxPhotos;
   }
 
-  get filteredCategorias(): CategoriaItem[] {
+  private applyCategoryFilter(): void {
     const q = this.categorySearch.toLowerCase();
-    return this.categorias$.value.filter(c =>
-      c.nombre.toLowerCase().includes(q)
-    );
+    const all = this.categorias$.value;
+    this.filteredCategorias = all.filter((c) => c.nombre.toLowerCase().includes(q));
   }
 
   isCategorySelected(cat: CategoriaItem): boolean {
@@ -119,14 +198,49 @@ export class Upload implements OnDestroy, OnInit {
     this.form.patchValue({ dificultad: level });
   }
 
-  // ── Category dropdown methods ────────────────────────────
   toggleCategoryDropdown(): void {
     this.categoryOpen = !this.categoryOpen;
-    if (this.categoryOpen) this.categorySearch = '';
+    if (this.categoryOpen) {
+      this.categorySearch = '';
+      this.applyCategoryFilter();
+    }
+  }
+
+  closeCategoryDropdown(): void {
+    this.categoryOpen = false;
+  }
+
+  onCategoryFocusOut(event: FocusEvent): void {
+    const wrapper = event.currentTarget as HTMLElement | null;
+    const next = event.relatedTarget as Node | null;
+    if (!wrapper || (next && wrapper.contains(next))) return;
+    this.closeCategoryDropdown();
+  }
+
+  toggleTimeUnitDropdown(): void {
+    this.timeUnitOpen = !this.timeUnitOpen;
+  }
+
+  closeTimeUnitDropdown(): void {
+    this.timeUnitOpen = false;
+  }
+
+  setTimeUnit(unit: TimeUnit): void {
+    this.form.patchValue({ tiempo_preparacion_unidad: unit });
+    this.form.get('tiempo_preparacion_unidad')?.markAsTouched();
+    this.closeTimeUnitDropdown();
+  }
+
+  onTimeUnitFocusOut(event: FocusEvent): void {
+    const wrapper = event.currentTarget as HTMLElement | null;
+    const next = event.relatedTarget as Node | null;
+    if (!wrapper || (next && wrapper.contains(next))) return;
+    this.closeTimeUnitDropdown();
   }
 
   onCategorySearch(event: Event): void {
     this.categorySearch = (event.target as HTMLInputElement).value;
+    this.applyCategoryFilter();
   }
 
   selectCategory(cat: CategoriaItem): void {
@@ -141,6 +255,8 @@ export class Upload implements OnDestroy, OnInit {
     this.form.patchValue({
       categoria: this.selectedCategories.map(c => c.id_categoria)
     });
+    this.form.get('categoria')?.markAsTouched();
+    this.closeCategoryDropdown();
   }
 
   removeCategory(cat: CategoriaItem): void {
@@ -150,6 +266,13 @@ export class Upload implements OnDestroy, OnInit {
     this.form.patchValue({
       categoria: this.selectedCategories.map(c => c.id_categoria)
     });
+    this.form.get('categoria')?.markAsTouched();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.categoryOpen) this.closeCategoryDropdown();
+    if (this.timeUnitOpen) this.closeTimeUnitDropdown();
   }
 
   onPhotosSelected(event: Event): void {
@@ -241,10 +364,11 @@ export class Upload implements OnDestroy, OnInit {
   ngOnInit(): void {
     this.categoriaService.getAll().subscribe({
       next: (cats) => {
-        console.log('Categorías:', cats);
+        console.log('Categories:', cats);
         this.categorias$.next(cats);
+        this.filteredCategorias = cats;
       },
-      error: (err) => console.error('Error cargando categorías:', err),
+      error: (err) => console.error('Error loading categories:', err),
     });
   }
 }
