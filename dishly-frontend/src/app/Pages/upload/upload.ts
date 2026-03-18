@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -10,13 +10,12 @@ import {
   Validators,
 } from '@angular/forms';
 import { BehaviorSubject, combineLatest, map } from 'rxjs';
+import { UploadPreview } from '../../Core/Interfaces/UploadPreview';
+import { Categoria } from '../../Core/Services/Categoria/categoria';
+import { CategoriaItem } from '../../Core/Interfaces/CategoriaItem';
 
 type DifficultyLevel = 'easy' | 'medium' | 'hard';
 
-interface UploadPreview {
-  file: File;
-  url: string;
-}
 
 @Component({
   selector: 'app-upload',
@@ -30,6 +29,14 @@ export class Upload implements OnDestroy, OnInit {
   readonly photos$ = new BehaviorSubject<UploadPreview[]>([]);
   readonly selectedDifficulty$ = new BehaviorSubject<DifficultyLevel>('easy');
   readonly coverIndex$ = new BehaviorSubject<number>(0);
+  private readonly categoriaService = inject(Categoria);
+  readonly categorias$ = new BehaviorSubject<CategoriaItem[]>([]);
+
+  // ── Category dropdown state ──────────────────────────────
+  selectedCategories: CategoriaItem[] = [];
+  categoryOpen = false;
+  categorySearch = '';
+
   readonly vm$ = combineLatest([this.photos$, this.coverIndex$]).pipe(
     map(([photos, coverIndex]) => {
       const nonCoverItems = photos
@@ -62,6 +69,7 @@ export class Upload implements OnDestroy, OnInit {
       dificultad: ['easy', [Validators.required]],
       instrucciones: ['', [Validators.required]],
       ingredientes: this.fb.array([this.createIngredientGroup()]),
+      categoria: [[], [Validators.required]],
     });
   }
 
@@ -75,6 +83,17 @@ export class Upload implements OnDestroy, OnInit {
 
   get canUploadMorePhotos(): boolean {
     return this.photoCount < this.maxPhotos;
+  }
+
+  get filteredCategorias(): CategoriaItem[] {
+    const q = this.categorySearch.toLowerCase();
+    return this.categorias$.value.filter(c =>
+      c.nombre.toLowerCase().includes(q)
+    );
+  }
+
+  isCategorySelected(cat: CategoriaItem): boolean {
+    return this.selectedCategories.some(c => c.id_categoria === cat.id_categoria);
   }
 
   private createIngredientGroup(): FormGroup {
@@ -92,13 +111,45 @@ export class Upload implements OnDestroy, OnInit {
     if (this.ingredientes.length === 1) {
       return;
     }
-
     this.ingredientes.removeAt(index);
   }
 
   setDifficulty(level: DifficultyLevel): void {
     this.selectedDifficulty$.next(level);
     this.form.patchValue({ dificultad: level });
+  }
+
+  // ── Category dropdown methods ────────────────────────────
+  toggleCategoryDropdown(): void {
+    this.categoryOpen = !this.categoryOpen;
+    if (this.categoryOpen) this.categorySearch = '';
+  }
+
+  onCategorySearch(event: Event): void {
+    this.categorySearch = (event.target as HTMLInputElement).value;
+  }
+
+  selectCategory(cat: CategoriaItem): void {
+    const exists = this.isCategorySelected(cat);
+    if (exists) {
+      this.selectedCategories = this.selectedCategories.filter(
+        c => c.id_categoria !== cat.id_categoria
+      );
+    } else {
+      this.selectedCategories = [...this.selectedCategories, cat];
+    }
+    this.form.patchValue({
+      categoria: this.selectedCategories.map(c => c.id_categoria)
+    });
+  }
+
+  removeCategory(cat: CategoriaItem): void {
+    this.selectedCategories = this.selectedCategories.filter(
+      c => c.id_categoria !== cat.id_categoria
+    );
+    this.form.patchValue({
+      categoria: this.selectedCategories.map(c => c.id_categoria)
+    });
   }
 
   onPhotosSelected(event: Event): void {
@@ -111,7 +162,6 @@ export class Upload implements OnDestroy, OnInit {
     const remaining = this.maxPhotos - current.length;
     const picked = Array.from(input.files).slice(0, remaining);
     const mapped = picked.map((file) => ({ file, url: URL.createObjectURL(file) }));
-
     this.photos$.next([...current, ...mapped]);
     this.photosError$.next(false);
     input.value = '';
@@ -121,7 +171,6 @@ export class Upload implements OnDestroy, OnInit {
     if (index < 0 || index >= this.photoCount) {
       return;
     }
-
     this.coverIndex$.next(index);
   }
 
@@ -190,9 +239,12 @@ export class Upload implements OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
-    this.selectedDifficulty$.subscribe((level) => {
-      this.form.patchValue({ dificultad: level });
+    this.categoriaService.getAll().subscribe({
+      next: (cats) => {
+        console.log('Categorías:', cats);
+        this.categorias$.next(cats);
+      },
+      error: (err) => console.error('Error cargando categorías:', err),
     });
   }
-
 }

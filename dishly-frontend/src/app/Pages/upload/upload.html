@@ -155,7 +155,7 @@
           <div class="col-12 col-md-4">
             <button type="button" class="btn btn-difficulty btn-difficulty--easy w-100" [class.is-active]="(selectedDifficulty$ | async) === 'easy'" (click)="setDifficulty('easy')">
               <div class="difficulty-hats" aria-hidden="true">
-                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon Chef" />
               </div>
               <span class="difficulty-pill">Easy</span>
             </button>
@@ -163,7 +163,7 @@
           <div class="col-12 col-md-4">
             <button type="button" class="btn btn-difficulty btn-difficulty--medium w-100" [class.is-active]="(selectedDifficulty$ | async) === 'medium'" (click)="setDifficulty('medium')">
               <div class="difficulty-hats" aria-hidden="true">
-                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon chef x2" />
                 <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
               </div>
               <span class="difficulty-pill">Medium</span>
@@ -172,7 +172,7 @@
           <div class="col-12 col-md-4">
             <button type="button" class="btn btn-difficulty btn-difficulty--hard w-100" [class.is-active]="(selectedDifficulty$ | async) === 'hard'" (click)="setDifficulty('hard')">
               <div class="difficulty-hats" aria-hidden="true">
-                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon chef x3" />
                 <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
                 <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
               </div>
@@ -182,6 +182,81 @@
         </div>
       </div>
     </article>
+
+    <article class="upload-card p-4 p-md-5">
+  <h2 class="upload-title mb-4">
+    <i class="bi bi-tags me-2"></i>Categorías
+  </h2>
+
+  <div class="mb-1">
+    <label class="form-label fw-semibold">Recipe Category *</label>
+    <div class="category-dropdown" [class.is-open]="categoryOpen">
+
+      <!-- Trigger -->
+      <div class="input-with-icon category-trigger" (click)="toggleCategoryDropdown()">
+        <span class="input-prefix"><i class="bi bi-tag"></i></span>
+        <span class="category-trigger__label" [class.placeholder]="selectedCategories.length === 0">
+          {{ selectedCategories.length === 0
+              ? 'Select categories...'
+              : selectedCategories.length + ' categor' + (selectedCategories.length === 1 ? 'ía seleccionada' : 'ías seleccionadas') }}
+        </span>
+        <span class="category-trigger__caret"><i class="bi bi-chevron-expand"></i></span>
+      </div>
+
+      <!-- Panel -->
+      @if (categoryOpen) {
+        <div class="category-panel">
+          <div class="category-search-wrap">
+            <i class="bi bi-search category-search-icon"></i>
+            <input
+              class="category-search-input"
+              type="text"
+              placeholder="Search category..."
+              [value]="categorySearch"
+              (input)="onCategorySearch($event)"
+              (click)="$event.stopPropagation()"
+              autofocus
+            />
+          </div>
+          <ul class="category-list">
+            @for (cat of filteredCategorias; track cat.id_categoria) {
+              <li
+                class="category-list__item"
+                [class.is-selected]="isCategorySelected(cat)"
+                (click)="selectCategory(cat)"
+              >
+                <i class="bi bi-check2 me-2 category-check"></i>
+                {{ cat.nombre }}
+              </li>
+            } @empty {
+              <li class="category-list__empty">No categories found.</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+
+    <!-- Tags de categorías seleccionadas -->
+    @if (selectedCategories.length > 0) {
+      <div class="category-tags mt-2">
+        @for (cat of selectedCategories; track cat.id_categoria) {
+          <span class="category-tag">
+            {{ cat.nombre }}
+            <button type="button" class="category-tag__remove" (click)="removeCategory(cat)">
+              <i class="bi bi-x"></i>
+            </button>
+          </span>
+        }
+      </div>
+    }
+
+    @if (form.get('categoria')?.invalid && form.get('categoria')?.touched) {
+      <div class="text-danger small mt-1">
+        <span>Select at least one category.</span>
+      </div>
+    }
+  </div>
+</article>
 
     <article class="upload-card p-4 p-md-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
