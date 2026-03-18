@@ -3,10 +3,10 @@
 }
 
 .upload-card {
-	background: var(--secondaryBackground);
-	border: 1px solid var(--gray-200);
-	border-radius: 18px;
-	box-shadow: 0 8px 24px var(--shadow-sm);
+  background: var(--background);
+  border: 1.5px solid var(--gray-300);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px var(--shadow-sm);
 }
 
 .upload-title {
@@ -149,11 +149,11 @@
 }
 
 .input-soft {
-	border: 1px solid var(--gray-200);
-	background: var(--gray-100);
-	color: var(--PrimaryText);
-	border-radius: 12px;
-	padding: 0.7rem 0.85rem;
+  border: 1.5px solid var(--gray-300);
+  background: #fff;
+  color: var(--PrimaryText);
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
 }
 
 .input-soft::placeholder {

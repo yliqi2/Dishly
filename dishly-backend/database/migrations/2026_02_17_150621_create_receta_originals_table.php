@@ -15,6 +15,7 @@ return new class extends Migration
             $table->increments('id_receta');
             $table->string('titulo');
             $table->text('descripcion');
+            $table->text('instrucciones');
             $table->integer('tiempo_preparacion');
             $table->enum('tiempo_preparacion_unidad', ['minutes', 'hours'])->default('minutes');
             $table->enum('dificultad', ['easy', 'medium', 'hard'])->default('easy');

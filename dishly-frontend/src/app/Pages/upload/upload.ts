@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { BehaviorSubject, combineLatest, map } from 'rxjs';
@@ -22,7 +24,7 @@ interface UploadPreview {
   templateUrl: './upload.html',
   styleUrl: './upload.css',
 })
-export class Upload implements OnDestroy {
+export class Upload implements OnDestroy, OnInit {
   readonly maxPhotos = 5;
 
   readonly photos$ = new BehaviorSubject<UploadPreview[]>([]);
@@ -42,15 +44,21 @@ export class Upload implements OnDestroy {
   readonly photosError$ = new BehaviorSubject<boolean>(false);
   readonly submitting$ = new BehaviorSubject<boolean>(false);
 
+  private readonly integerValidator = (control: AbstractControl): ValidationErrors | null => {
+    const v = control.value;
+    if (v === null || v === '') return null;
+    return Number.isInteger(Number(v)) ? null : { integer: true };
+  };
+
   readonly form: FormGroup;
 
   constructor(private readonly fb: FormBuilder) {
     this.form = this.fb.group({
       titulo: ['', [Validators.required, Validators.maxLength(255)]],
       descripcion: ['', [Validators.required]],
-      tiempo_preparacion: [30, [Validators.required, Validators.min(1)]],
+      tiempo_preparacion: [30, [Validators.required, Validators.min(1), this.integerValidator]],
       tiempo_preparacion_unidad: ['minutes', [Validators.required]],
-      porciones: [4, [Validators.required, Validators.min(1)]],
+      porciones: [4, [Validators.required, Validators.min(1), this.integerValidator]],
       dificultad: ['easy', [Validators.required]],
       instrucciones: ['', [Validators.required]],
       ingredientes: this.fb.array([this.createIngredientGroup()]),
@@ -71,7 +79,7 @@ export class Upload implements OnDestroy {
 
   private createIngredientGroup(): FormGroup {
     return this.fb.group({
-      cantidad: ['', [Validators.required]],
+      cantidad: [null, [Validators.required, Validators.min(0.001)]],
       nombre: ['', [Validators.required]],
     });
   }
@@ -179,6 +187,12 @@ export class Upload implements OnDestroy {
     for (const item of this.photos$.value) {
       URL.revokeObjectURL(item.url);
     }
+  }
+
+  ngOnInit(): void {
+    this.selectedDifficulty$.subscribe((level) => {
+      this.form.patchValue({ dificultad: level });
+    });
   }
 
 }

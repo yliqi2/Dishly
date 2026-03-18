@@ -9,11 +9,18 @@ use App\Models\RecetaOriginal;
 
 class RecetaController extends Controller
 {
+    public function getCategorias()
+    {
+        $categorias = DB::table('categoria')->select('id_categoria', 'nombre')->get();
+        return response()->json($categorias);
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([
             'titulo' => ['required', 'string', 'max:255'],
             'descripcion' => ['required', 'string'],
+            'instrucciones' => ['required', 'string'],
             'tiempo_preparacion' => ['required', 'integer', 'min:1'],
             'tiempo_preparacion_unidad' => ['required', Rule::in(['minutes', 'hours'])],
             'dificultad' => ['required', Rule::in(['easy', 'medium', 'hard'])],
@@ -42,6 +49,7 @@ class RecetaController extends Controller
             $receta = new RecetaOriginal();
             $receta->titulo = $data['titulo'];
             $receta->descripcion = $data['descripcion'];
+            $receta->instrucciones = $data['instrucciones'];
             $receta->tiempo_preparacion = $data['tiempo_preparacion'];
             $receta->tiempo_preparacion_unidad = $data['tiempo_preparacion_unidad'];
             $receta->dificultad = $data['dificultad'];

@@ -15,10 +15,10 @@ return new class extends Migration
             $table->unsignedInteger('id_receta');
             $table->unsignedInteger('id_ingrediente');
             $table->decimal('cantidad');
+            $table->enum('unidad', ['g', 'kg', 'mg', 'l', 'ml']);
 
             $table->primary(['id_receta', 'id_ingrediente']);
             $table->foreign('id_receta')->references('id_receta')->on('receta_original');
-            $table->foreign('id_ingrediente')->references('id_ingrediente')->on('ingrediente');
         });
     }
 

@@ -1,6 +1,6 @@
 <section class="page-header page-container gradient-bg">
   <div class="page-header__inner">
-    <h1 class="page-title">Upload your Recipe</h1>
+    <h1 class="page-title">Upload</h1>
     <div class="page-underline" aria-hidden="true"></div>
   </div>
 </section>
@@ -71,11 +71,22 @@
     </article>
 
     <article class="upload-card p-4 p-md-5">
-      <h2 class="upload-title mb-4"><i class="bi bi-stars me-2"></i>Basic Information</h2>
+      <h2 class="upload-title mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-fork-knife" viewBox="0 0 16 16">
+  <path d="M13 .5c0-.276-.226-.506-.498-.465-1.703.257-2.94 2.012-3 8.462a.5.5 0 0 0 .498.5c.56.01 1 .13 1 1.003v5.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5zM4.25 0a.25.25 0 0 1 .25.25v5.122a.128.128 0 0 0 .256.006l.233-5.14A.25.25 0 0 1 5.24 0h.522a.25.25 0 0 1 .25.238l.233 5.14a.128.128 0 0 0 .256-.006V.25A.25.25 0 0 1 6.75 0h.29a.5.5 0 0 1 .498.458l.423 5.07a1.69 1.69 0 0 1-1.059 1.711l-.053.022a.92.92 0 0 0-.58.884L6.47 15a.971.971 0 1 1-1.942 0l.202-6.855a.92.92 0 0 0-.58-.884l-.053-.022a1.69 1.69 0 0 1-1.059-1.712L3.462.458A.5.5 0 0 1 3.96 0z"/>
+</svg>Basic Information</h2>
 
       <div class="mb-3">
         <label class="form-label fw-semibold" for="titulo">Recipe Title *</label>
-        <input id="titulo" class="form-control input-soft" formControlName="titulo" placeholder="E.g.: Traditional Carbonara Pasta" />
+        <div class="input-with-icon">
+          <span class="input-prefix"><i class="bi bi-card-heading"></i></span>
+          <input id="titulo" class="form-control input-soft" formControlName="titulo" placeholder="E.g.: Traditional Carbonara Pasta" />
+        </div>
+        @if (form.get('titulo')?.invalid && form.get('titulo')?.touched) {
+          <div class="text-danger small mt-1">
+            @if (form.get('titulo')?.errors?.['required']) {<span>Title is required.</span>}
+            @if (form.get('titulo')?.errors?.['maxlength']) {<span>Title cannot exceed 255 characters.</span>}
+          </div>
+        }
       </div>
 
       <div class="mb-4">
@@ -87,25 +98,54 @@
           formControlName="descripcion"
           placeholder="Describe your recipe... What makes it special?"
         ></textarea>
+        @if (form.get('descripcion')?.invalid && form.get('descripcion')?.touched) {
+          <div class="text-danger small mt-1">
+            <span>Description is required.</span>
+          </div>
+        }
       </div>
 
       <div class="row g-3 mb-4">
         <div class="col-12 col-md-4">
           <label class="form-label fw-semibold" for="tiempoPreparacion">Prep Time *</label>
-          <input id="tiempoPreparacion" type="number" class="form-control input-soft" formControlName="tiempo_preparacion" min="1" />
+          <div class="input-with-icon">
+            <span class="input-prefix"><i class="bi bi-clock"></i></span>
+            <input id="tiempoPreparacion" type="number" class="form-control input-soft" formControlName="tiempo_preparacion" min="1" />
+          </div>
+          @if (form.get('tiempo_preparacion')?.invalid && form.get('tiempo_preparacion')?.touched) {
+            <div class="text-danger small mt-1">
+              @if (form.get('tiempo_preparacion')?.errors?.['required']) {<span>Prep time is required.</span>}
+              @if (form.get('tiempo_preparacion')?.errors?.['min']) {<span>Must be at least 1.</span>}
+              @if (form.get('tiempo_preparacion')?.errors?.['integer']) {<span>Must be a whole number.</span>}
+            </div>
+          }
         </div>
 
         <div class="col-12 col-md-4">
           <label class="form-label fw-semibold" for="unidadTiempo">Time Unit *</label>
-          <select id="unidadTiempo" class="form-select input-soft" formControlName="tiempo_preparacion_unidad">
-            <option value="minutes">Minutes</option>
-            <option value="hours">Hours</option>
-          </select>
+          <div class="select-wrap">
+            <span class="input-prefix"><i class="bi bi-hourglass-split"></i></span>
+            <select id="unidadTiempo" class="form-select input-soft input-soft-select" formControlName="tiempo_preparacion_unidad">
+              <option value="minutes">Minutes</option>
+              <option value="hours">Hours</option>
+            </select>
+            <span class="select-caret"><i class="bi bi-chevron-down"></i></span>
+          </div>
         </div>
 
         <div class="col-12 col-md-4">
           <label class="form-label fw-semibold" for="porciones">Servings *</label>
-          <input id="porciones" type="number" class="form-control input-soft" formControlName="porciones" min="1" />
+          <div class="input-with-icon">
+            <span class="input-prefix"><i class="bi bi-people"></i></span>
+            <input id="porciones" type="number" class="form-control input-soft" formControlName="porciones" min="1" />
+          </div>
+          @if (form.get('porciones')?.invalid && form.get('porciones')?.touched) {
+            <div class="text-danger small mt-1">
+              @if (form.get('porciones')?.errors?.['required']) {<span>Servings is required.</span>}
+              @if (form.get('porciones')?.errors?.['min']) {<span>Must be at least 1.</span>}
+              @if (form.get('porciones')?.errors?.['integer']) {<span>Must be a whole number.</span>}
+            </div>
+          }
         </div>
       </div>
 
@@ -145,7 +185,7 @@
 
     <article class="upload-card p-4 p-md-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="upload-title m-0"><i class="bi bi-tools me-2"></i>Ingredients</h2>
+        <h2 class="upload-title m-0"><i class="bi bi-basket me-2"></i>Ingredients</h2>
         <button type="button" class="btn btn-outline-secondary btn-sm" (click)="addIngredient()">
           <i class="bi bi-plus-lg me-1"></i>Add
         </button>
@@ -153,17 +193,34 @@
 
       <div formArrayName="ingredientes" class="d-flex flex-column gap-3">
         @for (ingredient of ingredientes.controls; track ingredient; let i = $index) {
-          <div class="row g-2 align-items-center" [formGroupName]="i">
-            <div class="col-12 col-md-1">
+          <div class="row g-2 align-items-start" [formGroupName]="i">
+            <div class="col-12 col-md-1 pt-2">
               <span class="ingredient-badge">{{ i + 1 }}</span>
             </div>
             <div class="col-12 col-md-3">
-              <input class="form-control input-soft" formControlName="cantidad" placeholder="Amount" />
+              <div class="input-with-icon">
+                <span class="input-prefix"><i class="bi bi-hash"></i></span>
+                <input type="number" step="any" min="0" class="form-control input-soft" formControlName="cantidad" placeholder="Amount" />
+              </div>
+              @if (ingredientes.controls[i].get('cantidad')?.invalid && ingredientes.controls[i].get('cantidad')?.touched) {
+                <div class="text-danger small mt-1">
+                  @if (ingredientes.controls[i].get('cantidad')?.errors?.['required']) {<span>Required.</span>}
+                  @if (ingredientes.controls[i].get('cantidad')?.errors?.['min']) {<span>Must be greater than 0.</span>}
+                </div>
+              }
             </div>
             <div class="col-12 col-md-7">
-              <input class="form-control input-soft" formControlName="nombre" placeholder="Ingredient name" />
+              <div class="input-with-icon">
+                <span class="input-prefix"><i class="bi bi-egg-fried"></i></span>
+                <input class="form-control input-soft" formControlName="nombre" placeholder="Ingredient name" />
+              </div>
+              @if (ingredientes.controls[i].get('nombre')?.invalid && ingredientes.controls[i].get('nombre')?.touched) {
+                <div class="text-danger small mt-1">
+                  <span>Ingredient name is required.</span>
+                </div>
+              }
             </div>
-            <div class="col-12 col-md-1 text-md-end">
+            <div class="col-12 col-md-1 text-md-end pt-2">
               <button type="button" class="btn btn-link text-secondary" (click)="removeIngredient(i)">−</button>
             </div>
           </div>
@@ -179,6 +236,11 @@
         formControlName="instrucciones"
         placeholder="Describe step by step how to prepare your recipe..."
       ></textarea>
+      @if (form.get('instrucciones')?.invalid && form.get('instrucciones')?.touched) {
+        <div class="text-danger small mt-2">
+          <span>Instructions are required.</span>
+        </div>
+      }
     </article>
 
     <div class="d-flex justify-content-end gap-2 pb-3">

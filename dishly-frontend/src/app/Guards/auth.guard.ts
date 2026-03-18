@@ -1,7 +1,7 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CanActivate, Router, UrlTree } from '@angular/router';
-import { AuthServices } from '../Pages/auth/Services/auth-services';
+import { AuthServices } from '../Core/Services/Auth/auth-services';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {

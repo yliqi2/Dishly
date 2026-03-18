@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { AuthServices } from '../auth/Services/auth-services';
+import { AuthServices } from '../../Core/Services/Auth/auth-services';
 import { LucideAngularModule } from 'lucide-angular';
 import { toSignal } from '@angular/core/rxjs-interop';
 
