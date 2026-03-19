@@ -62,7 +62,6 @@
 }
 
 .btn-view-recipe:hover {
-  background-color: #ffc107;
-  color: #000;
-  transform: scale(1.02);
+  filter: brightness(0.96);
+  transform: translateY(-1px);
 }

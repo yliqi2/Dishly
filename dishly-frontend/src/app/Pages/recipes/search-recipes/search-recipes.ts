@@ -17,9 +17,9 @@ export class SearchRecipes {
   searchQuery: string = '';
   
   categories = ['Pasta', 'Vegetarian', 'Seafood', 'Quick', 'Dessert', 'Healthy'];
-  selectedIngredients: string[] = ['Tomate', 'Queso'];
-  selectedPersons: string[] = ['2 personas'];
-  selectedTags: string[] = ['Pasta', 'Italiano'];
+  selectedIngredients: string[] = ['Tomato', 'Cheese'];
+  selectedPersons: string[] = ['2 people'];
+  selectedTags: string[] = ['Pasta', 'Italian'];
   
   priceMin: number = 0;
   priceMax: number = 100;
@@ -36,9 +36,9 @@ export class SearchRecipes {
   showTagsDropdown: boolean = false;
 
   // Mock data for available options
-  allIngredients = ['Tomate', 'Queso', 'Cebolla', 'Ajo', 'Pasta', 'Pollo', 'Albahaca', 'Champiñones'];
-  allPersons = ['1 persona', '2 personas', '3 personas', '4 personas', '5+ personas'];
-  allTags = ['Pasta', 'Italiano', 'Vegetariano', 'Rápido', 'Saludable', 'Gourmet'];
+  allIngredients = ['Tomato', 'Cheese', 'Onion', 'Garlic', 'Pasta', 'Chicken', 'Basil', 'Mushrooms'];
+  allPersons = ['1 person', '2 people', '3 people', '4 people', '5+ people'];
+  allTags = ['Pasta', 'Italian', 'Vegetarian', 'Quick', 'Healthy', 'Gourmet'];
 
   get filteredIngredientsOptions() {
     return this.allIngredients.filter(ing => 
@@ -85,8 +85,17 @@ export class SearchRecipes {
     this.showTagsDropdown = false;
   }
 
-  // Wrapper for template access to setTimeout
-  protected readonly setTimeout = setTimeout;
+  closeIngredientDropdown() {
+    setTimeout(() => (this.showIngredientDropdown = false), 200);
+  }
+
+  closePersonsDropdown() {
+    setTimeout(() => (this.showPersonsDropdown = false), 200);
+  }
+
+  closeTagsDropdown() {
+    setTimeout(() => (this.showTagsDropdown = false), 200);
+  }
 
   recipes = [
     {
@@ -160,6 +169,14 @@ export class SearchRecipes {
     this.minRating = r;
   }
 
+  validateRange() {
+    if (this.priceMin > this.priceMax) {
+      const temp = this.priceMin;
+      this.priceMin = this.priceMax;
+      this.priceMax = temp;
+    }
+  }
+
   updateSearch(query: string) {
     this.searchQuery = query;
   }
@@ -169,11 +186,9 @@ export class SearchRecipes {
       const matchesSearch = recipe.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
                           recipe.description.toLowerCase().includes(this.searchQuery.toLowerCase());
       
-      const matchesPrice = recipe.price <= this.priceMax;
+      const matchesPrice = recipe.price >= this.priceMin && recipe.price <= this.priceMax;
       const matchesRating = recipe.rating >= this.minRating;
       
-      // En una implementación real, aquí filtraríamos por ingredientes, personas y tags
-      // Para este mock, devolvemos los que cumplen búsqueda, precio y rating
       return matchesSearch && matchesPrice && matchesRating;
     });
   }

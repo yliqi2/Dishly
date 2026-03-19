@@ -46,7 +46,7 @@
 
           <div class="image-overlay top-right">
             <div class="rating-badge-custom shadow-sm">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="#ffc107" class="star-icon">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="#FD8923" class="star-icon">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
               </svg>
               {{ recipe.rating }}
@@ -82,7 +82,7 @@
               viewBox="0 0 24 24" 
               width="32" 
               height="32"
-              [attr.fill]="i <= (hoverRating || userRating) ? '#ffc107' : '#E5E7EB'"
+              [attr.fill]="i <= (hoverRating || userRating) ? '#FD8923' : '#E5E7EB'"
               (mouseenter)="setHoverRating(i)"
               (mouseleave)="setHoverRating(0)"
               (click)="setRating(i)"

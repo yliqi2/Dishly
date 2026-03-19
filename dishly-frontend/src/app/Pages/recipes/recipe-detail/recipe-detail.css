@@ -227,10 +227,9 @@
 }
 
 .btn-submit-custom:hover { 
-  background-color: #FD8923;
-  color: #ffffff;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(255, 193, 7, 0.3);
+  filter: brightness(0.96);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(253, 137, 35, 0.3);
 }
 
 .empty-icon-wrapper {
@@ -296,7 +295,7 @@
 .stat-card-custom:hover {
   border-color: #FD8923;
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(255, 193, 7, 0.1);
+  box-shadow: 0 8px 24px rgba(253, 137, 35, 0.1);
 }
 
 .stat-icon-wrapper { 
