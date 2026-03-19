@@ -1,0 +1,68 @@
+<article class="recipe-card">
+  <div class="recipe-image-wrapper">
+    <img [src]="mainImage()" alt="Recipe image" class="recipe-image" loading="lazy">
+
+    <div class="recipe-tags-top">
+      <div class="recipe-tags-top-left">
+        @for (cat of displayedCategories(); track cat.id_categoria) {
+        <span class="recipe-tag recipe-tag-category">
+          {{ cat.nombre }}
+        </span>
+        }
+      </div>
+      <div class="recipe-tags-top-right">
+        <span class="recipe-tag recipe-tag-rating">
+          <lucide-icon name="star" size="14" strokeWidth="2.5" class="star-icon"></lucide-icon>
+          4.5
+        </span>
+      </div>
+    </div>
+
+    <div class="recipe-tags-bottom">
+      <div class="recipe-tags-bottom-left">
+        @if (displayPrice() !== null) {
+        <span class="recipe-tag recipe-tag-price">{{ displayPrice() }} €</span>
+        }
+      </div>
+      <div class="recipe-tags-bottom-right">
+        <span class="recipe-tag recipe-tag-difficulty">
+          <div class="difficulty-bars">
+            <span class="diff-bar" [class.active-easy]="difficultyBars().bar1 && receta().dificultad === 'easy'"
+              [class.active-medium]="difficultyBars().bar1 && receta().dificultad === 'medium'"
+              [class.active-hard]="difficultyBars().bar1 && receta().dificultad === 'hard'"></span>
+            <span class="diff-bar" [class.active-medium]="difficultyBars().bar2 && receta().dificultad === 'medium'"
+              [class.active-hard]="difficultyBars().bar2 && receta().dificultad === 'hard'"></span>
+            <span class="diff-bar" [class.active-hard]="difficultyBars().bar3 && receta().dificultad === 'hard'"></span>
+          </div>
+          {{ difficultyLabel() }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="recipe-content">
+    <h3 class="recipe-title">{{ receta().titulo }}</h3>
+    <p class="recipe-desc">{{ receta().descripcion }}</p>
+
+    <div class="recipe-divider"></div>
+
+    <div class="recipe-footer">
+      <div class="recipe-author">
+        <lucide-icon name="chef-hat" size="16" strokeWidth="2"></lucide-icon>
+        <span class="author-name">{{ chefName() }}</span>
+      </div>
+      <div class="recipe-meta-group">
+        <div class="recipe-meta">
+          <lucide-icon name="user" size="16" strokeWidth="2"></lucide-icon>
+          <span>{{ receta().porciones }}p</span>
+        </div>
+        <div class="recipe-meta">
+          <lucide-icon name="clock" size="16" strokeWidth="2"></lucide-icon>
+          <span>{{ displayTime() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <a [routerLink]="['/recipe', receta().id_receta]" class="btn-recipe-view">View recipe</a>
+  </div>
+</article>

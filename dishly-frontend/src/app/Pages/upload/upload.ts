@@ -292,7 +292,20 @@ export class Upload implements OnDestroy, OnInit {
     const current = this.photos$.value;
     const remaining = this.maxPhotos - current.length;
     const picked = Array.from(input.files).slice(0, remaining);
-    const mapped = picked.map((file) => ({ file, url: URL.createObjectURL(file) }));
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const validFiles = picked.filter(file => allowedTypes.includes(file.type));
+
+    if (validFiles.length < picked.length) {
+      this.submitError$.next('Only PNG, JPG, and WEBP files are allowed.');
+    }
+
+    if (validFiles.length === 0) {
+      input.value = '';
+      return;
+    }
+
+    const mapped = validFiles.map((file) => ({ file, url: URL.createObjectURL(file) }));
     this.photos$.next([...current, ...mapped]);
     this.photosError$.next(false);
     input.value = '';

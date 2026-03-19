@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { AuthServices } from '../../Core/Services/Auth/auth-services';
 import { LucideAngularModule } from 'lucide-angular';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Profile as ProfileService } from '../../Core/Services/Recipes/profile-services';
+import { RecipeCardComponent } from '../../Core/Components/recipe-card/recipe-card';
 
 type User = {
   nombre?: string;
@@ -17,13 +19,14 @@ type User = {
 
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, RouterLink, LucideAngularModule, RecipeCardComponent],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Profile {
   private authService = inject(AuthServices);
+  private profileService = inject(ProfileService);
 
   protected readonly user = toSignal<User | null>(this.authService.user$, { initialValue: null });
   protected readonly isLoggingOut = signal(false);
@@ -39,7 +42,8 @@ export class Profile {
     return (u?.nombre ?? u?.name ?? 'User') as string;
   }
 
-  protected readonly myRecipesCount = computed(() => 0);
+  protected readonly myRecipesCount = toSignal(this.profileService.getCountRecipes(), { initialValue: 0 });
+  protected readonly myRecipes = toSignal(this.profileService.getMyRecipes(), { initialValue: [] });
   protected readonly boughtRecipesCount = computed(() => 0);
 
   protected get memberSince(): string {

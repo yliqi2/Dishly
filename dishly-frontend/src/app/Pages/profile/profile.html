@@ -12,16 +12,16 @@
         <div class="profile-header-main">
           <div class="profile-avatar" aria-hidden="true">
             @if (iconUrl(); as url) {
-              <img [src]="url" alt="Profile icon" />
+            <img [src]="url" alt="Profile icon" />
             } @else {
-              <span class="profile-avatar-initial">{{ displayName.charAt(0).toUpperCase() }}</span>
+            <span class="profile-avatar-initial">{{ displayName.charAt(0).toUpperCase() }}</span>
             }
           </div>
           <div class="profile-info">
             <h1 id="profile-title" class="profile-name">
               {{ displayName }}
               @if (user()?.chef) {
-                <lucide-icon name="chef-hat" class="profile-chef-hat" size="18" strokeWidth="2"></lucide-icon>
+              <lucide-icon name="chef-hat" class="profile-chef-hat" size="18" strokeWidth="2"></lucide-icon>
               }
             </h1>
             <p class="profile-meta">{{ memberSince }}</p>
@@ -48,11 +48,25 @@
         </article>
       </section>
 
-      <button type="button" class="btn-danger btn-full-width profile-logout-btn" [disabled]="isLoggingOut()" (click)="logout()" [attr.aria-busy]="isLoggingOut()">
-        @if (isLoggingOut()) {
-          <span class="btn-loading-icon" aria-hidden="true"></span>
+      <div class="profile-recipes-section">
+        <h2 class="section-title">My Published Recipes</h2>
+        @if (myRecipes().length > 0) {
+          <div class="recipes-grid">
+            @for (recipe of myRecipes(); track recipe.id_receta) {
+              <app-recipe-card [receta]="recipe"></app-recipe-card>
+            }
+          </div>
         } @else {
-          <span class="profile-logout-text">Log out</span>
+          <p class="no-recipes-message">You haven't published any recipes yet.</p>
+        }
+      </div>
+
+      <button type="button" class="btn-danger btn-full-width profile-logout-btn" [disabled]="isLoggingOut()"
+        (click)="logout()" [attr.aria-busy]="isLoggingOut()">
+        @if (isLoggingOut()) {
+        <span class="btn-loading-icon" aria-hidden="true"></span>
+        } @else {
+        <span class="profile-logout-text">Log out</span>
         }
       </button>
     </div>

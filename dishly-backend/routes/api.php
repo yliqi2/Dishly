@@ -23,7 +23,11 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/profile/deactivateAccount', [UserController::class, 'deactivateAccount']);
     Route::post('/profile/upload-icon', [AuthController::class, 'uploadIcon']);
     
+    Route::get('/profile/count-recipes', [RecetaController::class, 'getCountRecipes']); 
+    Route::get('/profile/my-recipes', [RecetaController::class, 'getMyRecipes']);
+    
     // Rutas de Recipes
     Route::post('/recetas/upload', [RecetaController::class, 'store']);
     Route::get('/recetas/categorias', [RecetaController::class, 'getCategorias']);
-});
+
+}); 

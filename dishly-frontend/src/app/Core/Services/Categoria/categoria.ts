@@ -13,8 +13,6 @@ import { CategoriaItem } from '../../Interfaces/CategoriaItem';
 export class Categoria {
   private apiUrl = '/api';
   private http = inject(HttpClient);
-  private router = inject(Router);
-  private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   getAll(): Observable<CategoriaItem[]> {
     return this.http.get<CategoriaItem[]>(`${this.apiUrl}/recetas/categorias`);

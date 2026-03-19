@@ -14,6 +14,7 @@ import { authInterceptor } from './Core/interceptors/auth-interceptor';
 
 import {
   ChefHat,
+  Clock,
   Cpu,
   Crown,
   Eye,
@@ -24,9 +25,11 @@ import {
   Pencil,
   ShieldCheck,
   ShoppingCart,
+  Star,
   TrendingUp,
   Upload,
-  User
+  User,
+  Wheat
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -39,6 +42,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(
       LucideAngularModule.pick({
         ChefHat,
+        Clock,
         Cpu,
         Crown,
         Eye,
@@ -48,9 +52,11 @@ export const appConfig: ApplicationConfig = {
         Pencil,
         ShieldCheck,
         ShoppingCart,
+        Star,
         TrendingUp,
         Upload,
-        User
+        User,
+        Wheat
       })
     )
   ]

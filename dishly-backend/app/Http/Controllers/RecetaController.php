@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use App\Models\RecetaOriginal;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 
 class RecetaController extends Controller
@@ -172,4 +173,107 @@ class RecetaController extends Controller
 
         return $storedPaths;
     }
+
+    public function getMyRecipes()
+    {
+        try {
+            $user = Auth::guard('api')->user();
+            
+            $recipes = DB::table('receta_original')
+                    ->where('id_autor', $user->id_usuario)
+                    ->get();
+            
+            if ($recipes->isEmpty()) {
+                return response()->json([]);
+            }
+
+            $recipeIds = $recipes->pluck('id_receta')->toArray();
+
+            $categorias = DB::table('receta_categoria')
+                ->join('categoria', 'receta_categoria.id_categoria', '=', 'categoria.id_categoria')
+                ->whereIn('receta_categoria.id_receta', $recipeIds)
+                ->select('receta_categoria.id_receta', 'categoria.id_categoria', 'categoria.nombre')
+                ->get()
+                ->groupBy('id_receta');
+
+            $ingredientes = DB::table('receta_ingrediente')
+                ->join('ingrediente', 'receta_ingrediente.id_ingrediente', '=', 'ingrediente.id_ingrediente')
+                ->whereIn('receta_ingrediente.id_receta', $recipeIds)
+                ->select(
+                    'receta_ingrediente.id_receta',
+                    'ingrediente.id_ingrediente',
+                    'ingrediente.nombre',
+                    'receta_ingrediente.cantidad',
+                    'receta_ingrediente.unidad'
+                )
+                ->get()
+                ->groupBy('id_receta');
+
+            foreach ($recipes as $recipe) {
+                $recipe->categorias = $categorias->get($recipe->id_receta, []);
+                $recipe->ingredientes = $ingredientes->get($recipe->id_receta, []);
+                $recipe->autor_nombre = $user->nombre;
+            }
+
+            return response()->json($recipes);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get recipes',
+                'errors' => [
+                    $e->getMessage(),
+                ],
+            ], 500);
+        }
+    }
+
+    public function getCountRecipes()
+    {
+        try {
+            $user = Auth::guard('api')->user();
+            
+            $count = DB::table('receta_original')
+                    ->where('id_autor', $user->id_usuario)
+                    ->count();
+            
+            return response()->json($count);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get count of recipes',
+                'errors' => [
+                    $e->getMessage(),
+                ],
+            ], 500);
+        }
+    }   
+
+    public function getValoraciones()
+    {
+        try {
+            $user = Auth::guard('api')->user();
+            
+            $valoraciones = DB::table('valoracion')
+                    ->join('receta_original', 'valoracion.id_receta', '=', 'receta_original.id_receta')
+                    ->where('valoracion.id_usuario', $user->id_usuario)
+                    ->select(
+                        'valoracion.*', 
+                        'receta_original.titulo as receta_titulo', 
+                        'receta_original.imagen_1 as receta_imagen'
+                    )
+                    ->orderBy('valoracion.fecha', 'desc')
+                    ->get();
+            
+            if ($valoraciones->isEmpty()) {
+                return response()->json([]);
+            }
+
+            return response()->json($valoraciones);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get valoraciones',
+                'errors' => [
+                    $e->getMessage(),
+                ],
+            ], 500);
+        }
+    }   
 }
