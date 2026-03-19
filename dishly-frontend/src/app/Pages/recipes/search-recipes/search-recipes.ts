@@ -183,13 +183,39 @@ export class SearchRecipes {
 
   get filteredRecipes() {
     return this.recipes.filter(recipe => {
-      const matchesSearch = recipe.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+      // Search query filter
+      const matchesSearch = !this.searchQuery || 
+                          recipe.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
                           recipe.description.toLowerCase().includes(this.searchQuery.toLowerCase());
       
+      // Price range filter
       const matchesPrice = recipe.price >= this.priceMin && recipe.price <= this.priceMax;
-      const matchesRating = recipe.rating >= this.minRating;
       
-      return matchesSearch && matchesPrice && matchesRating;
+      // Rating filter
+      const matchesRating = recipe.rating >= this.minRating;
+
+      // Ingredients filter (mock logic: if any selected ingredient is in the title/description or if we had an ingredients array)
+      // Since mock recipes don't have an ingredients array, we'll simulate it
+      const matchesIngredients = this.selectedIngredients.length === 0 || 
+                                 this.selectedIngredients.some(ing => 
+                                   recipe.title.toLowerCase().includes(ing.toLowerCase()) ||
+                                   recipe.description.toLowerCase().includes(ing.toLowerCase())
+                                 );
+
+      // Persons filter (mock logic: matching the badge or description)
+      const matchesPersons = this.selectedPersons.length === 0 ||
+                            this.selectedPersons.some(p => 
+                              recipe.description.toLowerCase().includes(p.toLowerCase()) ||
+                              recipe.badges.some(b => b.toLowerCase().includes(p.toLowerCase()))
+                            );
+
+      // Tags filter (matching badges)
+      const matchesTags = this.selectedTags.length === 0 ||
+                         this.selectedTags.some(tag => 
+                           recipe.badges.some(b => b.toLowerCase() === tag.toLowerCase())
+                         );
+      
+      return matchesSearch && matchesPrice && matchesRating && matchesIngredients && matchesPersons && matchesTags;
     });
   }
 }

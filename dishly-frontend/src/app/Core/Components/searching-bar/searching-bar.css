@@ -55,10 +55,10 @@
 	height: 48px;
 	border-radius: 50%;
 	border: none;
-	background: #ff8c00;
+	background: var(--highlight);
 	color: white;
 	cursor: pointer;
-	transition: background 0.3s ease;
+	transition: all 0.3s ease;
 	flex-shrink: 0;
 }
 
@@ -69,7 +69,8 @@
 }
 
 .search-bar__button:hover {
-	background: var(--highlight-hover);
+	filter: brightness(0.96);
+	transform: translateY(-1px);
 }
 
 .search-bar__button:active {
