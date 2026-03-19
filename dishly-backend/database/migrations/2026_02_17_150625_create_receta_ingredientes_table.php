@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('receta_ingrediente', function (Blueprint $table) {
             $table->unsignedInteger('id_receta');
             $table->unsignedInteger('id_ingrediente');
-            $table->decimal('cantidad');
+            $table->decimal('cantidad', 10, 2);
             $table->enum('unidad', ['g', 'kg', 'mg', 'l', 'ml']);
 
             $table->primary(['id_receta', 'id_ingrediente']);
-            $table->foreign('id_receta')->references('id_receta')->on('receta_original');
+            $table->foreign('id_receta')->references('id_receta')->on('receta_original')->onDelete('cascade');
+            $table->foreign('id_ingrediente')->references('id_ingrediente')->on('ingrediente')->onDelete('cascade');
         });
     }
 

@@ -6,16 +6,15 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\UserController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:api');
-
-// Auth routes (public)
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Auth routes (protected)
 Route::middleware('auth:api')->group(function () {
+    // Rutas de Profile
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
     Route::post('/logout', [AuthController::class, 'logout']);
     
     Route::put('/profile', [AuthController::class, 'updateProfile']);
@@ -24,6 +23,7 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/profile/deactivateAccount', [UserController::class, 'deactivateAccount']);
     Route::post('/profile/upload-icon', [AuthController::class, 'uploadIcon']);
     
+    // Rutas de Recipes
     Route::post('/recetas/upload', [RecetaController::class, 'store']);
     Route::get('/recetas/categorias', [RecetaController::class, 'getCategorias']);
 });

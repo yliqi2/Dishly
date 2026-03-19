@@ -65,7 +65,7 @@
 .brand-subtitle {
 	color: var(--PrimaryText);
 	font-family: var(--font-display);
-	font-size: 14px;
+	font-size: 16px;
 	line-height: 1.2;
 	margin-top: 4px;
 }
@@ -249,7 +249,7 @@
 }
 
 .user-subtitle {
-	font-size: 14px;
+	font-size: 16px;
 	color: var(--SecondaryText);
 	margin-top: 2px;
 }
@@ -285,7 +285,7 @@
 	background: transparent;
 	text-align: left;
 	padding: 10px 12px;
-	font-size: 15px;
+	font-size: 16px;
 	border-radius: 12px;
 	color: var(--PrimaryText);
 	cursor: pointer;
@@ -531,7 +531,7 @@
 	}
 
 	.brand-subtitle {
-		font-size: 13px;
+		font-size: 16px;
 	}
 
 	.nav-content {
@@ -550,7 +550,7 @@
 	}
 
 	.user-subtitle {
-		font-size: 13px;
+		font-size: 16px;
 	}
 }
 
@@ -571,7 +571,7 @@
 	}
 
 	.brand-subtitle {
-		font-size: 12px;
+		font-size: 16px;
 	}
 
 	.menu-link {
@@ -607,7 +607,7 @@
 	}
 
 	.brand-subtitle {
-		font-size: 11px;
+		font-size: 16px;
 	}
 
 	.hamburger {
@@ -625,17 +625,17 @@
 	}
 
 	.menu-link {
-		font-size: 15px;
+		font-size: 16px;
 	}
 
 	.avatar {
 		width: 40px;
 		height: 40px;
-		font-size: 15px;
+		font-size: 16px;
 	}
 
 	.cta {
-		font-size: 15px;
+		font-size: 16px;
 		padding: 8px 14px;
 	}
 }
