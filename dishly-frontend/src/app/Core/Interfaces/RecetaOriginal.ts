@@ -32,4 +32,5 @@ export interface RecetaOriginal {
     imagen_3: string | null;
     imagen_4: string | null;
     imagen_5: string | null;
+    media_valoraciones: number;
 }

@@ -31,4 +31,13 @@ export class Profile {
       tap(res => console.log('getCountRecipes response:', res))
     );
   }
+
+  getMediaValoraciones(): Observable<number> {
+    if (!this.auth.isAuthenticated()) {
+      return of(0);
+    }
+    return this.http.get<number>(`${this.apiUrl}/profile/media-valoraciones`).pipe(
+      tap(res => console.log('getMediaValoraciones response:', res))
+    );
+  }
 }

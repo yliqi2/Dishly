@@ -275,5 +275,75 @@ class RecetaController extends Controller
                 ],
             ], 500);
         }
-    }   
+    }
+
+    public function getMediaValoraciones()
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            $media = DB::table('valoracion')
+                ->join('receta_original', 'valoracion.id_receta', '=', 'receta_original.id_receta')
+                ->where('receta_original.id_autor', $user->id_usuario)
+                ->avg('valoracion.puntuacion');
+
+            return response()->json(['media' => $media !== null ? round((float) $media, 2) : null]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get media de valoraciones',
+                'errors' => [
+                    $e->getMessage(),
+                ],
+            ], 500);
+        }
+    }
+
+    public function setValoracion(Request $request)
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            $data = $request->validate([
+                'id_receta'  => ['required', 'integer', 'exists:receta_original,id_receta'],
+                'puntuacion' => ['required', 'integer', 'min:1', 'max:5'],
+                'comentario' => ['nullable', 'string', 'max:1000'],
+            ]);
+
+            // No permitir valorar la propia receta
+            $esAutor = DB::table('receta_original')
+                ->where('id_receta', $data['id_receta'])
+                ->where('id_autor', $user->id_usuario)
+                ->exists();
+
+            if ($esAutor) {
+                return response()->json([
+                    'message' => 'No puedes valorar tu propia receta.',
+                ], 403);
+            }
+
+            DB::table('valoracion')->updateOrInsert(
+                [
+                    'id_receta'  => $data['id_receta'],
+                    'id_usuario' => $user->id_usuario,
+                ],
+                [
+                    'puntuacion' => $data['puntuacion'],
+                    'comentario' => $data['comentario'] ?? null,
+                    'fecha'      => now()->toDateString(),
+                ]
+            );
+
+            return response()->json(['message' => 'Valoración guardada correctamente.']);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors'  => $e->errors(),
+            ], 422);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not save valoración',
+                'errors'  => [$e->getMessage()],
+            ], 500);
+        }
+    }
 }

@@ -28,7 +28,7 @@ type TimeUnit = 'minutes' | 'hours';
 })
 export class Upload implements OnDestroy, OnInit {
   readonly maxPhotos = 5;
-  readonly ingredientUnits = ['g', 'kg', 'mg', 'l', 'ml'] as const;
+  readonly ingredientUnits = ['g', 'kg', 'mg', 'l', 'ml', 'unit'] as const;
 
   readonly photos$ = new BehaviorSubject<UploadPreview[]>([]);
   readonly selectedDifficulty$ = new BehaviorSubject<DifficultyLevel>('easy');

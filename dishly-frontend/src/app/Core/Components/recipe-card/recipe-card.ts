@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { RecetaOriginal } from '../../Interfaces/RecetaOriginal';
+import { Console } from 'console';
 
 @Component({
   selector: 'app-recipe-card',
@@ -47,6 +48,14 @@ export class RecipeCardComponent {
       bar2: diff === 'medium' || diff === 'hard',
       bar3: diff === 'hard'
     };
+  });
+
+  protected readonly mediaValoraciones = computed(() => {
+    const media = this.receta().media_valoraciones;
+    if (media !== null && Number(media) > 0) {
+      return Number(media);
+    }
+    return 'NA';
   });
 
   protected readonly mainImage = computed(() => {
