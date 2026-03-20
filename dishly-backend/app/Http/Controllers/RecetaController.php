@@ -210,9 +210,17 @@ class RecetaController extends Controller
                 ->get()
                 ->groupBy('id_receta');
 
+            $valoraciones = DB::table('valoracion')
+                ->whereIn('id_receta', $recipeIds)
+                ->select('id_receta', DB::raw('AVG(puntuacion) as media_valoraciones'))
+                ->groupBy('id_receta')
+                ->get()
+                ->keyBy('id_receta');
+
             foreach ($recipes as $recipe) {
                 $recipe->categorias = $categorias->get($recipe->id_receta, []);
                 $recipe->ingredientes = $ingredientes->get($recipe->id_receta, []);
+                $recipe->media_valoraciones = $valoraciones->get($recipe->id_receta)->media_valoraciones ?? null;
                 $recipe->autor_nombre = $user->nombre;
             }
 
@@ -297,6 +305,57 @@ class RecetaController extends Controller
         } catch (Throwable $e) {
             return response()->json([
                 'message' => 'Could not get recipes',
+                'errors' => [
+                    'server' => [$e->getMessage()],
+                ],
+            ], 500);
+        }
+    }
+
+    public function getRecetaById($id)
+    {
+        try {
+            $recipe = DB::table('receta_original')->where('id_receta', $id)->first();
+            
+            if (!$recipe) {
+                return response()->json(['message' => 'Recipe not found'], 404);
+            }
+
+            $categorias = DB::table('receta_categoria')
+                ->join('categoria', 'receta_categoria.id_categoria', '=', 'categoria.id_categoria')
+                ->where('receta_categoria.id_receta', $id)
+                ->select('categoria.id_categoria', 'categoria.nombre')
+                ->get();
+
+            $ingredientes = DB::table('receta_ingrediente')
+                ->join('ingrediente', 'receta_ingrediente.id_ingrediente', '=', 'ingrediente.id_ingrediente')
+                ->where('receta_ingrediente.id_receta', $id)
+                ->select(
+                    'ingrediente.id_ingrediente',
+                    'ingrediente.nombre',
+                    'receta_ingrediente.cantidad',
+                    'receta_ingrediente.unidad'
+                )
+                ->get();
+
+            $valoracion = DB::table('valoracion')
+                ->where('id_receta', $id)
+                ->avg('puntuacion');
+
+            $autor = DB::table('users')
+                ->where('id_usuario', $recipe->id_autor)
+                ->select('nombre')
+                ->first();
+
+            $recipe->categorias = $categorias;
+            $recipe->ingredientes = $ingredientes;
+            $recipe->media_valoraciones = $valoracion !== null ? round((float) $valoracion, 2) : 0;
+            $recipe->autor_nombre = $autor->nombre ?? null;
+
+            return response()->json($recipe);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get recipe',
                 'errors' => [
                     'server' => [$e->getMessage()],
                 ],

@@ -8,10 +8,10 @@
     <div class="position-absolute top-0 start-0 end-0 d-flex justify-content-between align-items-start p-3">
       <div class="d-flex flex-wrap gap-2" style="max-width: 60%;">
         @for (cat of displayedCategories(); track cat.id_categoria) {
-          <span class="badge recipe-tag-category text-truncate" style="max-width: 100px;">{{ cat.nombre }}</span>
+        <span class="badge recipe-tag-category text-truncate" style="max-width: 100px;">{{ cat.nombre }}</span>
         }
         @if (extraCategoriesCount() > 0) {
-          <span class="badge recipe-tag-category">+{{ extraCategoriesCount() }}</span>
+        <span class="badge recipe-tag-category">+{{ extraCategoriesCount() }}</span>
         }
       </div>
       <span class="badge recipe-tag-rating d-flex align-items-center gap-1 flex-shrink-0">
@@ -24,20 +24,17 @@
     <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-between align-items-end p-3">
       <div>
         @if (displayPrice() !== null) {
-          <span class="badge recipe-tag-price fs-6">{{ displayPrice() }} €</span>
+        <span class="badge recipe-tag-price fs-6">{{ displayPrice() }} €</span>
         }
       </div>
       <span class="badge recipe-tag-difficulty d-flex align-items-center gap-2">
         <div class="difficulty-bars">
-          <span class="diff-bar"
-            [class.active-easy]="difficultyBars().bar1 && receta().dificultad === 'easy'"
+          <span class="diff-bar" [class.active-easy]="difficultyBars().bar1 && receta().dificultad === 'easy'"
             [class.active-medium]="difficultyBars().bar1 && receta().dificultad === 'medium'"
             [class.active-hard]="difficultyBars().bar1 && receta().dificultad === 'hard'"></span>
-          <span class="diff-bar"
-            [class.active-medium]="difficultyBars().bar2 && receta().dificultad === 'medium'"
+          <span class="diff-bar" [class.active-medium]="difficultyBars().bar2 && receta().dificultad === 'medium'"
             [class.active-hard]="difficultyBars().bar2 && receta().dificultad === 'hard'"></span>
-          <span class="diff-bar"
-            [class.active-hard]="difficultyBars().bar3 && receta().dificultad === 'hard'"></span>
+          <span class="diff-bar" [class.active-hard]="difficultyBars().bar3 && receta().dificultad === 'hard'"></span>
         </div>
         {{ difficultyLabel() }}
       </span>
@@ -59,10 +56,10 @@
           <span class="text-truncate" style="max-width: 120px;">{{ chefName() }}</span>
         </div>
         @if (publishedDate()) {
-          <div class="d-flex align-items-center gap-2 text-secondary" style="font-size: 13px; opacity: 0.8;">
-            <lucide-icon name="calendar" size="14" strokeWidth="2"></lucide-icon>
-            <span>{{ publishedDate() }}</span>
-          </div>
+        <div class="d-flex align-items-center gap-2 text-secondary" style="font-size: 13px; opacity: 0.8;">
+          <lucide-icon name="calendar" size="14" strokeWidth="2"></lucide-icon>
+          <span>{{ publishedDate() }}</span>
+        </div>
         }
       </div>
       <div class="d-flex flex-column align-items-end gap-2">
@@ -79,7 +76,7 @@
       </div>
     </div>
 
-    <a [routerLink]="['/recipe', receta().id_receta]" class="btn btn-recipe-view w-100">View recipe</a>
+    <a [routerLink]="['/recipesdetails', receta().id_receta]" class="btn btn-recipe-view w-100">View recipe</a>
   </div>
 
 </article>
