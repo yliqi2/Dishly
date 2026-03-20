@@ -16,7 +16,22 @@ export class RecipeCardComponent {
   receta = input.required<RecetaCard>();
 
   protected readonly displayedCategories = computed(() => {
-    return this.receta().categorias ?? [];
+    return (this.receta().categorias ?? []).slice(0, 2);
+  });
+
+  protected readonly extraCategoriesCount = computed(() => {
+    const cats = this.receta().categorias ?? [];
+    return cats.length > 2 ? cats.length - 2 : 0;
+  });
+
+  protected readonly publishedDate = computed(() => {
+    const dateStr = this.receta().fecha_creacion;
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   });
 
   protected readonly displayPrice = computed(() => {

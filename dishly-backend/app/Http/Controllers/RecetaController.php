@@ -181,6 +181,7 @@ class RecetaController extends Controller
             
             $recipes = DB::table('receta_original')
                     ->where('id_autor', $user->id_usuario)
+                    ->orderByDesc('fecha_creacion')
                     ->get();
             
             if ($recipes->isEmpty()) {
@@ -215,7 +216,9 @@ class RecetaController extends Controller
                 $recipe->autor_nombre = $user->nombre;
             }
 
-            return response()->json($recipes);
+            $sortedRecipes = $recipes->sortByDesc('fecha_creacion')->values();
+
+            return response()->json($sortedRecipes);
         } catch (Throwable $e) {
             return response()->json([
                 'message' => 'Could not get recipes',
@@ -249,7 +252,7 @@ class RecetaController extends Controller
         public function getAllRecetas()
     {
         try {
-            $recipes = DB::table('receta_original')->get();
+            $recipes = DB::table('receta_original')->orderByDesc('fecha_creacion')->get();
             
             if ($recipes->isEmpty()) {
                 return response()->json([]);
@@ -288,7 +291,9 @@ class RecetaController extends Controller
                 return $receta;
             });
 
-            return response()->json($recetasConDatos);
+            $sortedRecetas = $recetasConDatos->sortByDesc('fecha_creacion')->values();
+
+            return response()->json($sortedRecetas);
         } catch (Throwable $e) {
             return response()->json([
                 'message' => 'Could not get recipes',
