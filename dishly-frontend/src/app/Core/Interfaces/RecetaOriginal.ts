@@ -1,16 +1,8 @@
-export interface CategoriaReceta {
-    id_receta: number;
-    id_categoria: number;
-    nombre: string;
-}
+import { CategoriaReceta } from "./CategoriaReceta";
+import { IngredienteReceta } from "./IngredienteReceta";
 
-export interface IngredienteReceta {
-    id_receta: number;
-    id_ingrediente: number;
-    nombre: string;
-    cantidad: number;
-    unidad: string;
-}
+
+
 
 export interface RecetaOriginal {
     id_receta: number;
@@ -32,4 +24,5 @@ export interface RecetaOriginal {
     imagen_3: string | null;
     imagen_4: string | null;
     imagen_5: string | null;
+    media_valoraciones: number;
 }

@@ -3,14 +3,15 @@
 }
 
 /* ── Layout ───────────────────────────────────────── */
-.nf-container {
-  min-height: 100vh;
+.lp-container {
+  width: 100%;
+  min-height: calc(100vh - 80px);
   display: grid;
   place-items: center;
 }
 
 /* ── Background blobs ─────────────────────────────── */
-.nf-blob {
+.lp-blob {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
@@ -18,7 +19,7 @@
   pointer-events: none;
 }
 
-.nf-blob-1 {
+.lp-blob-1 {
   width: 500px;
   height: 500px;
   background: var(--highlight, #f97316);
@@ -27,7 +28,7 @@
   animation: blobFloat 8s ease-in-out infinite alternate;
 }
 
-.nf-blob-2 {
+.lp-blob-2 {
   width: 380px;
   height: 380px;
   background: #fb923c;
@@ -47,10 +48,10 @@
 }
 
 /* ── Card ─────────────────────────────────────────── */
-.nf-card {
+.lp-card {
   position: relative;
   z-index: 1;
-  background: var(--background);
+  background: var(--background, #ffffff);
   border: 1px solid rgba(249, 115, 22, 0.15);
   border-radius: 28px;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.1);
@@ -61,12 +62,18 @@
 }
 
 /* ── Chef illustration ────────────────────────────── */
-.nf-chef {
+.lp-chef {
   position: relative;
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 8px;
+  animation: cookBounce 2s ease-in-out infinite;
+}
+
+@keyframes cookBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
 /* Hat */
@@ -153,6 +160,16 @@
   border: 3px solid #c97c5a;
   border-top: none;
   border-radius: 0 0 20px 20px;
+  background: #c97c5a; /* Smile! */
+}
+.chef-mouth::after {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 4px;
+  background: #e76f51;
+  border-radius: 0 0 10px 10px;
+  margin: 2px auto 0;
 }
 
 /* Body */
@@ -229,32 +246,27 @@
   }
 }
 
-/* ── 404 Code ─────────────────────────────────────── */
-.nf-code {
-  font-family: var(--font-display, 'Poppins', sans-serif);
-  font-size: 96px;
-  font-weight: 900;
-  line-height: 1;
-  margin: 12px 0 0;
-  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -4px;
+/* ── Spinner ──────────────────────────────────────── */
+.lp-spinner {
+    display: flex;
+    justify-content: center;
+}
+.text-warning {
+    color: #f97316 !important;
 }
 
 /* ── Title ────────────────────────────────────────── */
-.nf-title {
+.lp-title {
   font-family: var(--font-display, 'Poppins', sans-serif);
   font-size: 22px;
   font-weight: 700;
-  color: var(--PrimaryText);
+  color: var(--PrimaryText, #1e293b);
   margin: 16px 0 12px;
   line-height: 1.35;
 }
 
 /* ── Subtitle ─────────────────────────────────────── */
-.nf-subtitle {
+.lp-subtitle {
   font-size: 15px;
   color: var(--SecondaryText, #64748b);
   line-height: 1.65;
@@ -264,7 +276,7 @@
 }
 
 /* ── Divider ──────────────────────────────────────── */
-.nf-divider {
+.lp-divider {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -272,55 +284,25 @@
   max-width: 320px;
 }
 
-.nf-divider::before,
-.nf-divider::after {
+.lp-divider::before,
+.lp-divider::after {
   content: '';
   flex: 1;
   height: 1px;
   background: #e2e8f0;
 }
 
-.nf-divider span {
+.lp-divider span {
   font-size: 18px;
-}
-
-/* ── CTA Button ───────────────────────────────────── */
-.btn-home {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--highlight, #f97316);
-  color: #ffffff;
-  padding: 14px 36px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 700;
-  text-decoration: none;
-  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-}
-
-.btn-home:hover {
-  background: #ea580c;
-  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
-  transform: translateY(-2px);
-}
-
-.btn-home:active {
-  transform: scale(0.98);
 }
 
 /* ── Responsive ───────────────────────────────────── */
 @media (max-width: 520px) {
-  .nf-card {
+  .lp-card {
     padding: 40px 24px 36px;
   }
 
-  .nf-code {
-    font-size: 72px;
-  }
-
-  .nf-title {
+  .lp-title {
     font-size: 18px;
   }
 }

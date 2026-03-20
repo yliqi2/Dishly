@@ -13,6 +13,7 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { authInterceptor } from './Core/interceptors/auth-interceptor';
 
 import {
+  Calendar,
   ChefHat,
   Clock,
   Cpu,
@@ -41,6 +42,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     importProvidersFrom(
       LucideAngularModule.pick({
+        Calendar,
         ChefHat,
         Clock,
         Cpu,

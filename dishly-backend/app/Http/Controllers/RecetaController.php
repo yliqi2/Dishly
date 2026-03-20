@@ -181,6 +181,8 @@ class RecetaController extends Controller
             
             $recipes = DB::table('receta_original')
                     ->where('id_autor', $user->id_usuario)
+                    ->where('estado', 1)
+                    ->orderByDesc('fecha_creacion')
                     ->get();
             
             if ($recipes->isEmpty()) {
@@ -209,13 +211,23 @@ class RecetaController extends Controller
                 ->get()
                 ->groupBy('id_receta');
 
+            $valoraciones = DB::table('valoracion')
+                ->whereIn('id_receta', $recipeIds)
+                ->select('id_receta', DB::raw('AVG(puntuacion) as media_valoraciones'))
+                ->groupBy('id_receta')
+                ->get()
+                ->keyBy('id_receta');
+
             foreach ($recipes as $recipe) {
                 $recipe->categorias = $categorias->get($recipe->id_receta, []);
                 $recipe->ingredientes = $ingredientes->get($recipe->id_receta, []);
+                $recipe->media_valoraciones = $valoraciones->get($recipe->id_receta)->media_valoraciones ?? null;
                 $recipe->autor_nombre = $user->nombre;
             }
 
-            return response()->json($recipes);
+            $sortedRecipes = $recipes->sortByDesc('fecha_creacion')->values();
+
+            return response()->json($sortedRecipes);
         } catch (Throwable $e) {
             return response()->json([
                 'message' => 'Could not get recipes',
@@ -233,6 +245,7 @@ class RecetaController extends Controller
             
             $count = DB::table('receta_original')
                     ->where('id_autor', $user->id_usuario)
+                    ->where('estado', 1)
                     ->count();
             
             return response()->json($count);
@@ -244,7 +257,119 @@ class RecetaController extends Controller
                 ],
             ], 500);
         }
-    }   
+    } 
+    
+        public function getAllRecetas()
+    {
+        try {
+            $recipes = DB::table('receta_original')
+                ->where('estado', 1)
+                ->orderByDesc('fecha_creacion')
+                ->get();
+            
+            if ($recipes->isEmpty()) {
+                return response()->json([]);
+            }
+
+            $recipeIds = $recipes->pluck('id_receta')->toArray();
+            $authorIds = $recipes->pluck('id_autor')->unique()->toArray();
+
+            $categorias = DB::table('receta_categoria')
+                ->join('categoria', 'receta_categoria.id_categoria', '=', 'categoria.id_categoria')
+                ->whereIn('receta_categoria.id_receta', $recipeIds)
+                ->select('receta_categoria.id_receta', 'categoria.id_categoria', 'categoria.nombre')
+                ->get()
+                ->groupBy('id_receta')
+                ->map(function ($items) {
+                    return $items->values()->toArray();
+                });
+
+            $valoraciones = DB::table('valoracion')
+                ->whereIn('id_receta', $recipeIds)
+                ->select('id_receta', DB::raw('AVG(puntuacion) as media_valoraciones'))
+                ->groupBy('id_receta')
+                ->get()
+                ->keyBy('id_receta');
+
+            $autores = DB::table('users')
+                ->whereIn('id_usuario', $authorIds)
+                ->select('id_usuario', 'nombre')
+                ->get()
+                ->keyBy('id_usuario');
+
+            $recetasConDatos = $recipes->map(function ($receta) use ($categorias, $valoraciones, $autores) {
+                $receta->categorias = $categorias[$receta->id_receta] ?? [];
+                $receta->media_valoraciones = $valoraciones[$receta->id_receta]->media_valoraciones ?? null;
+                $receta->autor_nombre = $autores[$receta->id_autor]->nombre ?? null;
+                return $receta;
+            });
+
+            $sortedRecetas = $recetasConDatos->sortByDesc('fecha_creacion')->values();
+
+            return response()->json($sortedRecetas);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get recipes',
+                'errors' => [
+                    'server' => [$e->getMessage()],
+                ],
+            ], 500);
+        }
+    }
+
+    public function getRecetaById($id)
+    {
+        try {
+            $recipe = DB::table('receta_original')
+                ->where('id_receta', $id)
+                ->where('estado', 1)
+                ->first();
+            
+            if (!$recipe) {
+                return response()->json(['message' => 'Recipe not found'], 404);
+            }
+
+            $categorias = DB::table('receta_categoria')
+                ->join('categoria', 'receta_categoria.id_categoria', '=', 'categoria.id_categoria')
+                ->where('receta_categoria.id_receta', $id)
+                ->select('categoria.id_categoria', 'categoria.nombre')
+                ->get();
+
+            $ingredientes = DB::table('receta_ingrediente')
+                ->join('ingrediente', 'receta_ingrediente.id_ingrediente', '=', 'ingrediente.id_ingrediente')
+                ->where('receta_ingrediente.id_receta', $id)
+                ->select(
+                    'ingrediente.id_ingrediente',
+                    'ingrediente.nombre',
+                    'receta_ingrediente.cantidad',
+                    'receta_ingrediente.unidad'
+                )
+                ->get();
+
+            $valoracion = DB::table('valoracion')
+                ->where('id_receta', $id)
+                ->avg('puntuacion');
+
+            $autor = DB::table('users')
+                ->where('id_usuario', $recipe->id_autor)
+                ->select('nombre')
+                ->first();
+
+            $recipe->categorias = $categorias;
+            $recipe->ingredientes = $ingredientes;
+            $recipe->media_valoraciones = $valoracion !== null ? round((float) $valoracion, 2) : 0;
+            $recipe->autor_nombre = $autor?->nombre;
+
+            return response()->json($recipe);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get recipe',
+                'errors' => [
+                    'server' => [$e->getMessage()],
+                ],
+            ], 500);
+        }
+    }
 
     public function getValoraciones()
     {
@@ -254,6 +379,7 @@ class RecetaController extends Controller
             $valoraciones = DB::table('valoracion')
                     ->join('receta_original', 'valoracion.id_receta', '=', 'receta_original.id_receta')
                     ->where('valoracion.id_usuario', $user->id_usuario)
+                    ->where('receta_original.estado', 1)
                     ->select(
                         'valoracion.*', 
                         'receta_original.titulo as receta_titulo', 
@@ -275,5 +401,111 @@ class RecetaController extends Controller
                 ],
             ], 500);
         }
-    }   
+    }
+
+    public function getMediaValoraciones()
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            $media = DB::table('valoracion')
+                ->join('receta_original', 'valoracion.id_receta', '=', 'receta_original.id_receta')
+                ->where('receta_original.id_autor', $user->id_usuario)
+                ->where('receta_original.estado', 1)
+                ->avg('valoracion.puntuacion');
+
+            return response()->json(['media' => $media !== null ? round((float) $media, 2) : null]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get media de valoraciones',
+                'errors' => [
+                    $e->getMessage(),
+                ],
+            ], 500);
+        }
+    }
+
+    public function setValoracion(Request $request)
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            $data = $request->validate([
+                'id_receta'  => ['required', 'integer', 'exists:receta_original,id_receta'],
+                'puntuacion' => ['required', 'integer', 'min:1', 'max:5'],
+                'comentario' => ['nullable', 'string', 'max:1000'],
+            ]);
+
+            $receta = DB::table('receta_original')
+                ->where('id_receta', $data['id_receta'])
+                ->where('estado', 1)
+                ->first();
+
+            if (!$receta) {
+                return response()->json([
+                    'message' => 'La receta no existe o no está disponible.',
+                ], 404);
+            }
+
+            if ($receta->id_autor == $user->id_usuario) {
+                return response()->json([
+                    'message' => 'No puedes valorar tu propia receta.',
+                ], 403);
+            }
+
+            DB::table('valoracion')->updateOrInsert(
+                [
+                    'id_receta'  => $data['id_receta'],
+                    'id_usuario' => $user->id_usuario,
+                ],
+                [
+                    'puntuacion' => $data['puntuacion'],
+                    'comentario' => $data['comentario'] ?? null,
+                    'fecha'      => now()->toDateString(),
+                ]
+            );
+
+            return response()->json(['message' => 'Valoración guardada correctamente.']);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors'  => $e->errors(),
+            ], 422);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not save valoración',
+                'errors'  => [$e->getMessage()],
+            ], 500);
+        }
+    }
+
+    public function desactivarReceta($id)
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            $affected = DB::table('receta_original')
+                ->where('id_receta', $id)
+                ->where('id_autor', $user->id_usuario)
+                ->where('estado', 1)
+                ->update(['estado' => 0]);
+
+            if ($affected === 0) {
+                return response()->json([
+                    'message' => 'La receta no existe, no eres el autor, o ya está desactivada.',
+                ], 404);
+            }
+
+            return response()->json([
+                'message' => 'Receta desactivada correctamente.',
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Error al desactivar la receta',
+                'errors' => [
+                    'server' => [$e->getMessage()],
+                ],
+            ], 500);
+        }
+    }
 }

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, input, computed } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { RecetaOriginal } from '../../Interfaces/RecetaOriginal';
+import { RecetaCard } from '../../Interfaces/RecetaCard';
 
 @Component({
   selector: 'app-recipe-card',
@@ -13,10 +13,25 @@ import { RecetaOriginal } from '../../Interfaces/RecetaOriginal';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RecipeCardComponent {
-  receta = input.required<RecetaOriginal>();
+  receta = input.required<RecetaCard>();
 
   protected readonly displayedCategories = computed(() => {
-    return this.receta().categorias ?? [];
+    return (this.receta().categorias ?? []).slice(0, 2);
+  });
+
+  protected readonly extraCategoriesCount = computed(() => {
+    const cats = this.receta().categorias ?? [];
+    return cats.length > 2 ? cats.length - 2 : 0;
+  });
+
+  protected readonly publishedDate = computed(() => {
+    const dateStr = this.receta().fecha_creacion;
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   });
 
   protected readonly displayPrice = computed(() => {
@@ -47,6 +62,14 @@ export class RecipeCardComponent {
       bar2: diff === 'medium' || diff === 'hard',
       bar3: diff === 'hard'
     };
+  });
+
+  protected readonly mediaValoraciones = computed(() => {
+    const media = this.receta().media_valoraciones;
+    if (media !== null && Number(media) > 0) {
+      return Number(media);
+    }
+    return 'NA';
   });
 
   protected readonly mainImage = computed(() => {

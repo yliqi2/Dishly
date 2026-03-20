@@ -48,19 +48,6 @@
         </article>
       </section>
 
-      <div class="profile-recipes-section">
-        <h2 class="section-title">My Published Recipes</h2>
-        @if (myRecipes().length > 0) {
-          <div class="recipes-grid">
-            @for (recipe of myRecipes(); track recipe.id_receta) {
-              <app-recipe-card [receta]="recipe"></app-recipe-card>
-            }
-          </div>
-        } @else {
-          <p class="no-recipes-message">You haven't published any recipes yet.</p>
-        }
-      </div>
-
       <button type="button" class="btn-danger btn-full-width profile-logout-btn" [disabled]="isLoggingOut()"
         (click)="logout()" [attr.aria-busy]="isLoggingOut()">
         @if (isLoggingOut()) {
@@ -69,6 +56,29 @@
         <span class="profile-logout-text">Log out</span>
         }
       </button>
+    </div>
+  </div>
+
+  <section class="page-header page-container">
+    <div class="page-header__inner">
+      <h1 class="page-title">My Recipes</h1>
+      <div class="page-underline" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <div class="profile-wrapper page-container page-container--no-gutter">
+    <div class="profile-card">
+      <div class="profile-recipes-section">
+        @if (myRecipes().length > 0) {
+        <div class="recipes-grid">
+          @for (recipe of myRecipes(); track recipe.id_receta) {
+          <app-recipe-card [receta]="recipe"></app-recipe-card>
+          }
+        </div>
+        } @else {
+        <p class="no-recipes-message">You haven't published any recipes yet.</p>
+        }
+      </div>
     </div>
   </div>
 </main>

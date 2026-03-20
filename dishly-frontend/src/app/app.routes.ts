@@ -11,6 +11,7 @@ import { AuthGuard } from './Guards/auth.guard';
 import { Profile } from './Pages/profile/profile';
 import { EditProfile } from './Pages/edit-profile/edit-profile';
 import { NotFound } from './Pages/not-found/not-found';
+import { RecipesDetails } from './Pages/recipes-details/recipes-details';
 
 export const routes: Routes = [
     {
@@ -28,7 +29,11 @@ export const routes: Routes = [
     {
         path: 'recipes',
         component: Recipes
-    },  
+    },
+    {
+        path: 'recipesdetails/:id',
+        component: RecipesDetails
+    },
     {
         path: 'dishly-ai',
         component: DishlyAi

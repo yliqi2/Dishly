@@ -1,15 +1,13 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { Observable, tap, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
+import { ApiBaseService } from '../api-base.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthServices {
-  private apiUrl = '/api';
-  private http = inject(HttpClient);
+export class AuthServices extends ApiBaseService {
   private router = inject(Router);
   private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private userSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
