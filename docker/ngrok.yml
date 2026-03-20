@@ -3,4 +3,4 @@ tunnels:
   frontend:
     proto: http
     addr: frontend:4200
-    hostname: servomechanically-nonaffecting-stephanie.ngrok-free.dev
+    hostname: stanchly-dulotic-sherri.ngrok-free.dev
