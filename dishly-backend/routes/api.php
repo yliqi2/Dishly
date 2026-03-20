@@ -35,4 +35,5 @@ Route::middleware('auth:api')->group(function () {
         // Rutas de Recipes
         Route::post('/recetas/upload', [RecetaController::class , 'store']);
         Route::get('/recetas/categorias', [RecetaController::class , 'getCategorias']);
+        Route::put('/recetas/desactivar/{id}', [RecetaController::class , 'desactivarReceta']);
     }); 

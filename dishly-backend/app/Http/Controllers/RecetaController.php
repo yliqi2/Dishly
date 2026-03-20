@@ -181,6 +181,7 @@ class RecetaController extends Controller
             
             $recipes = DB::table('receta_original')
                     ->where('id_autor', $user->id_usuario)
+                    ->where('estado', 1)
                     ->orderByDesc('fecha_creacion')
                     ->get();
             
@@ -244,6 +245,7 @@ class RecetaController extends Controller
             
             $count = DB::table('receta_original')
                     ->where('id_autor', $user->id_usuario)
+                    ->where('estado', 1)
                     ->count();
             
             return response()->json($count);
@@ -260,7 +262,10 @@ class RecetaController extends Controller
         public function getAllRecetas()
     {
         try {
-            $recipes = DB::table('receta_original')->orderByDesc('fecha_creacion')->get();
+            $recipes = DB::table('receta_original')
+                ->where('estado', 1)
+                ->orderByDesc('fecha_creacion')
+                ->get();
             
             if ($recipes->isEmpty()) {
                 return response()->json([]);
@@ -315,7 +320,10 @@ class RecetaController extends Controller
     public function getRecetaById($id)
     {
         try {
-            $recipe = DB::table('receta_original')->where('id_receta', $id)->first();
+            $recipe = DB::table('receta_original')
+                ->where('id_receta', $id)
+                ->where('estado', 1)
+                ->first();
             
             if (!$recipe) {
                 return response()->json(['message' => 'Recipe not found'], 404);
@@ -350,7 +358,7 @@ class RecetaController extends Controller
             $recipe->categorias = $categorias;
             $recipe->ingredientes = $ingredientes;
             $recipe->media_valoraciones = $valoracion !== null ? round((float) $valoracion, 2) : 0;
-            $recipe->autor_nombre = $autor->nombre ?? null;
+            $recipe->autor_nombre = $autor?->nombre;
 
             return response()->json($recipe);
         } catch (Throwable $e) {
@@ -371,6 +379,7 @@ class RecetaController extends Controller
             $valoraciones = DB::table('valoracion')
                     ->join('receta_original', 'valoracion.id_receta', '=', 'receta_original.id_receta')
                     ->where('valoracion.id_usuario', $user->id_usuario)
+                    ->where('receta_original.estado', 1)
                     ->select(
                         'valoracion.*', 
                         'receta_original.titulo as receta_titulo', 
@@ -402,6 +411,7 @@ class RecetaController extends Controller
             $media = DB::table('valoracion')
                 ->join('receta_original', 'valoracion.id_receta', '=', 'receta_original.id_receta')
                 ->where('receta_original.id_autor', $user->id_usuario)
+                ->where('receta_original.estado', 1)
                 ->avg('valoracion.puntuacion');
 
             return response()->json(['media' => $media !== null ? round((float) $media, 2) : null]);
@@ -426,13 +436,18 @@ class RecetaController extends Controller
                 'comentario' => ['nullable', 'string', 'max:1000'],
             ]);
 
-            // No permitir valorar la propia receta
-            $esAutor = DB::table('receta_original')
+            $receta = DB::table('receta_original')
                 ->where('id_receta', $data['id_receta'])
-                ->where('id_autor', $user->id_usuario)
-                ->exists();
+                ->where('estado', 1)
+                ->first();
 
-            if ($esAutor) {
+            if (!$receta) {
+                return response()->json([
+                    'message' => 'La receta no existe o no está disponible.',
+                ], 404);
+            }
+
+            if ($receta->id_autor == $user->id_usuario) {
                 return response()->json([
                     'message' => 'No puedes valorar tu propia receta.',
                 ], 403);
@@ -460,6 +475,36 @@ class RecetaController extends Controller
             return response()->json([
                 'message' => 'Could not save valoración',
                 'errors'  => [$e->getMessage()],
+            ], 500);
+        }
+    }
+
+    public function desactivarReceta($id)
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            $affected = DB::table('receta_original')
+                ->where('id_receta', $id)
+                ->where('id_autor', $user->id_usuario)
+                ->where('estado', 1)
+                ->update(['estado' => 0]);
+
+            if ($affected === 0) {
+                return response()->json([
+                    'message' => 'La receta no existe, no eres el autor, o ya está desactivada.',
+                ], 404);
+            }
+
+            return response()->json([
+                'message' => 'Receta desactivada correctamente.',
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Error al desactivar la receta',
+                'errors' => [
+                    'server' => [$e->getMessage()],
+                ],
             ], 500);
         }
     }
