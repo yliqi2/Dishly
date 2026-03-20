@@ -244,7 +244,60 @@ class RecetaController extends Controller
                 ],
             ], 500);
         }
-    }   
+    } 
+    
+        public function getAllRecetas()
+    {
+        try {
+            $recipes = DB::table('receta_original')->get();
+            
+            if ($recipes->isEmpty()) {
+                return response()->json([]);
+            }
+
+            $recipeIds = $recipes->pluck('id_receta')->toArray();
+            $authorIds = $recipes->pluck('id_autor')->unique()->toArray();
+
+            $categorias = DB::table('receta_categoria')
+                ->join('categoria', 'receta_categoria.id_categoria', '=', 'categoria.id_categoria')
+                ->whereIn('receta_categoria.id_receta', $recipeIds)
+                ->select('receta_categoria.id_receta', 'categoria.id_categoria', 'categoria.nombre')
+                ->get()
+                ->groupBy('id_receta')
+                ->map(function ($items) {
+                    return $items->values()->toArray();
+                });
+
+            $valoraciones = DB::table('valoracion')
+                ->whereIn('id_receta', $recipeIds)
+                ->select('id_receta', DB::raw('AVG(puntuacion) as media_valoraciones'))
+                ->groupBy('id_receta')
+                ->get()
+                ->keyBy('id_receta');
+
+            $autores = DB::table('users')
+                ->whereIn('id_usuario', $authorIds)
+                ->select('id_usuario', 'nombre')
+                ->get()
+                ->keyBy('id_usuario');
+
+            $recetasConDatos = $recipes->map(function ($receta) use ($categorias, $valoraciones, $autores) {
+                $receta->categorias = $categorias[$receta->id_receta] ?? [];
+                $receta->media_valoraciones = $valoraciones[$receta->id_receta]->media_valoraciones ?? null;
+                $receta->autor_nombre = $autores[$receta->id_autor]->nombre ?? null;
+                return $receta;
+            });
+
+            return response()->json($recetasConDatos);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get recipes',
+                'errors' => [
+                    'server' => [$e->getMessage()],
+                ],
+            ], 500);
+        }
+    }
 
     public function getValoraciones()
     {

@@ -2,8 +2,7 @@ import { ChangeDetectionStrategy, Component, input, computed } from '@angular/co
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { RecetaOriginal } from '../../Interfaces/RecetaOriginal';
-import { Console } from 'console';
+import { RecetaCard } from '../../Interfaces/RecetaCard';
 
 @Component({
   selector: 'app-recipe-card',
@@ -14,7 +13,7 @@ import { Console } from 'console';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RecipeCardComponent {
-  receta = input.required<RecetaOriginal>();
+  receta = input.required<RecetaCard>();
 
   protected readonly displayedCategories = computed(() => {
     return this.receta().categorias ?? [];

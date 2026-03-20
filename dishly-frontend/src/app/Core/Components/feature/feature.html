@@ -1,0 +1,16 @@
+<section class="recipes-section">
+  <div class="recipes-inner">
+    <h2 class="recipes-title">Recipes</h2>
+    <div class="recipes-underline" aria-hidden="true"></div>
+
+    <div class="recipes-grid">
+      @for (recipe of recipes(); track recipe.id_receta) {
+        <app-recipe-card [receta]="recipe" />
+      }
+    </div>
+
+    <div class="recipes-footer">
+      <a routerLink="/recipes" class="btn-view-all">View all recipes</a>
+    </div>
+  </div>
+</section>
