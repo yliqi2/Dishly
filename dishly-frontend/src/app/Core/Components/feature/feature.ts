@@ -20,4 +20,8 @@ export class Feature implements OnInit {
     this.homepageService.getRecipes().subscribe(data => this.recipes.set(data));
     console.log(this.homepageService.getRecipes());
   }
+
+  protected onRecipeDeactivated(recipeId: number): void {
+    this.recipes.update((recipes) => recipes.filter((recipe) => recipe.id_receta !== recipeId));
+  }
 }

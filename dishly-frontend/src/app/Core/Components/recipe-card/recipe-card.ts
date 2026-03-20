@@ -1,8 +1,11 @@
-import { ChangeDetectionStrategy, Component, input, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { LucideAngularModule } from 'lucide-angular';
 import { RecetaCard } from '../../Interfaces/RecetaCard';
+import { AuthServices } from '../../Services/Auth/auth-services';
 
 @Component({
   selector: 'app-recipe-card',
@@ -13,7 +16,15 @@ import { RecetaCard } from '../../Interfaces/RecetaCard';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RecipeCardComponent {
+  private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthServices);
+
   receta = input.required<RecetaCard>();
+  recipeDeactivated = output<number>();
+  protected readonly isDeactivating = signal(false);
+  private readonly currentUser = toSignal(this.authService.user$, {
+    initialValue: null as Record<string, unknown> | null,
+  });
 
   protected readonly displayedCategories = computed(() => {
     return (this.receta().categorias ?? []).slice(0, 2);
@@ -81,4 +92,38 @@ export class RecipeCardComponent {
   protected readonly chefName = computed(() => {
     return this.receta().autor_nombre;
   });
+
+  protected readonly canManageRecipe = computed(() => {
+    const user = this.currentUser();
+    const currentUserId = Number(user?.['id_usuario'] ?? 0);
+    const currentUserRole = String(user?.['rol'] ?? '');
+
+    if (!currentUserId && currentUserRole !== 'admin') {
+      return false;
+    }
+
+    return currentUserRole === 'admin' || currentUserId === this.receta().id_autor;
+  });
+
+  protected deactivateRecipe(): void {
+    if (this.isDeactivating()) {
+      return;
+    }
+
+    const confirmed = window.confirm('Are you sure you want to delete this recipe?');
+    if (!confirmed) {
+      return;
+    }
+
+    this.isDeactivating.set(true);
+    this.http.put(`/api/recetas/desactivar/${this.receta().id_receta}`, {}).subscribe({
+      next: () => {
+        this.recipeDeactivated.emit(this.receta().id_receta);
+        this.isDeactivating.set(false);
+      },
+      error: () => {
+        this.isDeactivating.set(false);
+      },
+    });
+  }
 }

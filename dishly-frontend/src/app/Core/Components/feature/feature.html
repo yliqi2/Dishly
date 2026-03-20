@@ -5,7 +5,7 @@
 
         <div class="recipes-grid">
             @for (recipe of recipes(); track recipe.id_receta) {
-            <app-recipe-card [receta]="recipe" />
+            <app-recipe-card [receta]="recipe" (recipeDeactivated)="onRecipeDeactivated($event)" />
             }
         </div>
 

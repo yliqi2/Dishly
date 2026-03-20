@@ -188,7 +188,7 @@ class RecetaSeeder extends Seeder
                 'imagen_3' => null,
                 'imagen_4' => null,
                 'imagen_5' => null,
-                'estado'   => 1,
+                'active'   => 1,
             ];
 
             $recetaId = DB::table('receta_original')->insertGetId($recipeData);

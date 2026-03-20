@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('imagen_5')->nullable();
             $table->date('fecha_creacion');
             $table->unsignedInteger('id_autor');
-            $table->boolean('estado')->default(true);
+            $table->boolean('active')->default(true);
 
             $table->foreign('id_autor')->references('id_usuario')->on('users');
         });

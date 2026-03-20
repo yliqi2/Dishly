@@ -4,6 +4,7 @@ import { Login } from './Pages/auth/login/login';
 import { Register } from './Pages/auth/register/register';
 import { Recipes } from './Pages/recipes/recipes';
 import { Upload } from './Pages/upload/upload';
+import { EditRecipe } from './Pages/edit-recipe/upload';
 import { DishlyAi } from './Pages/dishly-ai/dishly-ai';
 import { Forum } from './Pages/forum/forum';
 import { Cart } from './Pages/cart/cart';
@@ -45,6 +46,11 @@ export const routes: Routes = [
     {
         path: 'upload',
         component: Upload,
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'recipes/:id/edit',
+        component: EditRecipe,
         canActivate: [AuthGuard]
     },
     {

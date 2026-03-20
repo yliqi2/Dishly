@@ -76,7 +76,24 @@
       </div>
     </div>
 
-    <a [routerLink]="['/recipesdetails', receta().id_receta]" class="btn btn-recipe-view w-100">View recipe</a>
+    <div class="recipe-card-actions">
+      <a [routerLink]="['/recipesdetails', receta().id_receta]" class="btn-primary btn-sm btn-recipe-view w-100">
+        View recipe
+      </a>
+      @if (canManageRecipe()) {
+      <a [routerLink]="['/recipes', receta().id_receta, 'edit']" class="btn-primary btn-sm btn-recipe-edit w-100">
+        Edit recipe
+      </a>
+      <button type="button" class="btn-danger btn-sm btn-recipe-deactivate w-100" [disabled]="isDeactivating()"
+        (click)="deactivateRecipe()">
+        @if (isDeactivating()) {
+        <span class="btn-loading-icon" aria-hidden="true"></span>
+        } @else {
+        Delete Recipe
+        }
+      </button>
+      }
+    </div>
   </div>
 
 </article>

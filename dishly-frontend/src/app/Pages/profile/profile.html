@@ -48,7 +48,7 @@
         </article>
       </section>
 
-      <button type="button" class="btn-danger btn-full-width profile-logout-btn" [disabled]="isLoggingOut()"
+      <button type="button" class="btn-danger profile-logout-btn" [disabled]="isLoggingOut()"
         (click)="logout()" [attr.aria-busy]="isLoggingOut()">
         @if (isLoggingOut()) {
         <span class="btn-loading-icon" aria-hidden="true"></span>
@@ -69,10 +69,10 @@
   <div class="profile-wrapper page-container page-container--no-gutter">
     <div class="profile-card">
       <div class="profile-recipes-section">
-        @if (myRecipes().length > 0) {
+        @if (visibleRecipes().length > 0) {
         <div class="recipes-grid">
-          @for (recipe of myRecipes(); track recipe.id_receta) {
-          <app-recipe-card [receta]="recipe"></app-recipe-card>
+          @for (recipe of visibleRecipes(); track recipe.id_receta) {
+          <app-recipe-card [receta]="recipe" (recipeDeactivated)="onRecipeDeactivated($event)"></app-recipe-card>
           }
         </div>
         } @else {

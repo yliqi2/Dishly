@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, inject, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Component, HostListener, inject, OnDestroy, OnInit } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -10,39 +10,51 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, map } from 'rxjs';
-import { UploadPreview } from '../../Core/Interfaces/UploadPreview';
-import { Categoria } from '../../Core/Services/Categoria/categoria';
 import { CategoriaItem } from '../../Core/Interfaces/CategoriaItem';
-import { Router } from '@angular/router';
+import { RecetaOriginal } from '../../Core/Interfaces/RecetaOriginal';
+import { AuthServices } from '../../Core/Services/Auth/auth-services';
+import { Categoria } from '../../Core/Services/Categoria/categoria';
+import { RecetaDetailsService } from '../../Core/Services/Core/receta-details-service';
 
 type DifficultyLevel = 'easy' | 'medium' | 'hard';
 type TimeUnit = 'minutes' | 'hours';
+type EditablePhoto = {
+  file: File | null;
+  url: string;
+  existingPath: string | null;
+};
 
 
 @Component({
-  selector: 'app-upload',
+  selector: 'app-edit-recipe',
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './upload.html',
   styleUrl: './upload.css',
 })
-export class Upload implements OnDestroy, OnInit {
+export class EditRecipe implements OnDestroy, OnInit {
   readonly maxPhotos = 5;
   readonly ingredientUnits = ['g', 'kg', 'mg', 'l', 'ml', 'unit'] as const;
 
-  readonly photos$ = new BehaviorSubject<UploadPreview[]>([]);
+  readonly photos$ = new BehaviorSubject<EditablePhoto[]>([]);
   readonly selectedDifficulty$ = new BehaviorSubject<DifficultyLevel>('easy');
   readonly coverIndex$ = new BehaviorSubject<number>(0);
   private readonly categoriaService = inject(Categoria);
+  private readonly recetaDetailsService = inject(RecetaDetailsService);
+  private readonly authService = inject(AuthServices);
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   readonly categorias$ = new BehaviorSubject<CategoriaItem[]>([]);
+  readonly loading$ = new BehaviorSubject<boolean>(true);
 
   selectedCategories: CategoriaItem[] = [];
   categoryOpen = false;
   categorySearch = '';
   filteredCategorias: CategoriaItem[] = [];
   timeUnitOpen = false;
+  private recipeId: number | null = null;
 
   readonly vm$ = combineLatest([this.photos$, this.coverIndex$]).pipe(
     map(([photos, coverIndex]) => {
@@ -182,11 +194,11 @@ export class Upload implements OnDestroy, OnInit {
     return this.selectedCategories.some(c => c.id_categoria === cat.id_categoria);
   }
 
-  private createIngredientGroup(): FormGroup {
+  private createIngredientGroup(initial?: { cantidad?: number; nombre?: string; unidad?: string }): FormGroup {
     return this.fb.group({
-      cantidad: [null, [Validators.required, Validators.min(0.001)]],
-      nombre: ['', [Validators.required]],
-      unidad: ['g', [Validators.required]],
+      cantidad: [initial?.cantidad ?? null, [Validators.required, Validators.min(0.001)]],
+      nombre: [initial?.nombre ?? '', [Validators.required]],
+      unidad: [initial?.unidad ?? 'g', [Validators.required]],
     });
   }
 
@@ -305,7 +317,11 @@ export class Upload implements OnDestroy, OnInit {
       return;
     }
 
-    const mapped = validFiles.map((file) => ({ file, url: URL.createObjectURL(file) }));
+    const mapped = validFiles.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+      existingPath: null,
+    }));
     this.photos$.next([...current, ...mapped]);
     this.photosError$.next(false);
     input.value = '';
@@ -325,7 +341,7 @@ export class Upload implements OnDestroy, OnInit {
   removePhoto(index: number): void {
     const current = [...this.photos$.value];
     const target = current[index];
-    if (target) {
+    if (target?.file) {
       URL.revokeObjectURL(target.url);
     }
 
@@ -350,6 +366,10 @@ export class Upload implements OnDestroy, OnInit {
 
   onSubmit(): void {
     if (this.submitting$.value) return;
+    if (!this.recipeId) {
+      this.submitError$.next('Recipe not found.');
+      return;
+    }
 
     this.form.markAllAsTouched();
     this.submitError$.next(null);
@@ -365,7 +385,7 @@ export class Upload implements OnDestroy, OnInit {
 
     this.submitting$.next(true);
 
-    const photos = this.photos$.value.map((item) => item.file);
+    const photos = this.photos$.value;
     const coverIndex = this.coverIndex$.value;
     const cover = photos[coverIndex];
     const orderedPhotos = cover
@@ -374,6 +394,7 @@ export class Upload implements OnDestroy, OnInit {
 
     const raw = this.form.getRawValue();
     const formData = new FormData();
+    formData.append('_method', 'PUT');
     formData.append('titulo', String(raw.titulo ?? '').trim());
     formData.append('descripcion', String(raw.descripcion ?? '').trim());
     formData.append('instrucciones', String(raw.instrucciones ?? '').trim());
@@ -399,58 +420,44 @@ export class Upload implements OnDestroy, OnInit {
       formData.append(`ingredientes[${index}][unidad]`, String(ing?.unidad ?? 'g'));
     });
 
-    orderedPhotos.forEach((file) => {
-      formData.append('imagenes[]', file, file.name);
+    let newImageIndex = 0;
+    orderedPhotos.forEach((photo) => {
+      if (photo.file) {
+        formData.append('imagenes_nuevas[]', photo.file, photo.file.name);
+        formData.append('image_order[]', `new:${newImageIndex}`);
+        newImageIndex += 1;
+        return;
+      }
+
+      if (photo.existingPath) {
+        formData.append('image_order[]', `existing:${photo.existingPath}`);
+      }
     });
 
-    this.http.post('/api/recetas/upload', formData).subscribe({
+    this.http.post(`/api/recetas/${this.recipeId}`, formData).subscribe({
       next: () => {
-        this.submitSuccess$.next('Recipe uploaded successfully.');
-        this.resetFormAfterSuccess();
+        this.submitSuccess$.next('Recipe updated successfully.');
         this.submitting$.next(false);
         this.router.navigateByUrl('/profile');
       },
       error: (err) => {
         const errors = err?.error?.errors as Record<string, string[]> | undefined;
         const firstError = errors ? Object.values(errors).flat()[0] : null;
-        this.submitError$.next(firstError ?? err?.error?.message ?? 'Could not upload recipe.');
+        this.submitError$.next(firstError ?? err?.error?.message ?? 'Could not update recipe.');
         this.submitting$.next(false);
       },
     });
   }
 
   onCancel(): void {
-    this.router.navigateByUrl('/recipes');
-  }
-
-  private resetFormAfterSuccess(): void {
-    for (const item of this.photos$.value) {
-      URL.revokeObjectURL(item.url);
-    }
-
-    this.photos$.next([]);
-    this.coverIndex$.next(0);
-    this.selectedCategories = [];
-    this.categorySearch = '';
-    this.filteredCategorias = this.categorias$.value;
-    this.selectedDifficulty$.next('easy');
-    this.form.reset({
-      titulo: '',
-      descripcion: '',
-      tiempo_preparacion: 30,
-      tiempo_preparacion_unidad: 'minutes',
-      porciones: 4,
-      dificultad: 'easy',
-      instrucciones: '',
-      price: null,
-      categoria: [],
-    });
-    this.form.setControl('ingredientes', this.fb.array([this.createIngredientGroup(), this.createIngredientGroup()]));
+    this.router.navigateByUrl('/profile');
   }
 
   ngOnDestroy(): void {
     for (const item of this.photos$.value) {
-      URL.revokeObjectURL(item.url);
+      if (item.file) {
+        URL.revokeObjectURL(item.url);
+      }
     }
   }
 
@@ -464,5 +471,84 @@ export class Upload implements OnDestroy, OnInit {
         this.submitError$.next('Could not load categories.');
       },
     });
+
+    const routeId = Number(this.route.snapshot.paramMap.get('id'));
+    if (!Number.isInteger(routeId) || routeId <= 0) {
+      this.submitError$.next('Recipe not found.');
+      this.loading$.next(false);
+      return;
+    }
+
+    this.recetaDetailsService.getRecipeById(routeId).subscribe({
+      next: (recipe) => {
+        const currentUser = this.authService.getUser() as Record<string, unknown> | null;
+        const currentUserId = Number(currentUser?.['id_usuario'] ?? 0);
+        const currentUserRole = String(currentUser?.['rol'] ?? '');
+
+        if ((!currentUserId || currentUserId !== recipe.id_autor) && currentUserRole !== 'admin') {
+          this.submitError$.next('You cannot edit this recipe.');
+          this.loading$.next(false);
+          this.router.navigateByUrl('/profile');
+          return;
+        }
+
+        this.recipeId = recipe.id_receta;
+        this.populateForm(recipe);
+        this.loading$.next(false);
+      },
+      error: () => {
+        this.submitError$.next('Could not load recipe.');
+        this.loading$.next(false);
+      },
+    });
+  }
+
+  private populateForm(recipe: RecetaOriginal): void {
+    this.selectedCategories = (recipe.categorias ?? []).map((category) => ({
+      id_categoria: category.id_categoria,
+      nombre: category.nombre,
+    }));
+
+    const ingredientGroups = (recipe.ingredientes?.length ? recipe.ingredientes : [
+      { cantidad: undefined, nombre: '', unidad: 'g' },
+    ]).map((ingredient) => this.createIngredientGroup({
+      cantidad: ingredient.cantidad,
+      nombre: ingredient.nombre,
+      unidad: ingredient.unidad,
+    }));
+
+    this.form.setControl('ingredientes', this.fb.array(ingredientGroups));
+    this.form.patchValue({
+      titulo: recipe.titulo,
+      descripcion: recipe.descripcion,
+      tiempo_preparacion: recipe.tiempo_preparacion,
+      tiempo_preparacion_unidad: recipe.tiempo_preparacion_unidad,
+      porciones: recipe.porciones,
+      dificultad: recipe.dificultad,
+      instrucciones: recipe.instrucciones,
+      price: recipe.price,
+      categoria: this.selectedCategories.map((category) => category.id_categoria),
+    });
+
+    const existingImages = [
+      recipe.imagen_1,
+      recipe.imagen_2,
+      recipe.imagen_3,
+      recipe.imagen_4,
+      recipe.imagen_5,
+    ]
+      .filter((imagePath): imagePath is string => !!imagePath)
+      .map((imagePath) => ({
+        file: null,
+        url: this.authService.getAssetUrl(imagePath),
+        existingPath: imagePath,
+      }));
+
+    this.photos$.next(existingImages);
+    this.coverIndex$.next(0);
+    this.selectedDifficulty$.next(recipe.dificultad);
+    this.submitError$.next(null);
+    this.submitSuccess$.next(null);
+    this.photosError$.next(false);
   }
 }
