@@ -28,7 +28,7 @@ type TimeUnit = 'minutes' | 'hours';
 })
 export class Upload implements OnDestroy, OnInit {
   readonly maxPhotos = 5;
-  readonly ingredientUnits = ['g', 'kg', 'mg', 'l', 'ml'] as const;
+  readonly ingredientUnits = ['g', 'kg', 'mg', 'l', 'ml', 'unit'] as const;
 
   readonly photos$ = new BehaviorSubject<UploadPreview[]>([]);
   readonly selectedDifficulty$ = new BehaviorSubject<DifficultyLevel>('easy');
@@ -292,7 +292,20 @@ export class Upload implements OnDestroy, OnInit {
     const current = this.photos$.value;
     const remaining = this.maxPhotos - current.length;
     const picked = Array.from(input.files).slice(0, remaining);
-    const mapped = picked.map((file) => ({ file, url: URL.createObjectURL(file) }));
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const validFiles = picked.filter(file => allowedTypes.includes(file.type));
+
+    if (validFiles.length < picked.length) {
+      this.submitError$.next('Only PNG, JPG, and WEBP files are allowed.');
+    }
+
+    if (validFiles.length === 0) {
+      input.value = '';
+      return;
+    }
+
+    const mapped = validFiles.map((file) => ({ file, url: URL.createObjectURL(file) }));
     this.photos$.next([...current, ...mapped]);
     this.photosError$.next(false);
     input.value = '';
@@ -395,6 +408,7 @@ export class Upload implements OnDestroy, OnInit {
         this.submitSuccess$.next('Recipe uploaded successfully.');
         this.resetFormAfterSuccess();
         this.submitting$.next(false);
+        this.router.navigateByUrl('/profile');
       },
       error: (err) => {
         const errors = err?.error?.errors as Record<string, string[]> | undefined;

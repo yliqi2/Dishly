@@ -10,5 +10,11 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
+  },
+  "/recipes": {
+    "target": "http://backend",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }

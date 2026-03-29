@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { AuthServices } from '../../Core/Services/Auth/auth-services';
 import { LucideAngularModule } from 'lucide-angular';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Profile as ProfileService } from '../../Core/Services/Profile/profile-services';
+import { RecipeCardComponent } from '../../Core/Components/recipe-card/recipe-card';
 
 type User = {
   nombre?: string;
@@ -17,16 +19,21 @@ type User = {
 
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, RouterLink, LucideAngularModule, RecipeCardComponent],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Profile {
   private authService = inject(AuthServices);
+  private profileService = inject(ProfileService);
 
   protected readonly user = toSignal<User | null>(this.authService.user$, { initialValue: null });
   protected readonly isLoggingOut = signal(false);
+  protected readonly currentUserId = computed(() => {
+    const user = this.user() as Record<string, unknown> | null;
+    return Number(user?.['id_usuario'] ?? 0);
+  });
 
   protected readonly iconUrl = computed(() => {
     const u = this.user() ?? (this.authService.getUser() as User | null);
@@ -39,7 +46,13 @@ export class Profile {
     return (u?.nombre ?? u?.name ?? 'User') as string;
   }
 
-  protected readonly myRecipesCount = computed(() => 0);
+  protected readonly myRecipesCount = toSignal(this.profileService.getCountRecipes(), { initialValue: 0 });
+  protected readonly myRecipes = toSignal(this.profileService.getMyRecipes(), { initialValue: [] });
+  protected readonly hiddenRecipeIds = signal<number[]>([]);
+  protected readonly visibleRecipes = computed(() => {
+    const hiddenIds = new Set(this.hiddenRecipeIds());
+    return this.myRecipes().filter((recipe) => !hiddenIds.has(recipe.id_receta));
+  });
   protected readonly boughtRecipesCount = computed(() => 0);
 
   protected get memberSince(): string {
@@ -62,5 +75,9 @@ export class Profile {
   protected logout(): void {
     this.isLoggingOut.set(true);
     this.authService.logout();
+  }
+
+  protected onRecipeDeactivated(recipeId: number): void {
+    this.hiddenRecipeIds.update((ids) => ids.includes(recipeId) ? ids : [...ids, recipeId]);
   }
 }

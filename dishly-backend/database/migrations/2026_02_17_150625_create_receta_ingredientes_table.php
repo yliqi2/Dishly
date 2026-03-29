@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+return new class extends Migration 
 {
     /**
      * Run the migrations.
@@ -15,7 +15,7 @@ return new class extends Migration
             $table->unsignedInteger('id_receta');
             $table->unsignedInteger('id_ingrediente');
             $table->decimal('cantidad', 10, 2);
-            $table->enum('unidad', ['g', 'kg', 'mg', 'l', 'ml']);
+            $table->enum('unidad', ['g', 'kg', 'mg', 'l', 'ml', 'unit']);
 
             $table->primary(['id_receta', 'id_ingrediente']);
             $table->foreign('id_receta')->references('id_receta')->on('receta_original')->onDelete('cascade');

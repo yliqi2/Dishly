@@ -19,7 +19,7 @@ return new class extends Migration
             $table->boolean('chef')->default(false);
             $table->boolean('is_active')->default(true);
             $table->enum('rol', ['cliente', 'admin']);
-            $table->rememberToken();
+            $table->rememberToken();    
             $table->timestamps();
             
         });
