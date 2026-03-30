@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HomepageService } from '../../Services/Homepage/homepage-service';
 import { RecetaCard } from '../../Interfaces/RecetaCard';
@@ -6,7 +7,7 @@ import { RecipeCardComponent } from '../recipe-card/recipe-card';
 
 @Component({
   selector: 'app-feature',
-  imports: [RouterLink, RecipeCardComponent],
+  imports: [CommonModule, RouterLink, RecipeCardComponent],
   templateUrl: './feature.html',
   styleUrl: './feature.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

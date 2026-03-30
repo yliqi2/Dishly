@@ -73,8 +73,10 @@ services:
     working_dir: /app
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - VITE_ALLOWED_HOSTS=servomechanically-nonaffecting-stephanie.ngrok-free.dev
     volumes:
       - ./dishly-frontend:/app
+      - /app/node_modules
     ports:
       - "${FRONTEND_PORT}:4200"
     networks:

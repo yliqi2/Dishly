@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { SearchingBar } from '../../Components/searching-bar/searching-bar';
 
 @Component({
@@ -9,8 +10,9 @@ import { SearchingBar } from '../../Components/searching-bar/searching-bar';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeroHome {
+  private router = inject(Router);
+
   onSearch(query: string) {
-    console.log('Search query:', query);
-    // TODO: Implement search functionality
+    this.router.navigate(['/recipes'], { queryParams: { q: query } });
   }
 }

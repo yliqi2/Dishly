@@ -64,7 +64,8 @@
           "options": {
             "allowedHosts": [
               "localhost",
-              "stanchly-dulotic-sherri.ngrok-free.dev"
+              ".ngrok-free.dev",
+              "servomechanically-nonaffecting-stephanie.ngrok-free.dev"
             ]
           },
           "configurations": {

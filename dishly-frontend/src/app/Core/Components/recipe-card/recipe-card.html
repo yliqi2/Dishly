@@ -77,7 +77,7 @@
     </div>
 
     <div class="recipe-card-actions">
-      <a [routerLink]="['/recipesdetails', receta().id_receta]" class="btn-primary btn-sm btn-recipe-view w-100">
+      <a [routerLink]="['/recipes', receta().id_receta]" class="btn-primary btn-sm btn-recipe-view w-100">
         View recipe
       </a>
       @if (canManageRecipe()) {

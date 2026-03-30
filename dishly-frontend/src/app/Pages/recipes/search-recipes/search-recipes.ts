@@ -1,221 +1,202 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { FormsModule } from '@angular/forms';
 import { RecipeCard } from '../recipe-card/recipe-card';
-import { SearchingBar } from '../../../Core/Components/searching-bar/searching-bar';
+import { RecipeService } from '../../../Core/Services/Recipes/recipe.service';
+import { RecetaCard } from '../../../Core/Interfaces/RecetaCard';
 
 @Component({
   selector: 'app-search-recipes',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule, FormsModule, RecipeCard, SearchingBar],
+  imports: [CommonModule, RouterLink, LucideAngularModule, FormsModule, RecipeCard],
   templateUrl: './search-recipes.html',
   styleUrl: './search-recipes.css',
 })
-export class SearchRecipes {
-  searchQuery: string = '';
-  
-  categories = ['Pasta', 'Vegetarian', 'Seafood', 'Quick', 'Dessert', 'Healthy'];
-  selectedIngredients: string[] = ['Tomato', 'Cheese'];
-  selectedPersons: string[] = ['2 people'];
-  selectedTags: string[] = ['Pasta', 'Italian'];
-  
-  priceMin: number = 0;
-  priceMax: number = 100;
-  minRating: number = 4;
+export class SearchRecipes implements OnInit {
+  private recipeService = inject(RecipeService);
+  private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef);
 
-  // Search state for dropdowns
-  ingredientSearch: string = '';
-  personsSearch: string = '';
-  tagSearch: string = '';
+  recipes = signal<RecetaCard[]>([]);
+  loading = signal(true);
+  error = signal(false);
 
-  // Visibility state for dropdowns
-  showIngredientDropdown: boolean = false;
-  showPersonsDropdown: boolean = false;
-  showTagsDropdown: boolean = false;
+  searchQuery = signal('');
+  selectedCategory = signal('');
+  selectedDifficulty = signal('');
+  minRating = signal(0);
+  priceMin = signal(0);
+  priceMax = signal(200);
 
-  // Mock data for available options
-  allIngredients = ['Tomato', 'Cheese', 'Onion', 'Garlic', 'Pasta', 'Chicken', 'Basil', 'Mushrooms'];
-  allPersons = ['1 person', '2 people', '3 people', '4 people', '5+ people'];
-  allTags = ['Pasta', 'Italian', 'Vegetarian', 'Quick', 'Healthy', 'Gourmet'];
+  // New signals for Tags, Ingredients, Persons
+  selectedTags = signal<string[]>([]);
+  showTagsDropdown = signal(false);
+  tagSearch = signal('');
 
-  get filteredIngredientsOptions() {
-    return this.allIngredients.filter(ing => 
-      ing.toLowerCase().includes(this.ingredientSearch.toLowerCase()) && 
-      !this.selectedIngredients.includes(ing)
-    );
+  selectedIngredients = signal<string[]>([]);
+  showIngredientDropdown = signal(false);
+  ingredientSearch = signal('');
+
+  selectedPersons = signal<string[]>([]);
+  showPersonsDropdown = signal(false);
+  personsSearch = signal('');
+
+  categories = computed(() => {
+    const cats = new Set<string>();
+    this.recipes().forEach(r => r.categorias?.forEach(c => cats.add(c.nombre)));
+    return Array.from(cats).sort();
+  });
+
+  // Filtered dropdown options
+  filteredTagsOptions = computed(() => {
+    return this.categories().filter(t => t.toLowerCase().includes(this.tagSearch().toLowerCase()) && !this.selectedTags().includes(t));
+  });
+
+  filteredIngredientsOptions = computed(() => {
+    const defaultIngs = ['Chicken', 'Beef', 'Pork', 'Fish', 'Rice', 'Pasta', 'Tomato', 'Onion', 'Garlic', 'Cheese'];
+    return defaultIngs.filter(i => i.toLowerCase().includes(this.ingredientSearch().toLowerCase()) && !this.selectedIngredients().includes(i));
+  });
+
+  filteredPersonsOptions = computed(() => {
+    const defaultPersons = ['1', '2', '3', '4', '5', '6+'];
+    return defaultPersons.filter(p => p.includes(this.personsSearch()) && !this.selectedPersons().includes(p));
+  });
+
+  filteredRecipes = computed(() => {
+    const q = this.searchQuery().toLowerCase();
+    const cat = this.selectedCategory();
+    const diff = this.selectedDifficulty();
+    const rating = this.minRating();
+    const min = this.priceMin();
+    const max = this.priceMax();
+    const tags = this.selectedTags();
+    const ingredients = this.selectedIngredients();
+    const personsList = this.selectedPersons();
+
+    return this.recipes().filter(recipe => {
+      const q = this.searchQuery().toLowerCase();
+      const titulo = recipe.titulo ? recipe.titulo.toLowerCase() : '';
+      const desc = recipe.descripcion ? recipe.descripcion.toLowerCase() : '';
+      
+      const matchesSearch = !q ||
+        titulo.includes(q) ||
+        desc.includes(q) ||
+        recipe.categorias?.some(c => c.nombre && c.nombre.toLowerCase().includes(q));
+
+      const matchesCategory = !cat ||
+        recipe.categorias?.some(c => c.nombre === cat);
+
+      const matchesDifficulty = !diff || recipe.dificultad === diff;
+
+      const matchesRating = rating === 0 ||
+        (recipe.media_valoraciones !== null &&
+          parseFloat(String(recipe.media_valoraciones)) >= rating);
+
+      let matchesPrice = true;
+      if (recipe.price !== null && recipe.price !== undefined) {
+        const price = parseFloat(String(recipe.price));
+        matchesPrice = price >= min && price <= max;
+      }
+
+      // Arrays matching
+      const matchesTags = tags.length === 0 || tags.every(t => recipe.categorias?.some(c => c.nombre === t));
+      const matchesIngredients = ingredients.length === 0 || ingredients.some(i => {
+        const queryLower = i.toLowerCase();
+        return titulo.includes(queryLower) || desc.includes(queryLower);
+      });
+      
+      let matchesPersons = true;
+      if (personsList.length > 0) {
+        matchesPersons = personsList.includes(String(recipe.porciones)) || (personsList.includes('6+') && recipe.porciones >= 6);
+      }
+
+      return matchesSearch && matchesCategory && matchesDifficulty && matchesRating && matchesPrice && matchesTags && matchesIngredients && matchesPersons;
+    });
+  });
+
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      if (params['q']) this.searchQuery.set(params['q']);
+    });
+    this.loadRecipes();
   }
 
-  get filteredPersonsOptions() {
-    return this.allPersons.filter(p => 
-      p.toLowerCase().includes(this.personsSearch.toLowerCase()) && 
-      !this.selectedPersons.includes(p)
-    );
-  }
-
-  get filteredTagsOptions() {
-    return this.allTags.filter(t => 
-      t.toLowerCase().includes(this.tagSearch.toLowerCase()) && 
-      !this.selectedTags.includes(t)
-    );
-  }
-
-  addIngredient(ing: string) {
-    if (!this.selectedIngredients.includes(ing)) {
-      this.selectedIngredients.push(ing);
-    }
-    this.ingredientSearch = '';
-    this.showIngredientDropdown = false;
-  }
-
-  addPerson(p: string) {
-    if (!this.selectedPersons.includes(p)) {
-      this.selectedPersons.push(p);
-    }
-    this.personsSearch = '';
-    this.showPersonsDropdown = false;
-  }
-
-  addTag(t: string) {
-    if (!this.selectedTags.includes(t)) {
-      this.selectedTags.push(t);
-    }
-    this.tagSearch = '';
-    this.showTagsDropdown = false;
-  }
-
-  closeIngredientDropdown() {
-    setTimeout(() => (this.showIngredientDropdown = false), 200);
-  }
-
-  closePersonsDropdown() {
-    setTimeout(() => (this.showPersonsDropdown = false), 200);
-  }
-
-  closeTagsDropdown() {
-    setTimeout(() => (this.showTagsDropdown = false), 200);
-  }
-
-  recipes = [
-    {
-      id: 1,
-      title: 'Truffle Pasta Carbonara',
-      description: 'Classic Italian pasta with a gourmet twist, featuring rich truffle butter, crispy pancetta, and a creamy sauce that will transport you to Rome.',
-      image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?q=80&w=2071&auto=format&fit=crop',
-      rating: 4.8,
-      time: '30 min',
-      kcal: '320 kcal',
-      badges: ['Premium', 'Medium'],
-      price: 12.50
-    },
-    {
-      id: 2,
-      title: 'Creamy Mushroom Pasta',
-      description: 'A rich and velvety pasta dish with sautéed mushrooms, garlic, and a luxurious cream sauce. Perfect for a cozy dinner at home.',
-      image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=2000&auto=format&fit=crop',
-      rating: 4.6,
-      time: '25 min',
-      kcal: '320 kcal',
-      badges: ['Vegetarian', 'Easy'],
-      price: 10.00
-    },
-    {
-      id: 3,
-      title: 'Seafood Linguine',
-      description: 'Fresh seafood tossed with al dente linguine in a light white wine and tomato sauce. A taste of the Mediterranean coast.',
-      image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=2132&auto=format&fit=crop',
-      rating: 4.9,
-      time: '35 min',
-      kcal: '320 kcal',
-      badges: ['Seafood', 'Hard'],
-      price: 18.00
-    },
-    {
-      id: 4,
-      title: 'Pesto Gnocchi',
-      description: 'Pillowy soft potato gnocchi coated in a vibrant homemade basil pesto with pine nuts and parmesan. Simply irresistible.',
-      image: 'https://images.unsplash.com/photo-1558985250-27a406d64cb3?q=80&w=2070&auto=format&fit=crop',
-      rating: 4.7,
-      time: '20 min',
-      kcal: '320 kcal',
-      badges: ['Quick', 'Easy'],
-      price: 9.50
-    }
-  ];
-
-  clearFilters() {
-    this.selectedIngredients = [];
-    this.selectedPersons = [];
-    this.selectedTags = [];
-    this.priceMin = 0;
-    this.priceMax = 100;
-    this.minRating = 0;
-  }
-
-  removeIngredient(ing: string) {
-    this.selectedIngredients = this.selectedIngredients.filter(i => i !== ing);
-  }
-
-  removePerson(p: string) {
-    this.selectedPersons = this.selectedPersons.filter(i => i !== p);
-  }
-
-  removeTag(t: string) {
-    this.selectedTags = this.selectedTags.filter(i => i !== t);
+  loadRecipes() {
+    this.loading.set(true);
+    this.error.set(false);
+    this.recipeService.getRecipes().subscribe({
+      next: (data) => {
+        this.recipes.set(data);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set(true);
+        this.loading.set(false);
+      }
+    });
   }
 
   setRating(r: number) {
-    this.minRating = r;
+    this.minRating.set(this.minRating() === r ? 0 : r);
   }
 
   validateRange() {
-    if (this.priceMin > this.priceMax) {
-      const temp = this.priceMin;
-      this.priceMin = this.priceMax;
-      this.priceMax = temp;
+    if (this.priceMin() > this.priceMax()) {
+      const tmp = this.priceMin();
+      this.priceMin.set(this.priceMax());
+      this.priceMax.set(tmp);
     }
   }
 
-  updateSearch(query: string) {
-    this.searchQuery = query;
+  addTag(t: string) {
+    if (!this.selectedTags().includes(t)) this.selectedTags.update(arr => [...arr, t]);
+    this.tagSearch.set('');
+    this.showTagsDropdown.set(false);
+  }
+  removeTag(t: string) {
+    this.selectedTags.update(arr => arr.filter(x => x !== t));
+  }
+  closeTagsDropdown() { setTimeout(() => this.showTagsDropdown.set(false), 200); }
+
+  addIngredient(i: string) {
+    if (!this.selectedIngredients().includes(i)) this.selectedIngredients.update(arr => [...arr, i]);
+    this.ingredientSearch.set('');
+    this.showIngredientDropdown.set(false);
+  }
+  removeIngredient(i: string) {
+    this.selectedIngredients.update(arr => arr.filter(x => x !== i));
+  }
+  closeIngredientDropdown() { setTimeout(() => this.showIngredientDropdown.set(false), 200); }
+
+  addPerson(p: string) {
+    if (!this.selectedPersons().includes(p)) this.selectedPersons.update(arr => [...arr, p]);
+    this.personsSearch.set('');
+    this.showPersonsDropdown.set(false);
+  }
+  removePerson(p: string) {
+    this.selectedPersons.update(arr => arr.filter(x => x !== p));
+  }
+  closePersonsDropdown() { setTimeout(() => this.showPersonsDropdown.set(false), 200); }
+
+  clearFilters() {
+    this.searchQuery.set('');
+    this.selectedCategory.set('');
+    this.selectedDifficulty.set('');
+    this.minRating.set(0);
+    this.priceMin.set(0);
+    this.priceMax.set(200);
+    this.selectedTags.set([]);
+    this.selectedIngredients.set([]);
+    this.selectedPersons.set([]);
+    this.tagSearch.set('');
+    this.ingredientSearch.set('');
+    this.personsSearch.set('');
   }
 
-  get filteredRecipes() {
-    return this.recipes.filter(recipe => {
-      // Search query filter
-      const matchesSearch = !this.searchQuery || 
-                          recipe.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                          recipe.description.toLowerCase().includes(this.searchQuery.toLowerCase());
-      
-      // Price range filter
-      const matchesPrice = recipe.price >= this.priceMin && recipe.price <= this.priceMax;
-      
-      // Rating filter
-      const matchesRating = recipe.rating >= this.minRating;
-
-      // Ingredients filter (mock logic: if any selected ingredient is in the title/description or if we had an ingredients array)
-      // Since mock recipes don't have an ingredients array, we'll simulate it
-      const matchesIngredients = this.selectedIngredients.length === 0 || 
-                                 this.selectedIngredients.some(ing => 
-                                   recipe.title.toLowerCase().includes(ing.toLowerCase()) ||
-                                   recipe.description.toLowerCase().includes(ing.toLowerCase())
-                                 );
-
-      // Persons filter (mock logic: matching the badge or description)
-      const matchesPersons = this.selectedPersons.length === 0 ||
-                            this.selectedPersons.some(p => 
-                              recipe.description.toLowerCase().includes(p.toLowerCase()) ||
-                              recipe.badges.some(b => b.toLowerCase().includes(p.toLowerCase()))
-                            );
-
-      // Tags filter (matching badges)
-      const matchesTags = this.selectedTags.length === 0 ||
-                         this.selectedTags.some(tag => 
-                           recipe.badges.some(b => b.toLowerCase() === tag.toLowerCase())
-                         );
-      
-      return matchesSearch && matchesPrice && matchesRating && matchesIngredients && matchesPersons && matchesTags;
-    });
+  updateSearch(query: string) {
+    this.searchQuery.set(query);
   }
 }
+

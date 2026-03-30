@@ -11,7 +11,16 @@
     "changeOrigin": true,
     "logLevel": "debug"
   },
-  "/recipes": {
+  "/img-proxy": {
+    "target": "http://backend",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/img-proxy": ""
+    },
+    "logLevel": "debug"
+  },
+  "/storage": {
     "target": "http://backend",
     "secure": false,
     "changeOrigin": true,

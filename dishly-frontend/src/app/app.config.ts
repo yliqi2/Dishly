@@ -35,7 +35,9 @@ import {
   Star,
   Heart,
   ClipboardList,
-  Send
+  Send,
+  Calendar,
+  SearchX
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -68,7 +70,9 @@ export const appConfig: ApplicationConfig = {
         Star,
         Heart,
         ClipboardList,
-        Send
+        Send,
+        Calendar,
+        SearchX
       })
     )
   ]

@@ -86,7 +86,8 @@ export class RecipeCardComponent {
   protected readonly mainImage = computed(() => {
     const img = this.receta().imagen_1;
     if (!img) return '/assets/placeholder-recipe.jpg'; // Assuming a placeholder exists
-    return img.startsWith('/') || img.startsWith('http') ? img : `/${img}`;
+    if (img.startsWith('http')) return img;
+    return `/img-proxy/${img}`;
   });
 
   protected readonly chefName = computed(() => {
