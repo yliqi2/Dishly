@@ -1,16 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
+import { ReviewService } from '../../../Core/Services/Recipes/review.service';
+import { AuthServices } from '../../../Core/Services/Auth/auth-services';
+import { Review } from '../../../Core/Interfaces/Review';
 
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, FormsModule],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.css',
 })
-export class RecipeDetail {
+export class RecipeDetail implements OnInit {
   recipe = {
+    id_receta: 1, // Added ID so reviews can attach to something
     author: {
       name: 'Franchesco',
       initials: 'F'
@@ -50,14 +55,33 @@ export class RecipeDetail {
       'Whisk egg yolks with grated Parmesan in a bowl. Season with black pepper.',
       'Drain pasta and add to the pancetta pan. Remove from heat and quickly mix in egg mixture, adding pasta water to create a creamy sauce.',
       'Shave fresh black truffle over the top and serve immediately with extra Parmesan.'
-    ],
-    reviews: [] // Empty for "No reviews yet" state
+    ]
   };
 
   selectedThumbnailIndex = 0;
   userRating = 0;
   hoverRating = 0;
 
+  // Review-related properties
+  private reviewService = inject(ReviewService);
+  private authService = inject(AuthServices);
+  private cdr = inject(ChangeDetectorRef);
+
+  reviews: Review[] = [];
+  reviewComment = '';
+  submitError: string | null = null;
+  submitting = false;
+  editingReviewId: number | null = null;
+  editingComment = '';
+  private currentUserId: number | null = null;
+
+  ngOnInit(): void {
+    const user = this.authService.getUser() as { id_usuario?: number } | null;
+    this.currentUserId = user?.id_usuario ?? null;
+    this.loadReviews();
+  }
+
+  // Visual carousel functions
   selectThumbnail(index: number) {
     this.selectedThumbnailIndex = index;
   }
@@ -80,5 +104,111 @@ export class RecipeDetail {
 
   setHoverRating(rating: number) {
     this.hoverRating = rating;
+  }
+
+  // Logic functions for Reviews
+  loadReviews(): void {
+    this.reviewService.getReviews(this.recipe.id_receta).subscribe({
+      next: (data) => {
+        this.reviews = data;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.reviews = [];
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  submitReview(): void {
+    if (!this.authService.isAuthenticated()) {
+      this.submitError = 'You must be logged in to submit a review.';
+      this.cdr.detectChanges();
+      return;
+    }
+    if (!this.userRating) {
+      this.submitError = 'Please select a star rating before submitting.';
+      this.cdr.detectChanges();
+      return;
+    }
+    if (!this.reviewComment.trim()) {
+      this.submitError = 'Please write a comment before submitting.';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.submitting = true;
+    this.submitError = null;
+    this.cdr.detectChanges();
+
+    this.reviewService.submitReview({
+      id_receta: this.recipe.id_receta,
+      puntuacion: this.userRating,
+      comentario: this.reviewComment.trim()
+    }).subscribe({
+      next: () => {
+        this.reviewComment = '';
+        this.userRating = 0;
+        this.submitting = false;
+        this.submitError = null;
+        this.loadReviews();
+      },
+      error: (err: { error?: { message?: string } }) => {
+        this.submitting = false;
+        this.submitError = err?.error?.message ?? 'Could not submit review.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  startEdit(review: Review): void {
+    this.editingReviewId = review.id_valoracion;
+    this.editingComment = review.comentario;
+    this.cdr.detectChanges();
+  }
+
+  cancelEdit(): void {
+    this.editingReviewId = null;
+    this.editingComment = '';
+    this.cdr.detectChanges();
+  }
+
+  saveEdit(review: Review): void {
+    if (!this.editingComment.trim()) return;
+    this.reviewService.updateReviewWithPuntuacion(review.id_receta, review.puntuacion, this.editingComment.trim()).subscribe({
+      next: () => {
+        review.comentario = this.editingComment.trim();
+        this.editingReviewId = null;
+        this.editingComment = '';
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+  }
+
+  deleteReview(review: Review): void {
+    this.reviewService.deleteReview(review.id_valoracion).subscribe({
+      next: () => {
+        this.reviews = this.reviews.filter(r => r.id_valoracion !== review.id_valoracion);
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+  }
+
+  isOwnReview(review: Review): boolean {
+    return this.currentUserId !== null && review.id_usuario === this.currentUserId;
+  }
+
+  formatDate(dateStr: string): string {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  getInitials(name: string): string {
+    if (!name) return '??';
+    const parts = name.split(' ');
+    if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
   }
 }

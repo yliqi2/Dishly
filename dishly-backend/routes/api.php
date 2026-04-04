@@ -10,6 +10,7 @@ Route::post('/register', [AuthController::class , 'register']);
 Route::post('/login', [AuthController::class , 'login']);
 Route::get('/recipes', [RecetaController::class , 'getAllRecetas']);
 Route::get('/recipes/{id}', [RecetaController::class , 'getRecetaById']);
+Route::get('/recipes/{id}/reviews', [RecetaController::class , 'getReviewsForRecipe']);
 
 
 Route::middleware('auth:api')->group(function () {
@@ -31,6 +32,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/profile/my-recipes', [RecetaController::class , 'getMyRecipes']);
         Route::get('/profile/media-valoraciones', [RecetaController::class , 'getMediaValoraciones']);
         Route::post('/recetas/valorar', [RecetaController::class , 'setValoracion']);
+        Route::delete('/recetas/valorar/{id}', [RecetaController::class , 'deleteValoracion']);
 
         // Rutas de Recipes
         Route::post('/recetas/upload', [RecetaController::class , 'store']);

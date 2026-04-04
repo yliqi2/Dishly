@@ -752,4 +752,60 @@ class RecetaController extends Controller
             ], 500);
         }
     }
+
+    public function getReviewsForRecipe($id)
+    {
+        try {
+            $valoraciones = DB::table('valoracion')
+                ->join('users', 'valoracion.id_usuario', '=', 'users.id_usuario')
+                ->where('valoracion.id_receta', $id)
+                ->select(
+                    'valoracion.*',
+                    'users.nombre as autor_nombre'
+                )
+                ->orderByDesc('valoracion.fecha')
+                ->get();
+
+            return response()->json($valoraciones);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get reviews',
+                'errors' => [$e->getMessage()],
+            ], 500);
+        }
+    }
+
+    public function deleteValoracion($id)
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            $val = DB::table('valoracion')
+                ->where('id_valoracion', $id)
+                ->first();
+
+            if (!$val) {
+                return response()->json([
+                    'message' => 'Review no encontrada.',
+                ], 404);
+            }
+
+            if ((int) $val->id_usuario !== (int) $user->id_usuario && $user->rol !== 'admin') {
+                return response()->json([
+                    'message' => 'No puedes eliminar una review que no es tuya.',
+                ], 403);
+            }
+
+            DB::table('valoracion')
+                ->where('id_valoracion', $id)
+                ->delete();
+
+            return response()->json(['message' => 'Review eliminada correctamente.']);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Error al eliminar la review',
+                'errors' => [$e->getMessage()],
+            ], 500);
+        }
+    }
 }

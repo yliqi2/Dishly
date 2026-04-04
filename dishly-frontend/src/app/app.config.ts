@@ -37,7 +37,10 @@ import {
   ClipboardList,
   Send,
   Calendar,
-  SearchX
+  SearchX,
+  Trash2,
+  Check,
+  X
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -72,7 +75,10 @@ export const appConfig: ApplicationConfig = {
         ClipboardList,
         Send,
         Calendar,
-        SearchX
+        SearchX,
+        Trash2,
+        Check,
+        X
       })
     )
   ]

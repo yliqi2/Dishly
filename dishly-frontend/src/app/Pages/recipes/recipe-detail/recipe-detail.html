@@ -77,34 +77,85 @@
         <div class="reviews-section shadow-sm border p-4 mb-4 rounded-4 bg-white">
           <h2 class="section-title mb-4">Reviews</h2>
           <div class="rating-stars d-flex gap-2 mb-4">
-            <svg 
-              *ngFor="let i of [1,2,3,4,5]" 
-              viewBox="0 0 24 24" 
-              width="32" 
-              height="32"
-              [attr.fill]="i <= (hoverRating || userRating) ? '#FD8923' : '#E5E7EB'"
-              (mouseenter)="setHoverRating(i)"
-              (mouseleave)="setHoverRating(0)"
-              (click)="setRating(i)"
-              class="interactive-star">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            @for (i of [1,2,3,4,5]; track $index) {
+            <svg viewBox="0 0 24 24" width="32" height="32"
+              [attr.fill]="i <= (hoverRating || userRating) ? '#FD8923' : '#E5E7EB'" (mouseenter)="setHoverRating(i)"
+              (mouseleave)="setHoverRating(0)" (click)="setRating(i)" class="interactive-star">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
+            }
           </div>
-          <div class="review-input-group d-flex gap-2 mb-4">
-            <input type="text" class="form-control form-control-lg border bg-light rounded-3 small flex-grow-1" placeholder="Share your thoughts about this recipe...">
-            <button class="btn btn-submit-custom px-4 rounded-3 fw-bold d-flex align-items-center gap-2">
+          <div class="review-input-group d-flex gap-2 mb-2">
+            <input type="text" class="form-control form-control-lg border bg-light rounded-3 small flex-grow-1"
+              placeholder="Share your thoughts about this recipe..." [(ngModel)]="reviewComment" (keyup.enter)="submitReview()">
+            <button class="btn btn-submit-custom px-4 rounded-3 fw-bold d-flex align-items-center gap-2" (click)="submitReview()">
               <lucide-icon name="send" [size]="18"></lucide-icon>
               Submit
             </button>
           </div>
-  
-          <div class="reviews-empty-state pt-4 text-center border-top mt-2" *ngIf="recipe.reviews.length === 0">
+          @if (submitError) {
+          <p class="text-danger small mb-2">{{ submitError }}</p>
+          }
+
+          @if (reviews.length === 0) {
+          <div class="reviews-empty-state pt-4 text-center border-top mt-2">
             <div class="empty-icon-wrapper mx-auto mb-3 shadow-sm">
               <lucide-icon name="chef-hat" [size]="32"></lucide-icon>
             </div>
             <p class="empty-text h5 mb-1">There are no reviews yet</p>
             <p class="empty-subtext mb-0 text-muted">Be the first to review this recipe!</p>
           </div>
+          } @else {
+          <div class="reviews-list border-top pt-3 d-flex flex-column gap-3">
+            @for (review of reviews; track review.id_valoracion) {
+            <div class="review-card p-3 rounded-3">
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <div class="review-avatar d-flex align-items-center justify-content-center fw-bold flex-shrink-0">
+                  {{ getInitials(review.autor_nombre) }}
+                </div>
+                <div class="flex-grow-1 min-w-0">
+                  <span class="review-author-name d-block">{{ review.autor_nombre }}</span>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex gap-1">
+                      @for (i of [1,2,3,4,5]; track $index) {
+                      <svg viewBox="0 0 24 24" width="14" height="14"
+                        [attr.fill]="i <= review.puntuacion ? '#FD8923' : '#E5E7EB'">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                      }
+                    </div>
+                    <span class="review-date">{{ formatDate(review.fecha) }}</span>
+                  </div>
+                </div>
+                @if (isOwnReview(review)) {
+                <div class="d-flex gap-2 flex-shrink-0">
+                  <button class="btn-review-action edit" (click)="startEdit(review)" title="Edit">
+                    <lucide-icon name="pencil" [size]="15"></lucide-icon>
+                  </button>
+                  <button class="btn-review-action delete" (click)="deleteReview(review)" title="Delete">
+                    <lucide-icon name="trash-2" [size]="15"></lucide-icon>
+                  </button>
+                </div>
+                }
+              </div>
+              @if (editingReviewId === review.id_valoracion) {
+              <div class="d-flex gap-2 mt-2">
+                <input type="text" class="form-control form-control-sm border bg-light rounded-3 flex-grow-1"
+                  [(ngModel)]="editingComment" (keyup.enter)="saveEdit(review)">
+                <button class="btn-review-action edit" (click)="saveEdit(review)" title="Save">
+                  <lucide-icon name="check" [size]="15"></lucide-icon>
+                </button>
+                <button class="btn-review-action delete" (click)="cancelEdit()" title="Cancel">
+                  <lucide-icon name="x" [size]="15"></lucide-icon>
+                </button>
+              </div>
+              } @else {
+              <p class="review-comment mb-0">{{ review.comentario }}</p>
+              }
+            </div>
+            }
+          </div>
+          }
         </div>
       </div>
   
