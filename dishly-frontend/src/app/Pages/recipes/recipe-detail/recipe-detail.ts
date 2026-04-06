@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { ReviewService } from '../../../Core/Services/Recipes/review.service';
 import { AuthServices } from '../../../Core/Services/Auth/auth-services';
+import { RecetaDetailsService } from '../../../Core/Services/Core/receta-details-service';
 import { Review } from '../../../Core/Interfaces/Review';
 
 @Component({
@@ -15,7 +16,7 @@ import { Review } from '../../../Core/Interfaces/Review';
 })
 export class RecipeDetail implements OnInit {
   recipe = {
-    id_receta: 1, // Added ID so reviews can attach to something
+    id_receta: 1,
     author: {
       name: 'Franchesco',
       initials: 'F'
@@ -61,10 +62,12 @@ export class RecipeDetail implements OnInit {
   selectedThumbnailIndex = 0;
   userRating = 0;
   hoverRating = 0;
+  isLocked = false;
 
-  // Review-related properties
+
   private reviewService = inject(ReviewService);
   private authService = inject(AuthServices);
+  private recetaService = inject(RecetaDetailsService);
   private cdr = inject(ChangeDetectorRef);
 
   reviews: Review[] = [];
@@ -79,9 +82,33 @@ export class RecipeDetail implements OnInit {
     const user = this.authService.getUser() as { id_usuario?: number } | null;
     this.currentUserId = user?.id_usuario ?? null;
     this.loadReviews();
+    this.checkAccess();
   }
 
-  // Visual carousel functions
+  private checkAccess(): void {
+    if (!this.recipe.price || this.recipe.price <= 0) {
+      this.isLocked = false;
+      return;
+    }
+
+
+    this.isLocked = true;
+
+
+    if (this.authService.isAuthenticated()) {
+      const user = this.authService.getUser() as { id_usuario?: number } | null;
+      
+
+
+      this.recetaService.checkPurchase(this.recipe.id_receta.toString()).subscribe({
+        next: (res) => {
+
+        }
+      });
+    }
+  }
+
+
   selectThumbnail(index: number) {
     this.selectedThumbnailIndex = index;
   }
@@ -106,7 +133,7 @@ export class RecipeDetail implements OnInit {
     this.hoverRating = rating;
   }
 
-  // Logic functions for Reviews
+
   loadReviews(): void {
     this.reviewService.getReviews(this.recipe.id_receta).subscribe({
       next: (data) => {

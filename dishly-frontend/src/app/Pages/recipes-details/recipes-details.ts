@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { RecetaDetailsService } from '../../Core/Services/Core/receta-details-service';
+import { AuthServices } from '../../Core/Services/Auth/auth-services';
 import { RecetaOriginal } from '../../Core/Interfaces/RecetaOriginal';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
@@ -21,9 +22,13 @@ export class RecipesDetails implements OnInit {
   hoverRating = 0;
   userRating = 0;
 
+  /** Whether the recipe content is locked (not purchased) */
+  isLocked = false;
+
   constructor(
     private route: ActivatedRoute,
-    private recetaService: RecetaDetailsService
+    private recetaService: RecetaDetailsService,
+    private authService: AuthServices
   ) { }
 
   ngOnInit(): void {
@@ -34,6 +39,7 @@ export class RecipesDetails implements OnInit {
           this.recipe = data;
           console.log(this.recipe);
           this.loading = false;
+          this.checkAccess(id);
         },
         error: (err) => {
           console.error(err);
@@ -44,6 +50,34 @@ export class RecipesDetails implements OnInit {
     } else {
       this.error = 'ID de receta no proporcionado.';
       this.loading = false;
+    }
+  }
+
+  private checkAccess(recipeId: string): void {
+    if (!this.recipe) return;
+
+    // FOR TESTING: We force lock if it's a premium recipe, even for the author
+    // To restore: uncomment the original logic
+    
+    if (this.recipe.price !== null && this.recipe.price !== undefined && this.recipe.price > 0) {
+      this.isLocked = true;
+      
+      // Still, check authenticated/purchase to see if we should unlock it
+      if (this.authService.isAuthenticated()) {
+        const user = this.authService.getUser();
+        
+        // If you want to see it locked as the author, we keep it true here
+        // this.isLocked = (user as any)['id_usuario'] !== this.recipe.id_autor;
+        
+        this.recetaService.checkPurchase(recipeId).subscribe({
+          next: (res) => {
+            // Un-comment this line when done testing to restore author/purchaser bypass
+            // this.isLocked = !res.purchased;
+          }
+        });
+      }
+    } else {
+      this.isLocked = false;
     }
   }
 

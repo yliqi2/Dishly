@@ -39,4 +39,6 @@ Route::middleware('auth:api')->group(function () {
         Route::put('/recetas/{id}', [RecetaController::class , 'update']);
         Route::get('/recetas/categorias', [RecetaController::class , 'getCategorias']);
         Route::put('/recetas/desactivar/{id}', [RecetaController::class , 'desactivarReceta']);
+
+        Route::get('/recipes/{id}/check-purchase', [RecetaController::class , 'checkPurchase']);
     }); 

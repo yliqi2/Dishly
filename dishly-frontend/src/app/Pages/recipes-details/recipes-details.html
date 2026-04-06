@@ -87,6 +87,9 @@
 
                 <div class="reviews-section shadow-sm border p-4 mb-4 rounded-4 bg-white">
                     <h2 class="section-title mb-4">Reviews</h2>
+
+                    <!-- Review form: only visible when NOT locked -->
+                    @if (!isLocked) {
                     <div class="rating-stars d-flex gap-2 mb-4">
                         @for (i of [1,2,3,4,5]; track $index) {
                         <svg viewBox="0 0 24 24" width="32" height="32"
@@ -107,6 +110,22 @@
                             Submit
                         </button>
                     </div>
+                    } @else {
+                    <!-- Locked review banner -->
+                    <div class="review-locked-banner">
+                        <div class="locked-banner-icon">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                        </div>
+                        <div class="locked-banner-text">
+                            <span class="locked-banner-title">Buy this recipe to leave a review</span>
+                            <span class="locked-banner-sub">Purchase the recipe to unlock the review form</span>
+                        </div>
+                    </div>
+                    }
 
                     <div class="reviews-empty-state pt-4 text-center border-top mt-2">
                         <div class="empty-icon-wrapper mx-auto mb-3 shadow-sm">
@@ -197,7 +216,8 @@
                         </div>
                     </div>
 
-                    <div class="detail-section mb-2">
+                    <!-- Instructions Section with lock overlay -->
+                    <div class="detail-section mb-2" [class.instructions-locked]="isLocked">
                         <h3 class="detail-title mb-3 d-flex align-items-center gap-2 h5 fw-bold">
                             <lucide-icon name="chef-hat" [size]="20" class="text-highlight-color"></lucide-icon>
                             Instructions
@@ -213,6 +233,23 @@
                             </div>
                             }
                         </div>
+
+                        <!-- Lock overlay for instructions -->
+                        @if (isLocked) {
+                        <div class="lock-overlay">
+                            <div class="lock-overlay-content">
+                                <div class="lock-icon-circle">
+                                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                    </svg>
+                                </div>
+                                <p class="lock-title">Premium Content</p>
+                                <p class="lock-subtitle">Buy this recipe to unlock the full instructions</p>
+                            </div>
+                        </div>
+                        }
                     </div>
                 </div>
             </div>

@@ -808,4 +808,46 @@ class RecetaController extends Controller
             ], 500);
         }
     }
+
+    public function checkPurchase($id)
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            if (!$user) {
+                return response()->json(['purchased' => false]);
+            }
+
+            $recipe = DB::table('receta_original')
+                ->where('id_receta', $id)
+                ->where('active', 1)
+                ->first();
+
+            if (!$recipe) {
+                return response()->json(['message' => 'Recipe not found'], 404);
+            }
+
+            // The author always has access
+            if ((int) $recipe->id_autor === (int) $user->id_usuario) {
+                return response()->json(['purchased' => true]);
+            }
+
+            // Free recipes are accessible to everyone
+            if ($recipe->price === null || (float) $recipe->price <= 0) {
+                return response()->json(['purchased' => true]);
+            }
+
+            $purchased = DB::table('receta_adquirida')
+                ->where('id_usuario', $user->id_usuario)
+                ->where('id_receta', $id)
+                ->exists();
+
+            return response()->json(['purchased' => $purchased]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not check purchase status',
+                'errors' => [$e->getMessage()],
+            ], 500);
+        }
+    }
 }
