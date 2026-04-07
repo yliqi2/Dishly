@@ -1,23 +1,22 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { FormsModule } from '@angular/forms';
-import { RecipeCard } from '../recipe-card/recipe-card';
+import { RecipeCardComponent } from '../../../Core/Components/recipe-card/recipe-card';
 import { RecipeService } from '../../../Core/Services/Recipes/recipe.service';
 import { RecetaCard } from '../../../Core/Interfaces/RecetaCard';
 
 @Component({
   selector: 'app-search-recipes',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule, FormsModule, RecipeCard],
+  imports: [CommonModule, LucideAngularModule, FormsModule, RecipeCardComponent],
   templateUrl: './search-recipes.html',
   styleUrl: './search-recipes.css',
 })
 export class SearchRecipes implements OnInit {
   private recipeService = inject(RecipeService);
   private route = inject(ActivatedRoute);
-  private cdr = inject(ChangeDetectorRef);
 
   recipes = signal<RecetaCard[]>([]);
   loading = signal(true);

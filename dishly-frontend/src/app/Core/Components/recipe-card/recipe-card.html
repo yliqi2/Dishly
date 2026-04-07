@@ -2,7 +2,7 @@
 
   <!-- Image + overlay tags -->
   <div class="recipe-image-wrapper position-relative">
-    <img [src]="mainImage()" alt="Recipe image" class="recipe-image w-100" loading="lazy">
+    <img [src]="mainImage()" alt="Recipe image" class="recipe-image w-100" loading="lazy" (error)="$any($event.target).src='assets/placeholder.jpg'">
 
     <!-- Top tags -->
     <div class="position-absolute top-0 start-0 end-0 d-flex justify-content-between align-items-start p-3">

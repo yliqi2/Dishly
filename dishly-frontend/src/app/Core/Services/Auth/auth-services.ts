@@ -155,9 +155,23 @@ export class AuthServices extends ApiBaseService {
   }
 
   getAssetUrl(path: string, cacheBust?: string): string {
-    const p = path.startsWith('/') ? path.slice(1) : path;
-    const url = `/${p}`;
-    return cacheBust ? `${url}?v=${encodeURIComponent(cacheBust)}` : url;
+    if (!path) return 'assets/placeholder.jpg';
+
+    const trimmedPath = path.trim();
+    let url: string;
+
+    if (/^https?:\/\//i.test(trimmedPath)) {
+      url = trimmedPath
+        .replace('://localhost:8000', '://localhost:8080')
+        .replace('://127.0.0.1:8000', '://127.0.0.1:8080');
+    } else {
+      const cleanPath = trimmedPath.replace(/^\/+/, '');
+      url = `/img-proxy/${cleanPath}`;
+    }
+
+    if (!cacheBust) return url;
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}v=${encodeURIComponent(cacheBust)}`;
   }
 
   uploadIcon(file: File): Observable<AuthResponse> {

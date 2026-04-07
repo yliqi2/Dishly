@@ -10,4 +10,6 @@ export class RecipeService extends ApiBaseService {
   getRecipes(): Observable<RecetaCard[]> {
     return this.http.get<RecetaCard[]>(`${this.apiUrl}/recipes`);
   }
+
+  
 }

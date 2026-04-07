@@ -219,7 +219,7 @@
         <div *ngIf="!loading() && !error()">
           <div class="row row-cols-1 row-cols-md-2 g-4" *ngIf="filteredRecipes().length > 0; else noResults">
             <div class="col" *ngFor="let recipe of filteredRecipes()">
-              <app-recipe-card [recipe]="recipe"></app-recipe-card>
+              <app-recipe-card [receta]="recipe"></app-recipe-card>
             </div>
           </div>
 

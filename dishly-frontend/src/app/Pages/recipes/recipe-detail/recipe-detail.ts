@@ -1,73 +1,40 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ReviewService } from '../../../Core/Services/Recipes/review.service';
 import { AuthServices } from '../../../Core/Services/Auth/auth-services';
 import { RecetaDetailsService } from '../../../Core/Services/Core/receta-details-service';
+import { RecetaOriginal } from '../../../Core/Interfaces/RecetaOriginal';
 import { Review } from '../../../Core/Interfaces/Review';
+import { LoadingPage } from '../../loading-page/loading-page';
 
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, FormsModule],
+  imports: [CommonModule, LucideAngularModule, FormsModule, LoadingPage],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.css',
 })
 export class RecipeDetail implements OnInit {
-  recipe = {
-    id_receta: 1,
-    author: {
-      name: 'Franchesco',
-      initials: 'F'
-    },
-    title: 'Truffle Pasta Carbonara',
-    rating: 4.8,
-    price: 12.50,
-    mainImage: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?q=80&w=2071&auto=format&fit=crop',
-    thumbnails: [
-      'https://images.unsplash.com/photo-1612874742237-6526221588e3?q=80&w=2071&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=2000&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1473093226795-af9932fe5855?q=80&w=2094&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=2132&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1558985250-27a406d64cb3?q=80&w=2070&auto=format&fit=crop'
-    ],
-    badges: ['Pasta', 'Premium'],
-    difficulty: 'Easy',
-    stats: {
-      time: '35 min',
-      servings: '4 people',
-      level: 'Easy'
-    },
-    description: "This isn't just mac and cheese; it's a masterpiece of creamy indulgence. Our signature baked macaroni is a celebration of texture and flavor, where every forkful delivers the ultimate comfort food experience.",
-    ingredients: [
-      { name: 'Fresh Pasta', amount: '400g' },
-      { name: 'Pancetta', amount: '200g' },
-      { name: 'Egg Yolks', amount: '4 large' },
-      { name: 'Parmesan', amount: '100g' },
-      { name: 'Black Truffle', amount: '30g' },
-      { name: 'Black Pepper', amount: '2 tsp' },
-      { name: 'Garlic', amount: '2 cloves' },
-      { name: 'Salt', amount: 'To taste' }
-    ],
-    instructions: [
-      'Bring a large pot of salted water to boil. Cook pasta until al dente, reserving 1 cup of pasta water.',
-      'While pasta cooks, crisp pancetta in a large pan over medium heat until golden. Add minced garlic.',
-      'Whisk egg yolks with grated Parmesan in a bowl. Season with black pepper.',
-      'Drain pasta and add to the pancetta pan. Remove from heat and quickly mix in egg mixture, adding pasta water to create a creamy sauce.',
-      'Shave fresh black truffle over the top and serve immediately with extra Parmesan.'
-    ]
-  };
+  recipe: RecetaOriginal | null = null;
+  loading = true;
+  error: string | null = null;
+
+  thumbnails: string[] = [];
+  instructions: string[] = [];
 
   selectedThumbnailIndex = 0;
+  imageAnimationClass = '';
   userRating = 0;
   hoverRating = 0;
   isLocked = false;
 
-
   private reviewService = inject(ReviewService);
   private authService = inject(AuthServices);
   private recetaService = inject(RecetaDetailsService);
+  private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
 
   reviews: Review[] = [];
@@ -81,60 +48,179 @@ export class RecipeDetail implements OnInit {
   ngOnInit(): void {
     const user = this.authService.getUser() as { id_usuario?: number } | null;
     this.currentUserId = user?.id_usuario ?? null;
-    this.loadReviews();
-    this.checkAccess();
-  }
 
-  private checkAccess(): void {
-    if (!this.recipe.price || this.recipe.price <= 0) {
-      this.isLocked = false;
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.error = 'ID de receta no encontrado.';
+      this.loading = false;
       return;
     }
 
+    this.recetaService.getRecipeById(id).subscribe({
+      next: (data) => {
+        this.recipe = data;
+        this.thumbnails = this.computeThumbnails(data);
+        this.instructions = this.computeInstructions(data.instrucciones);
+        this.loading = false;
+        this.cdr.detectChanges();
+        this.loadReviews();
+        this.checkAccess(id);
+      },
+      error: (err) => {
+        console.error('Error al cargar la receta:', err);
+        this.error = 'The recipe failed to load.';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
-    this.isLocked = true;
+  private computeThumbnails(r: RecetaOriginal): string[] {
+    const thumbs: string[] = [];
 
+    const addImage = (path: string | null) => {
+      if (!path) return;
+      thumbs.push(this.authService.getAssetUrl(path));
+    };
 
-    if (this.authService.isAuthenticated()) {
-      const user = this.authService.getUser() as { id_usuario?: number } | null;
-      
+    addImage(r.imagen_1);
+    addImage(r.imagen_2);
+    addImage(r.imagen_3);
+    addImage(r.imagen_4);
+    addImage(r.imagen_5);
 
+    if (thumbs.length === 0) thumbs.push('assets/placeholder.jpg');
+    return thumbs;
+  }
 
-      this.recetaService.checkPurchase(this.recipe.id_receta.toString()).subscribe({
-        next: (res) => {
+  private computeInstructions(text: string): string[] {
+    if (!text) return [];
+    return text
+      .split('\n')
+      .map(s => s.trim().replace(/^\d+\.\s*/, ''))
+      .filter(s => s.length > 0);
+  }
 
-        }
-      });
+  getTimeLabel(): string {
+    if (!this.recipe) return '';
+    const unit = this.recipe.tiempo_preparacion_unidad === 'hours' ? 'h' : 'min';
+    return `${this.recipe.tiempo_preparacion} ${unit}`;
+  }
+
+  getDisplayPrice(): string {
+    if (!this.recipe || this.recipe.price === null || this.recipe.price === undefined) return 'Free';
+    const value = Number(this.recipe.price);
+    return Number.isFinite(value) && value > 0 ? `${value.toFixed(2)}€` : 'Free';
+  }
+
+  getPublishedDate(): string {
+    if (!this.recipe?.fecha_creacion) return '';
+    const date = new Date(this.recipe.fecha_creacion);
+    if (Number.isNaN(date.getTime())) return this.recipe.fecha_creacion;
+    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  getDifficultyBars(): number {
+    if (!this.recipe) return 1;
+    switch (this.recipe.dificultad) {
+      case 'medium': return 2;
+      case 'hard': return 3;
+      default: return 1;
     }
   }
 
+  getDifficultyLabel(): string {
+    if (!this.recipe) return '';
+    switch (this.recipe.dificultad) {
+      case 'easy': return 'Easy';
+      case 'medium': return 'Medium';
+      case 'hard': return 'Hard';
+      default: return this.recipe.dificultad;
+    }
+  }
 
-  selectThumbnail(index: number) {
+  isPremium(): boolean {
+    if (!this.recipe || this.recipe.price === null || this.recipe.price === undefined) return false;
+    const value = Number(this.recipe.price);
+    return Number.isFinite(value) && value > 0;
+  }
+
+  private checkAccess(id: string): void {
+    if (!this.recipe) return;
+    if (this.isPremium()) {
+      this.isLocked = true;
+      if (this.authService.isAuthenticated()) {
+        this.recetaService.checkPurchase(id).subscribe({
+          next: (res) => {
+            this.isLocked = !res.purchased;
+            this.cdr.detectChanges();
+          }
+        });
+      }
+    } else {
+      this.isLocked = false;
+    }
+  }
+
+  hasMultipleImages(): boolean {
+    return this.thumbnails.length > 1;
+  }
+
+  visibleThumbnails(): string[] {
+    return this.hasMultipleImages() ? this.thumbnails.slice(0, 5) : this.thumbnails;
+  }
+
+  hiddenThumbnailsCount(): number {
+    return Math.max(0, this.thumbnails.length - 5);
+  }
+
+  isSummaryThumbnail(index: number): boolean {
+    return this.hiddenThumbnailsCount() > 0 && index === 4;
+  }
+
+  selectThumbnail(index: number): void {
+    if (index === this.selectedThumbnailIndex) return;
+
+    this.triggerImageAnimation(index > this.selectedThumbnailIndex ? 'slide-next' : 'slide-prev');
     this.selectedThumbnailIndex = index;
   }
 
-  prevImage() {
-    this.selectedThumbnailIndex = (this.selectedThumbnailIndex > 0) 
-      ? this.selectedThumbnailIndex - 1 
-      : this.recipe.thumbnails.length - 1;
+  prevImage(): void {
+    this.triggerImageAnimation('slide-prev');
+    this.selectedThumbnailIndex = (this.selectedThumbnailIndex > 0)
+      ? this.selectedThumbnailIndex - 1
+      : this.thumbnails.length - 1;
   }
 
-  nextImage() {
-    this.selectedThumbnailIndex = (this.selectedThumbnailIndex < this.recipe.thumbnails.length - 1) 
-      ? this.selectedThumbnailIndex + 1 
+  nextImage(): void {
+    this.triggerImageAnimation('slide-next');
+    this.selectedThumbnailIndex = (this.selectedThumbnailIndex < this.thumbnails.length - 1)
+      ? this.selectedThumbnailIndex + 1
       : 0;
   }
 
-  setRating(rating: number) {
-    this.userRating = rating;
+  private triggerImageAnimation(direction: 'slide-next' | 'slide-prev'): void {
+    this.imageAnimationClass = '';
+    this.cdr.detectChanges();
+
+    requestAnimationFrame(() => {
+      this.imageAnimationClass = direction;
+      this.cdr.detectChanges();
+
+      window.setTimeout(() => {
+        if (this.imageAnimationClass === direction) {
+          this.imageAnimationClass = '';
+          this.cdr.detectChanges();
+        }
+      }, 320);
+    });
   }
 
-  setHoverRating(rating: number) {
-    this.hoverRating = rating;
-  }
-
+  setRating(rating: number): void { this.userRating = rating; }
+  setHoverRating(rating: number): void { this.hoverRating = rating; }
 
   loadReviews(): void {
+    if (!this.recipe) return;
     this.reviewService.getReviews(this.recipe.id_receta).subscribe({
       next: (data) => {
         this.reviews = data;
@@ -148,6 +234,7 @@ export class RecipeDetail implements OnInit {
   }
 
   submitReview(): void {
+    if (!this.recipe) return;
     if (!this.authService.isAuthenticated()) {
       this.submitError = 'You must be logged in to submit a review.';
       this.cdr.detectChanges();
