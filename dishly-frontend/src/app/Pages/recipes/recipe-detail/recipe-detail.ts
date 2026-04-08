@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ReviewService } from '../../../Core/Services/Recipes/review.service';
 import { AuthServices } from '../../../Core/Services/Auth/auth-services';
@@ -16,7 +16,7 @@ type ReviewSortOption = 'latest' | 'highest' | 'lowest';
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, FormsModule, LoadingPage],
+  imports: [CommonModule, LucideAngularModule, FormsModule, RouterLink, LoadingPage],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.css',
 })
@@ -87,6 +87,16 @@ export class RecipeDetail implements OnInit {
         this.isInCart = this.cartService.hasRecipe(data.id_receta);
         this.loading = false;
         this.cdr.detectChanges();
+
+        if (this.authService.isAuthenticated()) {
+          this.cartService.loadCart().subscribe({
+            next: (items) => {
+              this.isInCart = items.some((item) => item.id_receta === data.id_receta);
+              this.cdr.detectChanges();
+            }
+          });
+        }
+
         this.loadReviews();
         this.checkAccess(id);
       },
@@ -249,12 +259,19 @@ export class RecipeDetail implements OnInit {
       return;
     }
 
-    const result = this.cartService.addRecipe(this.recipe);
-    this.isInCart = result.added || result.duplicate;
-    this.cartNotice = result.added
-      ? 'Recipe added to your cart.'
-      : 'This recipe is already in your cart.';
-    this.cdr.detectChanges();
+    this.cartService.addRecipe(this.recipe).subscribe({
+      next: (result) => {
+        this.isInCart = result.added || result.duplicate;
+        this.cartNotice = result.added
+          ? 'Recipe added to your cart.'
+          : 'This recipe is already in your cart.';
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.cartNotice = err?.error?.message ?? 'Could not add this recipe to your cart.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   visibleThumbnails(): string[] {

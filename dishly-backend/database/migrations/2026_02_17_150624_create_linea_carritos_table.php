@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('linea_carrito', function (Blueprint $table) {
             $table->increments('id_linea_carrito');
-            $table->integer('cantidad');
             $table->float('precio_unitario');
             $table->unsignedInteger('id_carrito');
             $table->unsignedInteger('id_receta');

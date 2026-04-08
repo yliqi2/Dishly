@@ -130,7 +130,14 @@
               <span class="price-label">Price</span>
               <span class="price-value">{{ getDisplayPrice() }}</span>
             </div>
-            @if (isPremium() && !isAdminUser()) {
+            @if (isOwnRecipe()) {
+            <a
+              [routerLink]="['/recipes', recipe.id_receta, 'edit']"
+              class="btn btn-buy-custom btn-lg rounded-3 fw-bold d-inline-flex align-items-center justify-content-center gap-2 text-decoration-none">
+              <lucide-icon name="pencil" [size]="18"></lucide-icon>
+              Edit Recipe
+            </a>
+            } @else if (isPremium()) {
             <button
               type="button"
               class="btn btn-buy-custom btn-lg rounded-3 fw-bold d-inline-flex align-items-center justify-content-center gap-2"
@@ -141,7 +148,7 @@
             </button>
             } @else {
             <div class="free-access-badge d-flex align-items-center justify-content-center fw-bold">
-              {{ isAdminUser() ? 'Admin access' : 'Free access' }}
+              Free access
             </div>
             }
           </div>

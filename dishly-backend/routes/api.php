@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\UserController;
 
@@ -39,6 +40,11 @@ Route::middleware('auth:api')->group(function () {
         Route::put('/recetas/{id}', [RecetaController::class , 'update']);
         Route::get('/recetas/categorias', [RecetaController::class , 'getCategorias']);
         Route::put('/recetas/desactivar/{id}', [RecetaController::class , 'desactivarReceta']);
+
+        Route::get('/carrito', [CarritoController::class, 'getCarrito']);
+        Route::post('/carrito', [CarritoController::class, 'addToCart']);
+        Route::delete('/carrito/recipe/{idReceta}', [CarritoController::class, 'removeFromCart']);
+        Route::delete('/carrito', [CarritoController::class, 'clearCart']);
 
         Route::get('/recipes/{id}/check-purchase', [RecetaController::class , 'checkPurchase']);
     }); 

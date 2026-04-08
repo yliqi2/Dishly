@@ -1,83 +1,129 @@
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, catchError, map, of, tap, throwError } from 'rxjs';
 import { RecetaOriginal } from '../../Interfaces/RecetaOriginal';
 import { AuthServices } from '../Auth/auth-services';
-
-export interface CartItem {
-  id_receta: number;
-  title: string;
-  author: string;
-  price: number;
-  imageUrl: string;
-}
+import { CartItem } from '../../Interfaces/CartItem';
+import { CartApiItem, CartResponse } from '../../Interfaces/CartResponse';
+import { ApiBaseService } from '../api-base.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CartService {
-  private readonly storageKey = 'dishly_cart';
-  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+export class CartService extends ApiBaseService {
   private readonly authService = inject(AuthServices);
-  private readonly itemsSubject = new BehaviorSubject<CartItem[]>(this.readItems());
+  private readonly itemsSubject = new BehaviorSubject<CartItem[]>([]);
 
   readonly items$ = this.itemsSubject.asObservable();
+
+  constructor() {
+    super();
+
+    this.authService.user$.subscribe((user) => {
+      if (user && this.authService.isAuthenticated()) {
+        this.loadCart().subscribe();
+        return;
+      }
+
+      this.itemsSubject.next([]);
+    });
+  }
 
   getItems(): CartItem[] {
     return this.itemsSubject.value;
   }
 
   hasRecipe(recipeId: number): boolean {
-    return this.getItems().some(item => item.id_receta === recipeId);
+    return this.getItems().some((item) => item.id_receta === recipeId);
   }
 
-  addRecipe(recipe: RecetaOriginal): { added: boolean; duplicate: boolean } {
-    const items = this.getItems();
-    if (items.some(item => item.id_receta === recipe.id_receta)) {
-      return { added: false, duplicate: true };
+  loadCart(): Observable<CartItem[]> {
+    if (!this.authService.isAuthenticated()) {
+      this.itemsSubject.next([]);
+      return of([]);
     }
 
+    return this.http.get<CartResponse>(`${this.apiUrl}/carrito`).pipe(
+      map((response) => (response.items ?? []).map((item) => this.mapCartItem(item))),
+      tap((items) => this.itemsSubject.next(items)),
+      catchError(() => {
+        this.itemsSubject.next([]);
+        return of([]);
+      })
+    );
+  }
+
+  addRecipe(recipe: RecetaOriginal): Observable<{ added: boolean; duplicate: boolean }> {
+    if (!this.authService.isAuthenticated()) {
+      return of({ added: false, duplicate: false });
+    }
+
+    return this.http.post(`${this.apiUrl}/carrito`, { id_receta: recipe.id_receta }).pipe(
+      tap(() => {
+        const items = this.getItems();
+        if (!items.some((item) => item.id_receta === recipe.id_receta)) {
+          this.itemsSubject.next([...items, this.toCartItem(recipe)]);
+        }
+      }),
+      map(() => ({ added: true, duplicate: false })),
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 409) {
+          return of({ added: false, duplicate: true });
+        }
+
+        return throwError(() => error);
+      })
+    );
+  }
+
+  removeRecipe(recipeId: number): Observable<boolean> {
+    if (!this.authService.isAuthenticated()) {
+      return of(false);
+    }
+
+    return this.http.delete(`${this.apiUrl}/carrito/recipe/${recipeId}`).pipe(
+      tap(() => this.itemsSubject.next(this.getItems().filter((item) => item.id_receta !== recipeId))),
+      map(() => true),
+      catchError(() => of(false))
+    );
+  }
+
+  clearCart(): Observable<boolean> {
+    if (!this.authService.isAuthenticated()) {
+      this.itemsSubject.next([]);
+      return of(true);
+    }
+
+    return this.http.delete(`${this.apiUrl}/carrito`).pipe(
+      tap(() => this.itemsSubject.next([])),
+      map(() => true),
+      catchError(() => of(false))
+    );
+  }
+
+  private mapCartItem(item: CartApiItem): CartItem {
+    const imagePath = item.imagen_1 ?? item.imagen_2 ?? item.imagen_3 ?? item.imagen_4 ?? item.imagen_5 ?? '';
+    const price = Number(item.precio_unitario ?? item.price ?? 0);
+
+    return {
+      id_receta: item.id_receta,
+      title: item.titulo ?? 'Recipe',
+      author: item.autor_nombre ?? 'Dishly Chef',
+      price: Number.isFinite(price) ? price : 0,
+      imageUrl: this.authService.getAssetUrl(imagePath),
+    };
+  }
+
+  private toCartItem(recipe: RecetaOriginal): CartItem {
     const imagePath = recipe.imagen_1 ?? recipe.imagen_2 ?? recipe.imagen_3 ?? recipe.imagen_4 ?? recipe.imagen_5 ?? '';
     const price = Number(recipe.price ?? 0);
 
-    const newItem: CartItem = {
+    return {
       id_receta: recipe.id_receta,
       title: recipe.titulo,
       author: recipe.autor_nombre,
       price: Number.isFinite(price) ? price : 0,
       imageUrl: this.authService.getAssetUrl(imagePath),
     };
-
-    this.saveItems([...items, newItem]);
-    return { added: true, duplicate: false };
-  }
-
-  removeRecipe(recipeId: number): void {
-    this.saveItems(this.getItems().filter(item => item.id_receta !== recipeId));
-  }
-
-  clearCart(): void {
-    this.saveItems([]);
-  }
-
-  private readItems(): CartItem[] {
-    if (!this.isBrowser) {
-      return [];
-    }
-
-    try {
-      const raw = localStorage.getItem(this.storageKey);
-      return raw ? (JSON.parse(raw) as CartItem[]) : [];
-    } catch {
-      return [];
-    }
-  }
-
-  private saveItems(items: CartItem[]): void {
-    if (this.isBrowser) {
-      localStorage.setItem(this.storageKey, JSON.stringify(items));
-    }
-
-    this.itemsSubject.next(items);
   }
 }

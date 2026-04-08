@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -12,7 +12,7 @@ import { CartService } from '../../Core/Services/Cart/cart.service';
   templateUrl: './cart.html',
   styleUrl: './cart.css',
 })
-export class Cart {
+export class Cart implements OnInit {
   private readonly cartService = inject(CartService);
 
   protected readonly items = toSignal(this.cartService.items$, {
@@ -23,11 +23,15 @@ export class Cart {
     return this.items().reduce((sum, item) => sum + item.price, 0);
   });
 
+  ngOnInit(): void {
+    this.cartService.loadCart().subscribe();
+  }
+
   protected removeItem(recipeId: number): void {
-    this.cartService.removeRecipe(recipeId);
+    this.cartService.removeRecipe(recipeId).subscribe();
   }
 
   protected clearCart(): void {
-    this.cartService.clearCart();
+    this.cartService.clearCart().subscribe();
   }
 }
