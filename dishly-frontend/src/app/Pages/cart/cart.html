@@ -5,5 +5,74 @@
   </div>
 </section>
 
-<section class="page-container">
+<section class="page-container cart-page pb-4">
+  @if (items().length === 0) {
+  <div class="cart-empty shadow-sm">
+    <div class="cart-empty__chef" aria-hidden="true">
+      <div class="chef-hat">
+        <div class="hat-top"></div>
+        <div class="hat-brim"></div>
+      </div>
+      <div class="chef-face">
+        <div class="chef-eyes">
+          <span class="eye"></span>
+          <span class="eye"></span>
+        </div>
+        <div class="chef-mouth"></div>
+      </div>
+      <div class="chef-body">
+        <div class="chef-buttons">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+      <div class="steam">
+        <span class="swirl s1">~</span>
+        <span class="swirl s2">~</span>
+        <span class="swirl s3">~</span>
+      </div>
+    </div>
+    <h2>Your cart is empty</h2>
+    <p>Add a premium recipe from the details page to see it here.</p>
+    <a routerLink="/recipes" class="btn-primary">Browse recipes</a>
+  </div>
+  } @else {
+  <div class="cart-layout">
+    <div class="cart-list">
+      @for (item of items(); track item.id_receta) {
+      <article class="cart-card shadow-sm">
+        <img [src]="item.imageUrl" [alt]="item.title" class="cart-card__image" (error)="$any($event.target).src='assets/placeholder.jpg'">
+        <div class="cart-card__content">
+          <p class="cart-card__eyebrow mb-1">Premium recipe</p>
+          <h3 class="cart-card__title mb-1">{{ item.title }}</h3>
+          <p class="cart-card__author mb-0">By {{ item.author }}</p>
+        </div>
+        <div class="cart-card__actions">
+          <strong class="cart-card__price">{{ item.price | number:'1.2-2' }}€</strong>
+          <button type="button" class="cart-remove-btn" (click)="removeItem(item.id_receta)">
+            <lucide-icon name="trash-2" [size]="16"></lucide-icon>
+            Remove
+          </button>
+        </div>
+      </article>
+      }
+    </div>
+
+    <aside class="cart-summary shadow-sm">
+      <h2 class="cart-summary__title">Order summary</h2>
+      <div class="cart-summary__row">
+        <span>Recipes</span>
+        <strong>{{ items().length }}</strong>
+      </div>
+      <div class="cart-summary__row cart-summary__row--total">
+        <span>Total</span>
+        <strong>{{ total() | number:'1.2-2' }}€</strong>
+      </div>
+
+      <a routerLink="/recipes" class="cart-summary__link">Keep browsing</a>
+      <button type="button" class="btn-primary btn-full-width" (click)="clearCart()">
+        Clear cart
+      </button>
+    </aside>
+  </div>
+  }
 </section>

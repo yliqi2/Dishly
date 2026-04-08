@@ -6,4 +6,6 @@ export interface Review {
   comentario: string;
   fecha: string;
   autor_nombre: string;
+  autor_icon_path?: string | null;
+  autor_updated_at?: string | null;
 }

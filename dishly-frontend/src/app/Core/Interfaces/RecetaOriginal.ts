@@ -9,6 +9,8 @@ export interface RecetaOriginal {
     id_receta: number;
     id_autor: number;
     autor_nombre: string;
+    autor_icon_path?: string | null;
+    autor_updated_at?: string | null;
     fecha_creacion: string;
     titulo: string;
     descripcion: string;

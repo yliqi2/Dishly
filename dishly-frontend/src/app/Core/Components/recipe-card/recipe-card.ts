@@ -77,10 +77,14 @@ export class RecipeCardComponent {
 
   protected readonly mediaValoraciones = computed(() => {
     const media = this.receta().media_valoraciones;
-    if (media !== null && Number(media) > 0) {
-      return Number(media);
+    const numericMedia = Number(media);
+
+    if (!Number.isFinite(numericMedia) || numericMedia <= 0) {
+      return 'NA';
     }
-    return 'NA';
+
+    const roundedUp = Math.ceil(numericMedia * 10) / 10;
+    return roundedUp.toFixed(1);
   });
 
   protected readonly mainImage = computed(() => {

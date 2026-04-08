@@ -1,14 +1,17 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ReviewService } from '../../../Core/Services/Recipes/review.service';
 import { AuthServices } from '../../../Core/Services/Auth/auth-services';
+import { CartService } from '../../../Core/Services/Cart/cart.service';
 import { RecetaDetailsService } from '../../../Core/Services/Core/receta-details-service';
 import { RecetaOriginal } from '../../../Core/Interfaces/RecetaOriginal';
 import { Review } from '../../../Core/Interfaces/Review';
 import { LoadingPage } from '../../loading-page/loading-page';
+
+type ReviewSortOption = 'latest' | 'highest' | 'lowest';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -33,21 +36,41 @@ export class RecipeDetail implements OnInit {
 
   private reviewService = inject(ReviewService);
   private authService = inject(AuthServices);
+  private cartService = inject(CartService);
   private recetaService = inject(RecetaDetailsService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
   reviews: Review[] = [];
+  readonly reviewsPerPage = 5;
+  currentReviewPage = 1;
+  reviewSort: ReviewSortOption = 'latest';
   reviewComment = '';
   submitError: string | null = null;
+  cartNotice: string | null = null;
   submitting = false;
   editingReviewId: number | null = null;
   editingComment = '';
+  editingRating = 0;
+  editingHoverRating = 0;
+  isInCart = false;
   private currentUserId: number | null = null;
+  private currentUserRole: string | null = null;
+  private currentUserIconPath: string | null = null;
+  private currentUserUpdatedAt: string | null = null;
 
   ngOnInit(): void {
-    const user = this.authService.getUser() as { id_usuario?: number } | null;
+    const user = this.authService.getUser() as {
+      id_usuario?: number;
+      rol?: string | null;
+      icon_path?: string | null;
+      updated_at?: string | null;
+    } | null;
     this.currentUserId = user?.id_usuario ?? null;
+    this.currentUserRole = user?.rol ?? null;
+    this.currentUserIconPath = user?.icon_path ?? null;
+    this.currentUserUpdatedAt = user?.updated_at ?? null;
 
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
@@ -61,6 +84,7 @@ export class RecipeDetail implements OnInit {
         this.recipe = data;
         this.thumbnails = this.computeThumbnails(data);
         this.instructions = this.computeInstructions(data.instrucciones);
+        this.isInCart = this.cartService.hasRecipe(data.id_receta);
         this.loading = false;
         this.cdr.detectChanges();
         this.loadReviews();
@@ -120,6 +144,39 @@ export class RecipeDetail implements OnInit {
     return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  getAuthorAvatarUrl(): string | null {
+    if (this.recipe?.autor_icon_path) {
+      return this.authService.getAssetUrl(this.recipe.autor_icon_path, this.recipe.autor_updated_at ?? undefined);
+    }
+
+    if (
+      this.recipe &&
+      this.currentUserId !== null &&
+      this.recipe.id_autor === this.currentUserId &&
+      this.currentUserIconPath
+    ) {
+      return this.authService.getAssetUrl(this.currentUserIconPath, this.currentUserUpdatedAt ?? undefined);
+    }
+
+    return null;
+  }
+
+  getReviewAvatarUrl(review: Review): string | null {
+    if (review.autor_icon_path) {
+      return this.authService.getAssetUrl(review.autor_icon_path, review.autor_updated_at ?? undefined);
+    }
+
+    if (
+      this.currentUserId !== null &&
+      review.id_usuario === this.currentUserId &&
+      this.currentUserIconPath
+    ) {
+      return this.authService.getAssetUrl(this.currentUserIconPath, this.currentUserUpdatedAt ?? undefined);
+    }
+
+    return null;
+  }
+
   getDifficultyBars(): number {
     if (!this.recipe) return 1;
     switch (this.recipe.dificultad) {
@@ -145,8 +202,19 @@ export class RecipeDetail implements OnInit {
     return Number.isFinite(value) && value > 0;
   }
 
+  isAdminUser(): boolean {
+    return this.currentUserRole === 'admin';
+  }
+
   private checkAccess(id: string): void {
     if (!this.recipe) return;
+
+    if (this.isAdminUser()) {
+      this.isLocked = false;
+      this.cdr.detectChanges();
+      return;
+    }
+
     if (this.isPremium()) {
       this.isLocked = true;
       if (this.authService.isAuthenticated()) {
@@ -164,6 +232,29 @@ export class RecipeDetail implements OnInit {
 
   hasMultipleImages(): boolean {
     return this.thumbnails.length > 1;
+  }
+
+  addToCart(): void {
+    if (!this.recipe || !this.isPremium()) {
+      return;
+    }
+
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (this.isInCart) {
+      this.router.navigate(['/cart']);
+      return;
+    }
+
+    const result = this.cartService.addRecipe(this.recipe);
+    this.isInCart = result.added || result.duplicate;
+    this.cartNotice = result.added
+      ? 'Recipe added to your cart.'
+      : 'This recipe is already in your cart.';
+    this.cdr.detectChanges();
   }
 
   visibleThumbnails(): string[] {
@@ -218,23 +309,98 @@ export class RecipeDetail implements OnInit {
 
   setRating(rating: number): void { this.userRating = rating; }
   setHoverRating(rating: number): void { this.hoverRating = rating; }
+  setEditRating(rating: number): void { this.editingRating = rating; }
+  setEditHoverRating(rating: number): void { this.editingHoverRating = rating; }
+
+  get totalReviewPages(): number {
+    return Math.max(1, Math.ceil(this.reviews.length / this.reviewsPerPage));
+  }
+
+  get sortedReviews(): Review[] {
+    const reviews = [...this.reviews];
+
+    switch (this.reviewSort) {
+      case 'highest':
+        return reviews.sort((a, b) => {
+          const scoreDiff = b.puntuacion - a.puntuacion;
+          if (scoreDiff !== 0) return scoreDiff;
+          return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+        });
+      case 'lowest':
+        return reviews.sort((a, b) => {
+          const scoreDiff = a.puntuacion - b.puntuacion;
+          if (scoreDiff !== 0) return scoreDiff;
+          return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+        });
+      case 'latest':
+      default:
+        return reviews.sort((a, b) => {
+          const dateDiff = new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+          if (dateDiff !== 0) return dateDiff;
+          return b.id_valoracion - a.id_valoracion;
+        });
+    }
+  }
+
+  get paginatedReviews(): Review[] {
+    const start = (this.currentReviewPage - 1) * this.reviewsPerPage;
+    return this.sortedReviews.slice(start, start + this.reviewsPerPage);
+  }
+
+  hasReviewPagination(): boolean {
+    return this.reviews.length > this.reviewsPerPage;
+  }
+
+  setReviewSort(sort: ReviewSortOption): void {
+    if (this.reviewSort === sort) {
+      return;
+    }
+
+    this.reviewSort = sort;
+    this.currentReviewPage = 1;
+    this.cdr.detectChanges();
+  }
+
+  goToReviewPage(page: number): void {
+    if (page < 1 || page > this.totalReviewPages || page === this.currentReviewPage) {
+      return;
+    }
+
+    this.currentReviewPage = page;
+    this.cdr.detectChanges();
+  }
+
+  reviewPageNumbers(): number[] {
+    return Array.from({ length: this.totalReviewPages }, (_, index) => index + 1);
+  }
 
   loadReviews(): void {
     if (!this.recipe) return;
     this.reviewService.getReviews(this.recipe.id_receta).subscribe({
       next: (data) => {
         this.reviews = data;
+        this.currentReviewPage = 1;
         this.cdr.detectChanges();
       },
       error: () => {
         this.reviews = [];
+        this.currentReviewPage = 1;
         this.cdr.detectChanges();
       }
     });
   }
 
+  isOwnRecipe(): boolean {
+    return this.currentUserId !== null && this.recipe?.id_autor === this.currentUserId;
+  }
+
   submitReview(): void {
     if (!this.recipe) return;
+    if (this.isOwnRecipe()) {
+      this.submitError = "You can't review your own recipe.";
+      this.cdr.detectChanges();
+      return;
+    }
     if (!this.authService.isAuthenticated()) {
       this.submitError = 'You must be logged in to submit a review.';
       this.cdr.detectChanges();
@@ -278,22 +444,29 @@ export class RecipeDetail implements OnInit {
   startEdit(review: Review): void {
     this.editingReviewId = review.id_valoracion;
     this.editingComment = review.comentario;
+    this.editingRating = review.puntuacion;
+    this.editingHoverRating = 0;
     this.cdr.detectChanges();
   }
 
   cancelEdit(): void {
     this.editingReviewId = null;
     this.editingComment = '';
+    this.editingRating = 0;
+    this.editingHoverRating = 0;
     this.cdr.detectChanges();
   }
 
   saveEdit(review: Review): void {
-    if (!this.editingComment.trim()) return;
-    this.reviewService.updateReviewWithPuntuacion(review.id_receta, review.puntuacion, this.editingComment.trim()).subscribe({
+    if (!this.editingComment.trim() || !this.editingRating) return;
+    this.reviewService.updateReviewWithPuntuacion(review.id_receta, this.editingRating, this.editingComment.trim()).subscribe({
       next: () => {
         review.comentario = this.editingComment.trim();
+        review.puntuacion = this.editingRating;
         this.editingReviewId = null;
         this.editingComment = '';
+        this.editingRating = 0;
+        this.editingHoverRating = 0;
         this.cdr.detectChanges();
       },
       error: () => {}
@@ -304,6 +477,7 @@ export class RecipeDetail implements OnInit {
     this.reviewService.deleteReview(review.id_valoracion).subscribe({
       next: () => {
         this.reviews = this.reviews.filter(r => r.id_valoracion !== review.id_valoracion);
+        this.currentReviewPage = Math.min(this.currentReviewPage, this.totalReviewPages);
         this.cdr.detectChanges();
       },
       error: () => {}

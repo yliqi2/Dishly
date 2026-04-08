@@ -11,6 +11,7 @@ import { Cart } from './Pages/cart/cart';
 import { AuthGuard } from './Guards/auth.guard';
 import { Profile } from './Pages/profile/profile';
 import { EditProfile } from './Pages/edit-profile/edit-profile';
+import { EditRecipe } from './Pages/edit-recipe/upload';
 import { NotFound } from './Pages/not-found/not-found';
 
 export const routes: Routes = [
@@ -30,6 +31,7 @@ export const routes: Routes = [
         path: 'recipes',
         children: [
             { path: '', component: SearchRecipes },
+            { path: ':id/edit', component: EditRecipe, canActivate: [AuthGuard] },
             { path: ':id', component: RecipeDetail }
         ]
     },
@@ -53,17 +55,13 @@ export const routes: Routes = [
     },
     {
         path: 'profile',
-        canActivate: [AuthGuard],
-        children: [
-            {
-                path: '',
-                component: Profile
-            },
-            {
-                path: 'edit',
-                component: EditProfile
-            }
-        ]
+        component: Profile,
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'profile/edit',
+        component: EditProfile,
+        canActivate: [AuthGuard]
     },
     {
         path: '**',

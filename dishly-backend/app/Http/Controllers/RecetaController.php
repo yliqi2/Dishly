@@ -533,7 +533,7 @@ class RecetaController extends Controller
 
             $autores = DB::table('users')
                 ->whereIn('id_usuario', $authorIds)
-                ->select('id_usuario', 'nombre')
+                ->select('id_usuario', 'nombre', 'icon_path', 'updated_at')
                 ->get()
                 ->keyBy('id_usuario');
 
@@ -541,6 +541,8 @@ class RecetaController extends Controller
                 $receta->categorias = $categorias[$receta->id_receta] ?? [];
                 $receta->media_valoraciones = $valoraciones[$receta->id_receta]->media_valoraciones ?? null;
                 $receta->autor_nombre = $autores[$receta->id_autor]->nombre ?? null;
+                $receta->autor_icon_path = $autores[$receta->id_autor]->icon_path ?? null;
+                $receta->autor_updated_at = $autores[$receta->id_autor]->updated_at ?? null;
                 return $receta;
             });
 
@@ -592,13 +594,15 @@ class RecetaController extends Controller
 
             $autor = DB::table('users')
                 ->where('id_usuario', $recipe->id_autor)
-                ->select('nombre')
+                ->select('nombre', 'icon_path', 'updated_at')
                 ->first();
 
             $recipe->categorias = $categorias;
             $recipe->ingredientes = $ingredientes;
             $recipe->media_valoraciones = $valoracion !== null ? round((float) $valoracion, 2) : 0;
             $recipe->autor_nombre = $autor?->nombre;
+            $recipe->autor_icon_path = $autor?->icon_path;
+            $recipe->autor_updated_at = $autor?->updated_at;
 
             return response()->json($recipe);
         } catch (Throwable $e) {
@@ -761,7 +765,9 @@ class RecetaController extends Controller
                 ->where('valoracion.id_receta', $id)
                 ->select(
                     'valoracion.*',
-                    'users.nombre as autor_nombre'
+                    'users.nombre as autor_nombre',
+                    'users.icon_path as autor_icon_path',
+                    'users.updated_at as autor_updated_at'
                 )
                 ->orderByDesc('valoracion.fecha')
                 ->get();
