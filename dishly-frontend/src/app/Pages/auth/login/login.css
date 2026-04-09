@@ -13,6 +13,7 @@
 }
 
 .login-container {
+	min-height: 100dvh;
 	height: 100vh;
 	background: var(--AuthGradient);
 	display: flex;
@@ -25,6 +26,8 @@
 	right: 0;
 	bottom: 0;
 	font-family: var(--font-sans);
+	box-sizing: border-box;
+	overscroll-behavior: none;
 	overflow: hidden;
 }
 
@@ -53,8 +56,8 @@
 	padding: 48px 40px;
 	width: 100%;
 	max-width: 520px;
-	max-height: calc(100vh - 80px);
-	overflow-y: auto;
+	max-height: calc(100dvh - 80px);
+	overflow: hidden;
 	animation: fadeIn 0.6s cubic-bezier(.22,.9,.35,1);
 	will-change: transform, opacity;
 }
@@ -408,18 +411,27 @@
 /* Tablet */
 @media (max-width: 768px) {
 	.login-container {
-		padding: 24px var(--layout-gutter);
+		padding: 0;
+		align-items: stretch;
+		justify-content: stretch;
 	}
 
 	.back-link {
 		top: 24px;
-		left: var(--layout-gutter);
+		left: 20px;
 		font-size: 16px;
+		z-index: 2;
 	}
 
 	.login-card {
-		padding: 40px 32px;
-		max-width: 520px;
+		padding: 84px 24px 28px;
+		width: 100%;
+		max-width: none;
+		min-height: 100dvh;
+		max-height: 100dvh;
+		border-radius: 0;
+		box-shadow: none;
+		overflow-y: auto;
 	}
 
 	.title {
@@ -448,17 +460,21 @@
 /* Móvil grande */
 @media (max-width: 425px) {
 	.login-container {
-		padding: 20px var(--layout-gutter) 96px;
+		height: 100dvh;
+		min-height: 100dvh;
+		align-items: stretch;
+		padding: 0;
 	}
 
 	.back-link {
 		top: 20px;
-		left: var(--layout-gutter);
+		left: 16px;
 	}
 
 	.login-card {
-		padding: 32px 24px 72px;
-		max-height: calc(100vh - 140px);
+		padding: 76px 20px 24px;
+		max-height: 100dvh;
+		overflow-y: auto;
 	}
 
 	.brand-icon-box {
@@ -495,9 +511,9 @@
 
 	.help-button {
 		position: fixed;
-		top: 20px;
+		top: auto;
 		right: 20px;
-		bottom: auto;
+		bottom: 20px;
 		width: 46px;
 		height: 46px;
 		font-size: 20px;
@@ -553,19 +569,23 @@
 /* Móvil pequeño */
 @media (max-width: 320px) {
 	.login-container {
-		padding: 16px var(--layout-gutter) 88px;
+		height: 100dvh;
+		min-height: 100dvh;
+		align-items: stretch;
+		padding: 0;
 	}
 
 	.back-link {
 		top: 16px;
-		left: var(--layout-gutter);
+		left: 12px;
 		font-size: 16px;
 	}
 
 	.login-card {
-		padding: 24px 16px 64px;
-		border-radius: 20px;
-		max-height: calc(100vh - 128px);
+		padding: 68px 14px 20px;
+		border-radius: 0;
+		max-height: 100dvh;
+		overflow-y: auto;
 	}
 
 	.brand-icon-box {
@@ -598,9 +618,9 @@
 
 	.help-button {
 		position: fixed;
-		top: 16px;
+		top: auto;
 		right: 16px;
-		bottom: auto;
+		bottom: 16px;
 		width: 42px;
 		height: 42px;
 		font-size: 18px;

@@ -513,7 +513,7 @@
 @media (max-width: 425px) {
 	.nav {
 		min-height: 72px;
-		padding: 0;
+		padding: 0 16px;
 	}
 
 	.brand-icon-box {
@@ -589,7 +589,7 @@
 @media (max-width: 320px) {
 	.nav {
 		min-height: 64px;
-		padding: 0;
+		padding: 0 12px;
 	}
 
 	.brand-icon-box {

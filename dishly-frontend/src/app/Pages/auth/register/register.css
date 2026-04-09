@@ -24,6 +24,7 @@
 }
 
 .register-container {
+	min-height: 100dvh;
 	height: 100vh;
 	background: var(--AuthGradient);
 	display: flex;
@@ -36,7 +37,9 @@
 	right: 0;
 	bottom: 0;
 	font-family: var(--font-sans);
-	overflow: hidden;
+	box-sizing: border-box;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 .back-link {
@@ -370,19 +373,27 @@
 /* Tablet */
 @media (max-width: 768px) {
 	.register-container {
-		padding: 24px var(--layout-gutter);
+		padding: 0;
+		align-items: stretch;
+		justify-content: stretch;
 	}
 
 	.back-link {
 		top: 24px;
-		left: var(--layout-gutter);
+		left: 20px;
 		font-size: 16px;
+		z-index: 2;
 	}
 
 	.register-card {
-		padding: 36px 28px;
-		max-width: 520px;
-		max-height: calc(100vh - 20vh);
+		padding: 84px 24px 28px;
+		width: 100%;
+		max-width: none;
+		min-height: 100dvh;
+		max-height: 100dvh;
+		border-radius: 0;
+		box-shadow: none;
+		overflow-y: auto;
 	}
 
 	.header {
@@ -441,17 +452,24 @@
 /* Móvil grande */
 @media (max-width: 425px) {
 	.register-container {
-		padding: 20px var(--layout-gutter) 96px;
+		height: 100dvh;
+		min-height: 100dvh;
+		align-items: stretch;
+		padding: 0;
+		overflow: hidden;
 	}
 
 	.back-link {
 		top: 20px;
-		left: var(--layout-gutter);
+		left: 16px;
 	}
 
 	.register-card {
-		padding: 28px 20px 64px;
-		max-height: calc(100vh - 20vh);
+		padding: 72px 18px 20px;
+		min-height: 100dvh;
+		max-height: 100dvh;
+		border-radius: 0;
+		overflow-y: auto;
 	}
 
 	.brand-icon-box {
@@ -504,59 +522,75 @@
 
 	.help-button {
 		position: fixed;
-		top: 20px;
+		top: auto;
 		right: 20px;
-		bottom: auto;
+		bottom: 20px;
 		width: 42px;
 		height: 42px;
 		font-size: 18px;
 	}
 
 	.terms-accept {
-		font-size: 16px;
-	}
-
-	.social-buttons {
-		grid-template-columns: 1fr 1fr;
+		font-size: 15px;
+		line-height: 1.35;
 	}
 }
 
 /* Móvil mediano */
 @media (max-width: 375px) {
+	.register-container {
+		height: 100dvh;
+		min-height: 100dvh;
+		align-items: stretch;
+		padding: 0;
+		overflow: hidden;
+	}
+
 	.register-card {
-		padding: 24px 18px 60px;
-		max-height: calc(100vh - 20vh);
+		padding: 68px 16px 18px;
+		min-height: 100dvh;
+		max-height: 100dvh;
+		border-radius: 0;
+		overflow-y: auto;
+	}
+
+	.header {
+		gap: 8px;
+		margin-bottom: 14px;
 	}
 
 	.brand-icon-box {
-		width: 56px;
-		height: 56px;
+		width: 48px;
+		height: 48px;
 	}
 
 	.brand-icon {
-		width: 40px;
-		height: 40px;
+		width: 30px;
+		height: 30px;
 	}
 
 	.title {
-		font-size: 22px;
+		font-size: 21px;
+		margin-bottom: 6px;
 	}
 
 	.subtitle {
-		font-size: 16px;
+		font-size: 15px;
+		line-height: 1.35;
 	}
 
 	.input {
+		min-height: 46px;
 		padding: 10px 12px;
 		font-size: 16px;
 	}
 
 	.form {
-		gap: 10px;
+		gap: 8px;
 	}
 
 	.form-group {
-		gap: 6px;
+		gap: 4px;
 	}
 
 	.btn-social {
@@ -565,34 +599,39 @@
 	}
 
 	.divider {
-		margin: 16px 0 12px 0;
+		margin: 14px 0 10px;
 	}
 
 	.login-prompt {
-		margin-top: 14px;
+		margin-top: 10px;
 	}
 
 	.terms-accept {
-		font-size: 16px;
+		font-size: 15px;
+		line-height: 1.35;
 	}
 }
 
 /* Móvil pequeño */
 @media (max-width: 320px) {
 	.register-container {
-		padding: 16px var(--layout-gutter) 88px;
+		height: 100dvh;
+		min-height: 100dvh;
+		align-items: stretch;
+		padding: 0;
 	}
 
 	.back-link {
 		top: 16px;
-		left: var(--layout-gutter);
+		left: 12px;
 		font-size: 16px;
 	}
 
 	.register-card {
-		padding: 22px 14px 56px;
-		border-radius: 20px;
-		max-height: calc(100vh - 20vh);
+		padding: 68px 14px 20px;
+		border-radius: 0;
+		max-height: 100dvh;
+		overflow-y: auto;
 	}
 
 	.brand-icon-box {
@@ -645,9 +684,9 @@
 
 	.help-button {
 		position: fixed;
-		top: 16px;
+		top: auto;
 		right: 16px;
-		bottom: auto;
+		bottom: 16px;
 		width: 38px;
 		height: 38px;
 		font-size: 16px;

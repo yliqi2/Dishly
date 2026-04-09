@@ -253,7 +253,7 @@ class RecetaSeeder extends Seeder
             // Spaghetti alla Puttanesca (Recipe 2, Author: Marc)
             [
                 'id_receta' => $recetaIds[2],
-                'id_usuario' => $user('liqi@gmail.com'),
+                'id_usuario' => $user('1871649909yang@gmail.com'),
                 'puntuacion' => 5,
                 'comentario' => 'Incredible flavors. The olives give it such a great punch.',
                 'fecha' => now(),
@@ -262,7 +262,7 @@ class RecetaSeeder extends Seeder
             // Ultimate Smash Burger (Recipe 3, Author: Pau)
             [
                 'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('liqi@gmail.com'),
+                'id_usuario' => $user('1871649909yang@gmail.com'),
                 'puntuacion' => 4,
                 'comentario' => 'Great burger, though I prefer more cheddar.',
                 'fecha' => '2026-04-07',

@@ -4,11 +4,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarritoController;
+use App\Http\Controllers\MailController;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\UserController;
 
 Route::post('/register', [AuthController::class , 'register']);
 Route::post('/login', [AuthController::class , 'login']);
+Route::post('/send-email', [MailController::class, 'send']);
 Route::get('/recipes', [RecetaController::class , 'getAllRecetas']);
 Route::get('/recipes/{id}', [RecetaController::class , 'getRecetaById']);
 Route::get('/recipes/{id}/reviews', [RecetaController::class , 'getReviewsForRecipe']);
@@ -47,4 +49,6 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/carrito', [CarritoController::class, 'clearCart']);
 
         Route::get('/recipes/{id}/check-purchase', [RecetaController::class , 'checkPurchase']);
+
+
     }); 

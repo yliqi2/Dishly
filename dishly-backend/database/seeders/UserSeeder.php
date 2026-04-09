@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'nombre' => 'Liqi',
-                'email' => 'liqi@gmail.com',
+                'email' => '1871649909yang@gmail.com',
                 'password' => Hash::make('12345678'),
                 'chef' => false,
                 'rol' => 'admin',

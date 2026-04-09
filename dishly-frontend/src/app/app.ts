@@ -20,7 +20,7 @@ export class App {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
-        const authRoutes = ['/login', '/register'];
+        const authRoutes = ['/login', '/register', '/forgot-password'];
         this.showHeader.set(!authRoutes.some(route => event.url.startsWith(route)));
         if (this.showHeader()) {
           setTimeout(() => {

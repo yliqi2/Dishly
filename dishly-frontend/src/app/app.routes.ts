@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { Homepage } from './Pages/homepage/homepage';
 import { Login } from './Pages/auth/login/login';
 import { Register } from './Pages/auth/register/register';
+import { ForgotPassword } from './Pages/auth/forgot-password/forgot-password';
 import { SearchRecipes } from './Pages/recipes/search-recipes/search-recipes';
 import { RecipeDetail } from './Pages/recipes/recipe-detail/recipe-detail';
 import { Upload } from './Pages/upload/upload';
@@ -26,6 +27,10 @@ export const routes: Routes = [
     {
         path: 'register',
         component: Register
+    },
+    {
+        path: 'forgot-password',
+        component: ForgotPassword
     },
     {
         path: 'recipes',
