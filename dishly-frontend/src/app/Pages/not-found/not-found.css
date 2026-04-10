@@ -1,50 +1,24 @@
 :host {
   display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 /* ── Layout ───────────────────────────────────────── */
 .nf-container {
+  position: relative;
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
   display: grid;
   place-items: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  overflow-x: clip;
+  background-color: transparent;
 }
 
-/* ── Background blobs ─────────────────────────────── */
-.nf-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.25;
-  pointer-events: none;
-}
-
-.nf-blob-1 {
-  width: 500px;
-  height: 500px;
-  background: var(--highlight, #f97316);
-  top: -120px;
-  right: -100px;
-  animation: blobFloat 8s ease-in-out infinite alternate;
-}
-
-.nf-blob-2 {
-  width: 380px;
-  height: 380px;
-  background: #fb923c;
-  bottom: -80px;
-  left: -80px;
-  animation: blobFloat 10s ease-in-out infinite alternate-reverse;
-}
-
-@keyframes blobFloat {
-  from {
-    transform: translate(0, 0) scale(1);
-  }
-
-  to {
-    transform: translate(20px, 30px) scale(1.06);
-  }
-}
 
 /* ── Card ─────────────────────────────────────────── */
 .nf-card {
@@ -58,6 +32,8 @@
   text-align: center;
   max-width: 560px;
   width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* ── Chef illustration ────────────────────────────── */
