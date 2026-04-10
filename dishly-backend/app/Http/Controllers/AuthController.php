@@ -46,10 +46,7 @@ class AuthController extends Controller
                     'chef' => false,
                 ]);
 
-                $verificationUrl = route('verification.verify', [
-                    'email' => $user->email,
-                    'code' => $verificationCode,
-                ]);
+                $verificationUrl = $this->frontendVerificationUrl($user->email, $verificationCode);
 
                 Mail::to($user->email)->send(
                     new SendEmail(
@@ -135,8 +132,19 @@ class AuthController extends Controller
         $email = (string) $request->query('email', '');
         $code = (string) $request->query('code', '');
 
+        return redirect()->away($this->frontendVerificationUrl($email, $code));
+    }
+
+    public function verifyEmailApi(Request $request)
+    {
+        $email = (string) $request->query('email', $request->input('email', ''));
+        $code = (string) $request->query('code', $request->input('code', ''));
+
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($code) !== 6) {
-            return redirect()->away($this->verificationRedirectUrl('invalid'));
+            return response()->json([
+                'message' => 'This verification link is invalid or has expired.',
+                'status' => 'invalid',
+            ], 422);
         }
 
         $user = User::query()
@@ -145,18 +153,27 @@ class AuthController extends Controller
             ->first();
 
         if (!$user || $user->recovery_code !== $code) {
-            return redirect()->away($this->verificationRedirectUrl('invalid'));
+            return response()->json([
+                'message' => 'This verification link is invalid or has expired.',
+                'status' => 'invalid',
+            ], 422);
         }
 
         if ($user->usuario_verificado) {
-            return redirect()->away($this->verificationRedirectUrl('already'));
+            return response()->json([
+                'message' => 'Your email was already verified. You can log in normally.',
+                'status' => 'already',
+            ]);
         }
 
         $user->usuario_verificado = true;
         $user->recovery_code = null;
         $user->save();
 
-        return redirect()->away($this->verificationRedirectUrl('success'));
+        return response()->json([
+            'message' => 'Your email has been verified successfully. You can now log in.',
+            'status' => 'success',
+        ]);
     }
 
     public function updateProfile(Request $request)
@@ -234,9 +251,18 @@ class AuthController extends Controller
         }
     }
 
+    private function frontendVerificationUrl(string $email, string $code): string
+    {
+        $frontendUrl = rtrim((string) config('app.frontend_url', 'https://servomechanically-nonaffecting-stephanie.ngrok-free.dev'), '/');
+
+        return $frontendUrl
+            . '/verifyEmail?email=' . urlencode($email)
+            . '&code=' . urlencode($code);
+    }
+
     private function verificationRedirectUrl(string $status): string
     {
-        $frontendUrl = rtrim((string) config('app.frontend_url', 'http://localhost:4200'), '/');
+        $frontendUrl = rtrim((string) config('app.frontend_url', 'https://servomechanically-nonaffecting-stephanie.ngrok-free.dev'), '/');
 
         return $frontendUrl . '/login?verification=' . urlencode($status);
     }

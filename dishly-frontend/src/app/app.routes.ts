@@ -3,6 +3,7 @@ import { Homepage } from './Pages/homepage/homepage';
 import { Login } from './Pages/auth/login/login';
 import { Register } from './Pages/auth/register/register';
 import { ForgotPassword } from './Pages/auth/forgot-password/forgot-password';
+import { VerifyEmail } from './Pages/auth/verify-email/verify-email';
 import { SearchRecipes } from './Pages/recipes/search-recipes/search-recipes';
 import { RecipeDetail } from './Pages/recipes/recipe-detail/recipe-detail';
 import { Upload } from './Pages/upload/upload';
@@ -34,6 +35,11 @@ export const routes: Routes = [
     {
         path: 'forgot-password',
         component: ForgotPassword
+    },
+    {
+        path: 'verifyEmail',
+        component: VerifyEmail,
+        canActivate: [GuestGuard]
     },
     {
         path: 'recipes',

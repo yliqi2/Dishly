@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 
 Route::post('/register', [AuthController::class , 'register']);
 Route::post('/login', [AuthController::class , 'login']);
+Route::get('/verify-email', [AuthController::class, 'verifyEmailApi']);
 Route::post('/send-email', [MailController::class, 'send']);
 Route::post('/reset-password', [MailController::class, 'resetPassword']);
 Route::get('/recipes', [RecetaController::class , 'getAllRecetas']);

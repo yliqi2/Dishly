@@ -54,6 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'frontend_url' => env('FRONTEND_URL', 'https://servomechanically-nonaffecting-stephanie.ngrok-free.dev'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

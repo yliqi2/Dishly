@@ -74,6 +74,15 @@ export class AuthServices extends ApiBaseService {
     );
   }
 
+  verifyEmail(params: { email: string; code: string }): Observable<VerificationResponse> {
+    return this.http.get<VerificationResponse>(`${this.apiUrl}/verify-email`, {
+      params: {
+        email: params.email,
+        code: params.code,
+      },
+    });
+  }
+
   getRememberedCredentials(): { email: string; password: string } | null {
     const raw = this.getItem('rememberedCredentials');
     if (!raw) return null;
@@ -206,4 +215,9 @@ type UpdateProfilePayload = { name?: string; email?: string; password?: string; 
 type AuthResponse = {
   access_token?: string;
   user?: User;
+};
+
+type VerificationResponse = {
+  message: string;
+  status: 'success' | 'already' | 'invalid';
 };
