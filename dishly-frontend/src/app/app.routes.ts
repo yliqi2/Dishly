@@ -10,6 +10,7 @@ import { DishlyAi } from './Pages/dishly-ai/dishly-ai';
 import { Forum } from './Pages/forum/forum';
 import { Cart } from './Pages/cart/cart';
 import { AuthGuard } from './Guards/auth.guard';
+import { GuestGuard } from './Guards/guest.guard';
 import { Profile } from './Pages/profile/profile';
 import { EditProfile } from './Pages/edit-profile/edit-profile';
 import { EditRecipe } from './Pages/edit-recipe/upload';
@@ -22,11 +23,13 @@ export const routes: Routes = [
     },
     {
         path: 'login',
-        component: Login
+        component: Login,
+        canActivate: [GuestGuard]
     },
     {
         path: 'register',
-        component: Register
+        component: Register,
+        canActivate: [GuestGuard]
     },
     {
         path: 'forgot-password',

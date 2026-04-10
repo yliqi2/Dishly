@@ -34,10 +34,13 @@ class CarritoController extends Controller
                 ]);
             }
 
+            $this->removeUnavailableCartItems((int) $carrito->id_carrito);
+
             $items = LineaCarrito::query()
                 ->join('receta_original', 'linea_carrito.id_receta', '=', 'receta_original.id_receta')
                 ->join('users', 'receta_original.id_autor', '=', 'users.id_usuario')
                 ->where('linea_carrito.id_carrito', $carrito->id_carrito)
+                ->where('receta_original.active', 1)
                 ->select(
                     'linea_carrito.id_linea_carrito',
                     'linea_carrito.id_receta',
@@ -231,5 +234,26 @@ class CarritoController extends Controller
         $carrito->save();
 
         return $carrito;
+    }
+
+    protected function removeUnavailableCartItems(int $cartId): void
+    {
+        $invalidRecipeIds = RecetaOriginal::query()
+            ->rightJoin('linea_carrito', 'receta_original.id_receta', '=', 'linea_carrito.id_receta')
+            ->where('linea_carrito.id_carrito', $cartId)
+            ->where(function ($query) {
+                $query->whereNull('receta_original.id_receta')
+                    ->orWhere('receta_original.active', '!=', 1);
+            })
+            ->pluck('linea_carrito.id_receta');
+
+        if ($invalidRecipeIds->isEmpty()) {
+            return;
+        }
+
+        LineaCarrito::query()
+            ->where('id_carrito', $cartId)
+            ->whereIn('id_receta', $invalidRecipeIds->all())
+            ->delete();
     }
 }

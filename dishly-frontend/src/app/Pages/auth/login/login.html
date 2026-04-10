@@ -15,6 +15,12 @@
 			<p class="subtitle">Sign in to continue your culinary journey</p>
 		</div>
 
+		@if (successMessage()) {
+			<div class="success-banner" role="status" aria-live="polite">
+				{{ successMessage() }}
+			</div>
+		}
+
 		<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form">
 			<div class="form-group">
 				<label for="login-email" class="label">Email</label>

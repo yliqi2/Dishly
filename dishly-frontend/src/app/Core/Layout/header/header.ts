@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, signal, inject, NgModule 
 import { NgOptimizedImage } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthServices } from '../../Services/Auth/auth-services';
+import { CartService } from '../../Services/Cart/cart.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LucideAngularModule } from 'lucide-angular';
 
@@ -23,14 +24,18 @@ type AuthUser = {
 })
 export class Header {
   private authService = inject(AuthServices);
+  private cartService = inject(CartService);
 
   protected readonly menuOpen = signal(false);
   protected readonly mobileMenuOpen = signal(false);
   protected readonly isLoggingOut = signal(false);
 
   private readonly user = toSignal<AuthUser | null>(this.authService.user$, { initialValue: null });
+  private readonly cartItems = toSignal(this.cartService.items$, { initialValue: [] });
 
   protected readonly isAuthenticated = computed(() => !!this.user());
+  protected readonly cartCount = computed(() => this.cartItems().length);
+  protected readonly cartBadgeText = computed(() => this.cartCount() > 99 ? '99+' : String(this.cartCount()));
   protected readonly displayName = computed(() => this.user()?.nombre || this.user()?.name || 'User');
   protected readonly chef = computed(() => this.user()?.chef ?? false);
   protected readonly userInitial = computed(() => this.displayName().charAt(0).toUpperCase());

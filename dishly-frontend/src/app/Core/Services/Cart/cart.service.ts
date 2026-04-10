@@ -109,6 +109,7 @@ export class CartService extends ApiBaseService {
       id_receta: item.id_receta,
       title: item.titulo ?? 'Recipe',
       author: item.autor_nombre ?? 'Dishly Chef',
+      description: item.descripcion ?? 'A premium recipe ready to complete your next meal.',
       price: Number.isFinite(price) ? price : 0,
       imageUrl: this.authService.getAssetUrl(imagePath),
     };
@@ -122,6 +123,7 @@ export class CartService extends ApiBaseService {
       id_receta: recipe.id_receta,
       title: recipe.titulo,
       author: recipe.autor_nombre,
+      description: recipe.descripcion ?? 'A premium recipe ready to complete your next meal.',
       price: Number.isFinite(price) ? price : 0,
       imageUrl: this.authService.getAssetUrl(imagePath),
     };

@@ -23,6 +23,7 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'recovery_code',
+        'usuario_verificado',
         'fecha_registro',
         'rol',
         'chef',
@@ -51,6 +52,7 @@ class User extends Authenticatable implements JWTSubject
         return [
             'chef' => 'boolean',
             'is_active' => 'boolean',
+            'usuario_verificado' => 'boolean',
             'password' => 'hashed',
         ];
     }

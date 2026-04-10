@@ -67,8 +67,19 @@
             <div class="actions">
                 @if (isAuthenticated()) {
                     <!-- Desktop dropdown menu -->
-                    <button class="action-button" type="button" aria-label="Shopping cart" routerLink="/cart" (click)="closeMobileMenu()">
-                        <lucide-icon name="shoppingCart"class="my-icon" strokeWidth="2.6"></lucide-icon>
+                    <button
+                        class="action-button action-button--cart position-relative"
+                        type="button"
+                        [attr.aria-label]="cartCount() > 0 ? 'Shopping cart, ' + cartCount() + ' recipes' : 'Shopping cart'"
+                        routerLink="/cart"
+                        (click)="closeMobileMenu()"
+                    >
+                        <lucide-icon name="shoppingCart" class="my-icon" strokeWidth="2.6"></lucide-icon>
+                        @if (cartCount() > 0) {
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge">
+                                {{ cartBadgeText() }}
+                            </span>
+                        }
                     </button>
                     <button class="action-button" type="button" aria-label="Upload" routerLink="/upload" (click)="closeMobileMenu()">
                         <lucide-icon name="upload"class="my-icon" strokeWidth="2.6"></lucide-icon>
@@ -132,9 +143,16 @@
 
                     <!-- Mobile/Tablet direct buttons -->
                     <div class="user-menu--mobile">
-                        <a class="menu-link" routerLink="/cart" (click)="closeMobileMenu()">
-                            <lucide-icon name="shoppingCart" class="menu-link__icon" ></lucide-icon>
-                            Cart
+                        <a class="menu-link menu-link--cart" routerLink="/cart" (click)="closeMobileMenu()">
+                            <span class="menu-link__content">
+                                <lucide-icon name="shoppingCart" class="menu-link__icon"></lucide-icon>
+                                Cart
+                            </span>
+                            @if (cartCount() > 0) {
+                                <span class="badge rounded-pill bg-danger cart-badge cart-badge--mobile">
+                                    {{ cartBadgeText() }}
+                                </span>
+                            }
                         </a>
                         <a class="menu-link" routerLink="/upload" (click)="closeMobileMenu()">
                             <lucide-icon name="upload" class="menu-link__icon"></lucide-icon>

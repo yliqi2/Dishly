@@ -18,6 +18,8 @@ class SendEmail extends Mailable
         public string $messageBody,
         public ?string $recipientName = null,
         public ?string $recoveryCode = null,
+        public ?string $actionUrl = null,
+        public ?string $actionText = null,
     ) {
     }
 
@@ -36,6 +38,8 @@ class SendEmail extends Mailable
                 'recipientName' => $this->recipientName,
                 'messageBody' => $this->messageBody,
                 'recoveryCode' => $this->recoveryCode,
+                'actionUrl' => $this->actionUrl,
+                'actionText' => $this->actionText,
             ],
         );
     }

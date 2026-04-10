@@ -23,6 +23,9 @@ export class Cart implements OnInit {
     return this.items().reduce((sum, item) => sum + item.price, 0);
   });
 
+  protected readonly itemCount = computed(() => this.items().length);
+  protected readonly taxes = computed(() => Number((this.total() * 0.21).toFixed(2)));
+
   ngOnInit(): void {
     this.cartService.loadCart().subscribe();
   }

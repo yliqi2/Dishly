@@ -1,6 +1,7 @@
 export interface CartApiItem {
   id_receta: number;
   titulo?: string;
+  descripcion?: string | null;
   autor_nombre?: string | null;
   precio_unitario?: number | string | null;
   price?: number | string | null;

@@ -119,6 +119,8 @@
 
 .recipe-media-stack--single {
   grid-template-rows: minmax(0, 1fr);
+  align-self: stretch;
+  height: 100%;
 }
 
 .main-image-container {
@@ -133,8 +135,11 @@
   box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
 }
 
-.recipe-media-stack--single .main-image-container {
-  min-height: clamp(280px, 32vw, 390px);
+.recipe-media-stack--single .main-image-container,
+.main-image-container.single-image {
+  height: 100%;
+  min-height: 100%;
+  aspect-ratio: auto;
 }
 
 .main-image {

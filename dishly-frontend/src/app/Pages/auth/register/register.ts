@@ -113,9 +113,9 @@ export class Register {
     };
 
     this.authService.register(userData).subscribe({
-      next: (response) => {
+      next: () => {
         this.isLoading.set(false);
-        this.router.navigate(['/']);
+        this.router.navigate(['/login'], { queryParams: { verification: 'pending' } });
       },
       error: (err) => {
         this.isLoading.set(false);
