@@ -26,6 +26,7 @@ class UserSeeder extends Seeder
                 'icon_path' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
             [
                 'nombre' => 'Liqi',
@@ -36,6 +37,7 @@ class UserSeeder extends Seeder
                 'icon_path' => 'users/icons/2.png',
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
             [
                 'nombre' => 'Marc',
@@ -46,6 +48,7 @@ class UserSeeder extends Seeder
                 'icon_path' => 'users/icons/3.png',
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
             [
                 'nombre' => 'Alex',
@@ -56,6 +59,7 @@ class UserSeeder extends Seeder
                 'icon_path' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
             [
                 'nombre' => 'Mia',
@@ -66,6 +70,7 @@ class UserSeeder extends Seeder
                 'icon_path' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
             [
                 'nombre' => 'Noah',
@@ -76,6 +81,7 @@ class UserSeeder extends Seeder
                 'icon_path' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
             [
                 'nombre' => 'Sofia',
@@ -86,6 +92,7 @@ class UserSeeder extends Seeder
                 'icon_path' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
             [
                 'nombre' => 'Emma',
@@ -96,6 +103,7 @@ class UserSeeder extends Seeder
                 'icon_path' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
             [
                 'nombre' => 'Leo',
@@ -106,6 +114,7 @@ class UserSeeder extends Seeder
                 'icon_path' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
             [
                 'nombre' => 'Chloe',
@@ -116,6 +125,7 @@ class UserSeeder extends Seeder
                 'icon_path' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
             [
                 'nombre' => 'Hugo',
@@ -126,6 +136,7 @@ class UserSeeder extends Seeder
                 'icon_path' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
             [
                 'nombre' => 'Nora',
@@ -136,6 +147,7 @@ class UserSeeder extends Seeder
                 'icon_path' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
             [
                 'nombre' => 'Lucas',
@@ -146,6 +158,7 @@ class UserSeeder extends Seeder
                 'icon_path' => null,
                 'created_at' => $now,
                 'updated_at' => $now,
+                'usuario_verificado' => true,
             ],
         ]);
     }
