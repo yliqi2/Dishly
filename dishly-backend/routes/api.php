@@ -7,6 +7,7 @@ use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\OwnedRecipes;
 
 Route::post('/register', [AuthController::class , 'register']);
 Route::post('/login', [AuthController::class , 'login']);
@@ -52,6 +53,9 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/carrito', [CarritoController::class, 'clearCart']);
 
         Route::get('/recipes/{id}/check-purchase', [RecetaController::class , 'checkPurchase']);
+        Route::get('/owned-recipes', [OwnedRecipes::class, 'index']);
+
+
 
 
     }); 

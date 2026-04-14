@@ -55,6 +55,7 @@ export class RecipeDetail implements OnInit {
   editingRating = 0;
   editingHoverRating = 0;
   isInCart = false;
+  hasPurchased = false;
   private currentUserId: number | null = null;
   private currentUserRole: string | null = null;
   private currentUserIconPath: string | null = null;
@@ -94,6 +95,7 @@ export class RecipeDetail implements OnInit {
     this.recetaService.getRecipeById(id).subscribe({
       next: (data) => {
         this.recipe = data;
+        this.hasPurchased = Boolean(data.purchased);
         this.thumbnails = this.computeThumbnails(data);
         this.instructions = this.computeInstructions(data.instrucciones);
         this.isInCart = this.cartService.hasRecipe(data.id_receta);
@@ -232,22 +234,32 @@ export class RecipeDetail implements OnInit {
     if (!this.recipe) return;
 
     if (this.isAdminUser()) {
+      this.hasPurchased = true;
       this.isLocked = false;
       this.cdr.detectChanges();
       return;
     }
 
     if (this.isPremium()) {
+      if (typeof this.recipe.purchased === 'boolean') {
+        this.hasPurchased = this.recipe.purchased;
+        this.isLocked = !this.recipe.purchased;
+        this.cdr.detectChanges();
+        return;
+      }
+
       this.isLocked = true;
       if (this.authService.isAuthenticated()) {
         this.recetaService.checkPurchase(id).subscribe({
           next: (res) => {
+            this.hasPurchased = res.purchased;
             this.isLocked = !res.purchased;
             this.cdr.detectChanges();
           }
         });
       }
     } else {
+      this.hasPurchased = false;
       this.isLocked = false;
     }
   }
@@ -258,6 +270,12 @@ export class RecipeDetail implements OnInit {
 
   addToCart(): void {
     if (!this.recipe || !this.isPremium()) {
+      return;
+    }
+
+    if (this.hasPurchased) {
+      this.cartNotice = 'You already own this recipe.';
+      this.cdr.detectChanges();
       return;
     }
 

@@ -6,6 +6,7 @@ import { ForgotPassword } from './Pages/auth/forgot-password/forgot-password';
 import { VerifyEmail } from './Pages/auth/verify-email/verify-email';
 import { SearchRecipes } from './Pages/recipes/search-recipes/search-recipes';
 import { RecipeDetail } from './Pages/recipes/recipe-detail/recipe-detail';
+import { BoughtRecipes } from './Pages/recipes/bought-recipes/bought-recipes';
 import { Upload } from './Pages/upload/upload';
 import { DishlyAi } from './Pages/dishly-ai/dishly-ai';
 import { Forum } from './Pages/forum/forum';
@@ -49,6 +50,11 @@ export const routes: Routes = [
             { path: ':id/edit', component: EditRecipe, canActivate: [AuthGuard] },
             { path: ':id', component: RecipeDetail }
         ]
+    },
+    {
+        path: 'my-recipes',
+        component: BoughtRecipes,
+        canActivate: [AuthGuard]
     },
     {
         path: 'dishly-ai',

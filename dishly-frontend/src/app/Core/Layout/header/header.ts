@@ -47,7 +47,7 @@ export class Header {
 
   protected readonly navItems = [
     { label: 'Home', route: '/' },
-    { label: 'Recipes', route: '/recipes' },
+    { label: 'Recipes', route: '/my-recipes' },
     { label: 'Dishly AI', route: '/dishly-ai' },
     { label: 'Forum', route: '/forum' },
   ];

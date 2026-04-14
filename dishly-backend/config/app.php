@@ -54,7 +54,7 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-    'frontend_url' => env('FRONTEND_URL', 'https://servomechanically-nonaffecting-stephanie.ngrok-free.dev'),
+    'frontend_url' => env('FRONTEND_URL', 'https://stanchly-dulotic-sherri.ngrok-free.dev'),
 
     /*
     |--------------------------------------------------------------------------

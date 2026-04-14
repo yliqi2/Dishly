@@ -562,6 +562,8 @@ class RecetaController extends Controller
     public function getRecetaById($id)
     {
         try {
+            $user = Auth::guard('api')->user();
+
             $recipe = DB::table('receta_original')
                 ->where('id_receta', $id)
                 ->where('active', 1)
@@ -603,6 +605,7 @@ class RecetaController extends Controller
             $recipe->autor_nombre = $autor?->nombre;
             $recipe->autor_icon_path = $autor?->icon_path;
             $recipe->autor_updated_at = $autor?->updated_at;
+            $recipe->purchased = $this->resolveRecipePurchaseStatus($recipe, $user);
 
             return response()->json($recipe);
         } catch (Throwable $e) {
@@ -833,27 +836,34 @@ class RecetaController extends Controller
                 return response()->json(['message' => 'Recipe not found'], 404);
             }
 
-            // The author always has access
-            if ((int) $recipe->id_autor === (int) $user->id_usuario) {
-                return response()->json(['purchased' => true]);
-            }
-
-            // Free recipes are accessible to everyone
-            if ($recipe->price === null || (float) $recipe->price <= 0) {
-                return response()->json(['purchased' => true]);
-            }
-
-            $purchased = DB::table('receta_adquirida')
-                ->where('id_usuario', $user->id_usuario)
-                ->where('id_receta', $id)
-                ->exists();
-
-            return response()->json(['purchased' => $purchased]);
+            return response()->json([
+                'purchased' => $this->resolveRecipePurchaseStatus($recipe, $user),
+            ]);
         } catch (Throwable $e) {
             return response()->json([
                 'message' => 'Could not check purchase status',
                 'errors' => [$e->getMessage()],
             ], 500);
         }
+    }
+
+    private function resolveRecipePurchaseStatus(object $recipe, ?object $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ((int) $recipe->id_autor === (int) $user->id_usuario) {
+            return true;
+        }
+
+        if ($recipe->price === null || (float) $recipe->price <= 0) {
+            return true;
+        }
+
+        return DB::table('receta_adquirida')
+            ->where('id_usuario', $user->id_usuario)
+            ->where('id_receta', $recipe->id_receta)
+            ->exists();
     }
 }

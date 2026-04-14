@@ -73,7 +73,7 @@ services:
     working_dir: /app
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - VITE_ALLOWED_HOSTS=servomechanically-nonaffecting-stephanie.ngrok-free.dev
+      - VITE_ALLOWED_HOSTS=stanchly-dulotic-sherri.ngrok-free.dev
     volumes:
       - ./dishly-frontend:/app
       - /app/node_modules
