@@ -5,6 +5,7 @@ import { RecetaOriginal } from '../../Interfaces/RecetaOriginal';
 import { AuthServices } from '../Auth/auth-services';
 import { CartItem } from '../../Interfaces/CartItem';
 import { CartApiItem, CartResponse } from '../../Interfaces/CartResponse';
+import { PayCartResponse } from '../../Interfaces/PayCartResponse';
 import { ApiBaseService } from '../api-base.service';
 
 @Injectable({
@@ -98,6 +99,23 @@ export class CartService extends ApiBaseService {
       tap(() => this.itemsSubject.next([])),
       map(() => true),
       catchError(() => of(false))
+    );
+  }
+
+  payCart(): Observable<PayCartResponse> {
+    if (!this.authService.isAuthenticated()) {
+      return throwError(() => new Error('Unauthenticated.'));
+    }
+
+    return this.http.post<PayCartResponse>(`${this.apiUrl}/carrito/pagar`, {}).pipe(
+      map((response) => ({
+        ...response,
+        purchased_items: (response.purchased_items ?? []).map((item) => ({
+          ...item,
+          imagen_1: item.imagen_1 ? this.authService.getAssetUrl(item.imagen_1) : null,
+        })),
+      })),
+      tap(() => this.itemsSubject.next([]))
     );
   }
 

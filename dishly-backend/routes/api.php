@@ -47,6 +47,7 @@ Route::middleware('auth:api')->group(function () {
 
         Route::get('/carrito', [CarritoController::class, 'getCarrito']);
         Route::post('/carrito', [CarritoController::class, 'addToCart']);
+        Route::post('/carrito/pagar', [CarritoController::class, 'pagar']);
         Route::delete('/carrito/recipe/{idReceta}', [CarritoController::class, 'removeFromCart']);
         Route::delete('/carrito', [CarritoController::class, 'clearCart']);
 

@@ -85,9 +85,9 @@
         <strong>{{ total() | number:'1.2-2' }}€</strong>
       </div>
 
-      <button type="button" class="btn-primary btn-full-width cart-summary__checkout">
+      <a routerLink="/payment" class="btn-primary btn-full-width cart-summary__checkout">
         Secure Checkout
-      </button>
+      </a>
       <a routerLink="/recipes" class="cart-summary__continue">Continue Shopping</a>
       <button type="button" class="cart-summary__clear" (click)="clearCart()">Clear cart</button>
 

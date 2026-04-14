@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carrito;
+use App\Models\Factura;
 use App\Models\LineaCarrito;
+use App\Models\LineaFactura;
+use App\Models\RecetaAdquirida;
 use App\Models\RecetaOriginal;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class CarritoController extends Controller
@@ -255,5 +260,169 @@ class CarritoController extends Controller
             ->where('id_carrito', $cartId)
             ->whereIn('id_receta', $invalidRecipeIds->all())
             ->delete();
+    }
+
+    public function pagar(Request $request): JsonResponse
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            if (!$user) {
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+
+            $carrito = $this->resolveUserCart((int) $user->id_usuario);
+
+            if (!$carrito) {
+                return response()->json([
+                    'message' => 'Cart not found.',
+                ], 404);
+            }
+
+            $this->removeUnavailableCartItems((int) $carrito->id_carrito);
+
+            $cartItems = $this->getPurchasableCartItems((int) $carrito->id_carrito);
+
+            if ($cartItems->isEmpty()) {
+                return response()->json([
+                    'message' => 'Cart has no payable recipes.',
+                ], 422);
+            }
+
+            $acquiredCount = 0;
+            $invoiceId = 0;
+            $invoiceTotal = 0.0;
+            $purchasedItems = [];
+
+            DB::transaction(function () use ($user, $carrito, $cartItems, &$acquiredCount, &$invoiceId, &$invoiceTotal, &$purchasedItems): void {
+                $factura = $this->createInvoiceFromCartItems((int) $user->id_usuario, $cartItems);
+                $invoiceId = (int) $factura->id_factura;
+                $invoiceTotal = (float) $factura->total;
+
+                $this->createInvoiceLinesFromCartItems($invoiceId, $cartItems);
+
+                $acquiredCount = $this->transferCartItemsToAcquiredRecipes(
+                    (int) $user->id_usuario,
+                    $cartItems
+                );
+
+                LineaCarrito::query()
+                    ->where('id_carrito', $carrito->id_carrito)
+                    ->delete();
+
+                $purchasedItems = $cartItems
+                    ->map(static fn ($item): array => [
+                        'id_receta' => (int) $item->id_receta,
+                        'titulo' => (string) $item->titulo,
+                        'precio_unitario' => (float) $item->precio_unitario,
+                        'imagen_1' => $item->imagen_1,
+                    ])
+                    ->values()
+                    ->all();
+            });
+
+            return response()->json([
+                'message' => 'Payment processed successfully. Your cart has been cleared.',
+                'acquired_count' => $acquiredCount,
+                'invoice_id' => $invoiceId,
+                'invoice_total' => $invoiceTotal,
+                'purchased_items' => $purchasedItems,
+            ]);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not process payment.',
+                'errors' => [
+                    'server' => [$e->getMessage()],
+                ],
+            ], 500);
+        }
+    }
+
+    protected function getPurchasableCartItems(int $cartId): Collection
+    {
+        return LineaCarrito::query()
+            ->join('receta_original', 'linea_carrito.id_receta', '=', 'receta_original.id_receta')
+            ->where('linea_carrito.id_carrito', $cartId)
+            ->where('receta_original.active', 1)
+            ->select(
+                'linea_carrito.id_receta',
+                'linea_carrito.precio_unitario',
+                'receta_original.titulo',
+                'receta_original.imagen_1'
+            )
+            ->get();
+    }
+
+    protected function createInvoiceFromCartItems(int $userId, Collection $cartItems): Factura
+    {
+        $factura = new Factura();
+        $factura->fecha = now()->toDateString();
+        $factura->total = (float) $cartItems->sum(fn ($item): float => (float) $item->precio_unitario);
+        $factura->id_usuario = $userId;
+        $factura->save();
+
+        return $factura;
+    }
+
+    protected function createInvoiceLinesFromCartItems(int $invoiceId, Collection $cartItems): void
+    {
+        $groupedItems = $cartItems->groupBy(fn ($item): string => ((int) $item->id_receta) . '|' . ((float) $item->precio_unitario));
+
+        foreach ($groupedItems as $items) {
+            $first = $items->first();
+            $quantity = $items->count();
+            $unitPrice = (float) $first->precio_unitario;
+
+            $lineaFactura = new LineaFactura();
+            $lineaFactura->cantidad = $quantity;
+            $lineaFactura->subtotal = $quantity * $unitPrice;
+            $lineaFactura->id_factura = $invoiceId;
+            $lineaFactura->id_receta = (int) $first->id_receta;
+            $lineaFactura->save();
+        }
+    }
+
+    protected function transferCartItemsToAcquiredRecipes(int $userId, Collection $cartItems): int
+    {
+        if ($cartItems->isEmpty()) {
+            return 0;
+        }
+
+        $recipeIds = $cartItems
+            ->pluck('id_receta')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+
+        $existingRecipeIds = RecetaAdquirida::query()
+            ->where('id_usuario', $userId)
+            ->whereIn('id_receta', $recipeIds)
+            ->pluck('id_receta')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+
+        $existingLookup = array_flip($existingRecipeIds);
+        $created = 0;
+
+        foreach ($cartItems as $item) {
+            $recipeId = (int) $item->id_receta;
+
+            if (isset($existingLookup[$recipeId])) {
+                continue;
+            }
+
+            $recetaAdquirida = new RecetaAdquirida();
+            $recetaAdquirida->fecha_compra = now()->toDateString();
+            $recetaAdquirida->precio = (float) $item->precio_unitario;
+            $recetaAdquirida->id_usuario = $userId;
+            $recetaAdquirida->id_receta = $recipeId;
+            $recetaAdquirida->save();
+
+            $existingLookup[$recipeId] = true;
+            $created++;
+        }
+
+        return $created;
     }
 }

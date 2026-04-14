@@ -9,7 +9,8 @@ import { RecipeDetail } from './Pages/recipes/recipe-detail/recipe-detail';
 import { Upload } from './Pages/upload/upload';
 import { DishlyAi } from './Pages/dishly-ai/dishly-ai';
 import { Forum } from './Pages/forum/forum';
-import { Cart } from './Pages/cart/cart';
+import { Cart } from './Pages/shopping/cart/cart';
+import { PaymentMethod } from './Pages/shopping/payment-method/payment-method';
 import { AuthGuard } from './Guards/auth.guard';
 import { GuestGuard } from './Guards/guest.guard';
 import { Profile } from './Pages/profile/profile';
@@ -68,6 +69,11 @@ export const routes: Routes = [
         canActivate: [AuthGuard]
     },
     {
+        path: 'payment',
+        component: PaymentMethod,
+        canActivate: [AuthGuard]
+    },
+    {
         path: 'profile',
         component: Profile,
         canActivate: [AuthGuard]
@@ -81,5 +87,4 @@ export const routes: Routes = [
         path: '**',
         component: NotFound
     }
-
 ];

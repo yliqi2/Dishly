@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -59,6 +59,18 @@ export class RecipeDetail implements OnInit {
   private currentUserRole: string | null = null;
   private currentUserIconPath: string | null = null;
   private currentUserUpdatedAt: string | null = null;
+  private readonly reviewChanges = signal(0);
+
+  readonly reviewAverageSignal = computed(() => {
+    this.reviewChanges();
+
+    if (this.reviews.length === 0) {
+      return Number(this.recipe?.media_valoraciones ?? 0);
+    }
+
+    const total = this.reviews.reduce((sum, review) => sum + Number(review.puntuacion || 0), 0);
+    return total / this.reviews.length;
+  });
 
   ngOnInit(): void {
     const user = this.authService.getUser() as {
@@ -333,29 +345,53 @@ export class RecipeDetail implements OnInit {
     return Math.max(1, Math.ceil(this.reviews.length / this.reviewsPerPage));
   }
 
-  get sortedReviews(): Review[] {
-    const reviews = [...this.reviews];
+  get reviewAverage(): number {
+    this.reviewChanges();
 
+    if (this.reviews.length === 0) {
+      return Number(this.recipe?.media_valoraciones ?? 0);
+    }
+
+    const total = this.reviews.reduce((sum, review) => sum + Number(review.puntuacion || 0), 0);
+    return total / this.reviews.length;
+  }
+
+  get sortedReviews(): Review[] {
+    const ownReviews: Review[] = [];
+    const otherReviews: Review[] = [];
+
+    for (const review of this.reviews) {
+      if (this.isOwnReview(review)) {
+        ownReviews.push(review);
+      } else {
+        otherReviews.push(review);
+      }
+    }
+
+    ownReviews.sort((a, b) => this.compareReviewsBySort(a, b));
+    otherReviews.sort((a, b) => this.compareReviewsBySort(a, b));
+
+    return [...ownReviews, ...otherReviews];
+  }
+
+  private compareReviewsBySort(a: Review, b: Review): number {
     switch (this.reviewSort) {
-      case 'highest':
-        return reviews.sort((a, b) => {
-          const scoreDiff = b.puntuacion - a.puntuacion;
-          if (scoreDiff !== 0) return scoreDiff;
-          return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
-        });
-      case 'lowest':
-        return reviews.sort((a, b) => {
-          const scoreDiff = a.puntuacion - b.puntuacion;
-          if (scoreDiff !== 0) return scoreDiff;
-          return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
-        });
+      case 'highest': {
+        const scoreDiff = b.puntuacion - a.puntuacion;
+        if (scoreDiff !== 0) return scoreDiff;
+        return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+      }
+      case 'lowest': {
+        const scoreDiff = a.puntuacion - b.puntuacion;
+        if (scoreDiff !== 0) return scoreDiff;
+        return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+      }
       case 'latest':
-      default:
-        return reviews.sort((a, b) => {
-          const dateDiff = new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
-          if (dateDiff !== 0) return dateDiff;
-          return b.id_valoracion - a.id_valoracion;
-        });
+      default: {
+        const dateDiff = new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+        if (dateDiff !== 0) return dateDiff;
+        return b.id_valoracion - a.id_valoracion;
+      }
     }
   }
 
@@ -397,11 +433,13 @@ export class RecipeDetail implements OnInit {
       next: (data) => {
         this.reviews = data;
         this.currentReviewPage = 1;
+        this.bumpReviewChanges();
         this.cdr.detectChanges();
       },
       error: () => {
         this.reviews = [];
         this.currentReviewPage = 1;
+        this.bumpReviewChanges();
         this.cdr.detectChanges();
       }
     });
@@ -448,6 +486,7 @@ export class RecipeDetail implements OnInit {
         this.userRating = 0;
         this.submitting = false;
         this.submitError = null;
+        this.bumpReviewChanges();
         this.loadReviews();
       },
       error: (err: { error?: { message?: string } }) => {
@@ -484,6 +523,7 @@ export class RecipeDetail implements OnInit {
         this.editingComment = '';
         this.editingRating = 0;
         this.editingHoverRating = 0;
+        this.bumpReviewChanges();
         this.cdr.detectChanges();
       },
       error: () => {}
@@ -495,6 +535,7 @@ export class RecipeDetail implements OnInit {
       next: () => {
         this.reviews = this.reviews.filter(r => r.id_valoracion !== review.id_valoracion);
         this.currentReviewPage = Math.min(this.currentReviewPage, this.totalReviewPages);
+        this.bumpReviewChanges();
         this.cdr.detectChanges();
       },
       error: () => {}
@@ -515,5 +556,9 @@ export class RecipeDetail implements OnInit {
     const parts = name.split(' ');
     if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
     return name.substring(0, 2).toUpperCase();
+  }
+
+  private bumpReviewChanges(): void {
+    this.reviewChanges.update((value) => value + 1);
   }
 }

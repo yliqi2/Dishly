@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LucideAngularModule } from 'lucide-angular';
-import { CartService } from '../../Core/Services/Cart/cart.service';
+import { CartService } from '../../../Core/Services/Cart/cart.service';
+import { PaymentMethod } from '../payment-method/payment-method';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, RouterLink, LucideAngularModule, PaymentMethod],
   templateUrl: './cart.html',
   styleUrl: './cart.css',
 })
