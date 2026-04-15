@@ -90,7 +90,7 @@ export class Upload implements OnDestroy, OnInit {
       tiempo_preparacion_unidad: ['minutes', [Validators.required]],
       porciones: [4, [Validators.required, Validators.min(1), this.integerValidator]],
       dificultad: ['easy', [Validators.required]],
-      instrucciones: ['', [Validators.required]],
+      instrucciones: this.fb.array([this.createStepGroup()]),
       price: [null, [this.priceValidator]],
       ingredientes: this.fb.array([this.createIngredientGroup(), this.createIngredientGroup()]),
       categoria: [[], [Validators.required]],
@@ -120,8 +120,8 @@ export class Upload implements OnDestroy, OnInit {
           return 'Prep time is required.';
         case 'porciones':
           return 'Servings is required.';
-        case 'instrucciones':
-          return 'Instructions are required.';
+        case 'paso':
+          return 'This step cannot be empty.';
         case 'categoria':
           return 'Select at least one category.';
         case 'cantidad':
@@ -199,6 +199,27 @@ export class Upload implements OnDestroy, OnInit {
       return;
     }
     this.ingredientes.removeAt(index);
+  }
+
+  private createStepGroup(): FormGroup {
+    return this.fb.group({
+      paso: ['', [Validators.required]],
+    });
+  }
+
+  get instruccionesArray(): FormArray<FormGroup> {
+    return this.form.get('instrucciones') as FormArray<FormGroup>;
+  }
+
+  addStep(): void {
+    this.instruccionesArray.push(this.createStepGroup());
+  }
+
+  removeStep(index: number): void {
+    if (this.instruccionesArray.length === 1) {
+      return;
+    }
+    this.instruccionesArray.removeAt(index);
   }
 
   setDifficulty(level: DifficultyLevel): void {
@@ -376,7 +397,9 @@ export class Upload implements OnDestroy, OnInit {
     const formData = new FormData();
     formData.append('titulo', String(raw.titulo ?? '').trim());
     formData.append('descripcion', String(raw.descripcion ?? '').trim());
-    formData.append('instrucciones', String(raw.instrucciones ?? '').trim());
+    const stepsRaw = Array.isArray(raw.instrucciones) ? raw.instrucciones as { paso: string }[] : [];
+    const instruccionesText = stepsRaw.map(s => String(s?.paso ?? '').trim()).filter(s => s.length > 0).join('\n');
+    formData.append('instrucciones', instruccionesText);
     formData.append('tiempo_preparacion', String(raw.tiempo_preparacion ?? 1));
     formData.append('tiempo_preparacion_unidad', String(raw.tiempo_preparacion_unidad ?? 'minutes'));
     formData.append('dificultad', String(raw.dificultad ?? 'easy'));
@@ -441,11 +464,11 @@ export class Upload implements OnDestroy, OnInit {
       tiempo_preparacion_unidad: 'minutes',
       porciones: 4,
       dificultad: 'easy',
-      instrucciones: '',
       price: null,
       categoria: [],
     });
     this.form.setControl('ingredientes', this.fb.array([this.createIngredientGroup(), this.createIngredientGroup()]));
+    this.form.setControl('instrucciones', this.fb.array([this.createStepGroup()]));
   }
 
   ngOnDestroy(): void {
