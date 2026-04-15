@@ -47,13 +47,13 @@ export class Profile {
   }
 
   protected readonly myRecipesCount = toSignal(this.profileService.getCountRecipes(), { initialValue: 0 });
+  protected readonly acquiredRecipesCount = toSignal(this.profileService.getCountAcquiredRecipes(), { initialValue: 0 });
   protected readonly myRecipes = toSignal(this.profileService.getMyRecipes(), { initialValue: [] });
   protected readonly hiddenRecipeIds = signal<number[]>([]);
   protected readonly visibleRecipes = computed(() => {
     const hiddenIds = new Set(this.hiddenRecipeIds());
     return this.myRecipes().filter((recipe) => !hiddenIds.has(recipe.id_receta));
   });
-  protected readonly boughtRecipesCount = computed(() => 0);
 
   protected get memberSince(): string {
     const u = this.user();

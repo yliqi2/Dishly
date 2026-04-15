@@ -498,8 +498,28 @@ class RecetaController extends Controller
             ], 500);
         }
     } 
+
+    public function getCountAcquiredRecipes()
+    {
+        try {
+            $user = Auth::guard('api')->user();
+            
+            $count = DB::table('receta_adquirida')
+                    ->where('id_usuario', $user->id_usuario)
+                    ->count();
+            
+            return response()->json($count);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get count of acquired recipes',
+                'errors' => [
+                    $e->getMessage(),
+                ],
+            ], 500);
+        }
+    }
     
-        public function getAllRecetas()
+    public function getAllRecetas()
     {
         try {
             $recipes = DB::table('receta_original')

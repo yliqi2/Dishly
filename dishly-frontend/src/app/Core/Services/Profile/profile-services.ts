@@ -25,6 +25,13 @@ export class Profile extends ApiBaseService {
     );
   }
 
+  getCountAcquiredRecipes(): Observable<number> {
+    if (!this.auth.isAuthenticated()) return of(0);
+    return this.http.get<number>(`${this.apiUrl}/profile/acquired-recipes`).pipe(
+      tap(res => console.log('getCountAcquiredRecipes response:', res))
+    );
+  }
+
   getMediaValoraciones(): Observable<{ media: number | null }> {
     if (!this.auth.isAuthenticated()) return of({ media: null });
     return this.http.get<{ media: number | null }>(`${this.apiUrl}/profile/media-valoraciones`).pipe(

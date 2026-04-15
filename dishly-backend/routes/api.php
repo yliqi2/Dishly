@@ -35,6 +35,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/profile/upload-icon', [AuthController::class , 'uploadIcon']);
 
         Route::get('/profile/count-recipes', [RecetaController::class , 'getCountRecipes']);
+        Route::get('/profile/acquired-recipes', [RecetaController::class , 'getCountAcquiredRecipes']);
         Route::get('/profile/my-recipes', [RecetaController::class , 'getMyRecipes']);
         Route::get('/profile/media-valoraciones', [RecetaController::class , 'getMediaValoraciones']);
         Route::post('/recetas/valorar', [RecetaController::class , 'setValoracion']);
