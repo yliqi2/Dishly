@@ -22,7 +22,7 @@ export class Feature implements OnInit {
   ngOnInit(): void {
     this.homepageService.getRecipes().subscribe({
       next: (data) => {
-        this.recipes.set(data);
+        this.recipes.set(data.slice(0, 6));
         this.isLoading.set(false);
       },
       error: () => {
