@@ -30,8 +30,8 @@ type EditablePhoto = {
 @Component({
   selector: 'app-edit-recipe',
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './upload.html',
-  styleUrl: './upload.css',
+  templateUrl: './edit-recipe.html',
+  styleUrls: ['./edit-recipe.css'],
 })
 export class EditRecipe implements OnDestroy, OnInit {
   readonly maxPhotos = 5;

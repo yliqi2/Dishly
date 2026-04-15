@@ -213,5 +213,13 @@ textarea:focus-visible,
 	:root {
 		--layout-gutter: 16px;
 	}
+
+	.page-title {
+		font-size: 28px;
+	}
+
+	.page-underline {
+		width: 25%;
+	}
 }
 

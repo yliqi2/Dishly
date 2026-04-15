@@ -16,7 +16,7 @@ import { AuthGuard } from './Guards/auth.guard';
 import { GuestGuard } from './Guards/guest.guard';
 import { Profile } from './Pages/profile/profile';
 import { EditProfile } from './Pages/edit-profile/edit-profile';
-import { EditRecipe } from './Pages/edit-recipe/upload';
+import { EditRecipe } from './Pages/edit-recipe/edit-recipe';
 import { NotFound } from './Pages/not-found/not-found';
 
 export const routes: Routes = [
