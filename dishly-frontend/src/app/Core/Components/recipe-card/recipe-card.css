@@ -1,13 +1,11 @@
 /* ── Host ────────────────────────────────────── */
 :host {
   display: block;
-  height: 100%;
 }
 
 /* ── Card shell ──────────────────────────────── */
 .recipe-card {
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--secondaryBackground);
@@ -132,7 +130,7 @@
   font-size: 22px;
   font-weight: 700;
   color: var(--PrimaryText);
-  margin: 0 0 12px;
+  margin: 0 0 4px;
   line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;

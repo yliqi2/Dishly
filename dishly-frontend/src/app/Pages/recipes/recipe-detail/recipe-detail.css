@@ -32,6 +32,8 @@
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--text-strong);
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .page-underline {
@@ -384,6 +386,8 @@
   min-height: 1vh;
   height: fit-content;
   align-self: start;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .recipe-details--inline .buy-content {
@@ -399,6 +403,8 @@
 .recipe-title {
   font-size: clamp(1.8rem, 2.2vw, 2.35rem);
   line-height: 1.05;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .text-highlight-color {
@@ -545,6 +551,8 @@
 
 .detail-text {
   line-height: 1.65;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .review-card {
