@@ -7,6 +7,13 @@
       <div class="alert alert-danger rounded-4">{{ error }}</div>
     } @else if (recipe) {
 
+    @if (recipe.active === false) {
+      <div class="alert alert-warning d-flex align-items-center gap-2 rounded-4 mb-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>This recipe has been removed by its author. You can still access it because you purchased it.</span>
+      </div>
+    }
+
     <section class="page-header page-container">
     <div class="page-header__inner">
       <h1 class="page-title">Recipe Details</h1>
@@ -421,6 +428,6 @@
       </div>
     </div>
 
-    } <!-- end @else if (recipe) -->
+    } <!-- end @else if (recipe) -->67
   </div>
 </div>

@@ -5,7 +5,7 @@ import { IngredienteReceta } from "./IngredienteReceta";
 
 
 export interface RecetaOriginal {
-    active?: number;
+    active?: boolean;
     purchased?: boolean;
     id_receta: number;
     id_autor: number;

@@ -586,7 +586,6 @@ class RecetaController extends Controller
 
             $recipe = DB::table('receta_original')
                 ->where('id_receta', $id)
-                ->where('active', 1)
                 ->first();
             
             if (!$recipe) {
@@ -626,6 +625,7 @@ class RecetaController extends Controller
             $recipe->autor_icon_path = $autor?->icon_path;
             $recipe->autor_updated_at = $autor?->updated_at;
             $recipe->purchased = $this->resolveRecipePurchaseStatus($recipe, $user);
+            $recipe->active = (bool) $recipe->active;
 
             return response()->json($recipe);
         } catch (Throwable $e) {

@@ -94,6 +94,14 @@ export class RecipeDetail implements OnInit {
 
     this.recetaService.getRecipeById(id).subscribe({
       next: (data) => {
+        // If the recipe is inactive and the user hasn't purchased it, treat as not found
+        if (data.active === false && !data.purchased) {
+          this.error = 'This recipe is no longer available.';
+          this.loading = false;
+          this.cdr.detectChanges();
+          return;
+        }
+
         this.recipe = data;
         this.hasPurchased = Boolean(data.purchased);
         this.thumbnails = this.computeThumbnails(data);
