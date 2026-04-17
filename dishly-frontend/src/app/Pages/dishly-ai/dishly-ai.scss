@@ -1,0 +1,40 @@
+// dishy-ai.scss
+.dishly-ai-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
+  .ai-header {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    
+    h1 {
+      color: white;
+      font-size: 2.5rem;
+      margin: 0;
+      
+      .ai-icon {
+        margin-right: 1rem;
+        animation: pulse 2s infinite;
+      }
+    }
+    
+    .subtitle {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.1rem;
+      margin-top: 0.5rem;
+    }
+  }
+  
+  .ai-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}

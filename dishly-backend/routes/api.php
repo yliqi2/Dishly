@@ -14,6 +14,7 @@ Route::get('/verify-email', [AuthController::class, 'verifyEmailApi']);
 Route::post('/send-email', [MailController::class, 'send']);
 Route::post('/reset-password', [MailController::class, 'resetPassword']);
 Route::get('/recipes', [RecetaController::class , 'getAllRecetas']);
+Route::post('/chatbot/receta/buscar', [\App\Http\Controllers\ChatbotController::class, 'buscar']);
 Route::get('/recipes/{id}', [RecetaController::class , 'getRecetaById']);
 Route::get('/recipes/{id}/reviews', [RecetaController::class , 'getReviewsForRecipe']);
 

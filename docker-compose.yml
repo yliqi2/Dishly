@@ -48,17 +48,14 @@ services:
       - DB_DATABASE=${MYSQL_DATABASE}
       - DB_USERNAME=${MYSQL_USER}
       - DB_PASSWORD=${MYSQL_PASSWORD}
-      - APP_ENV=production
-      - APP_DEBUG=false
+      - APP_ENV=local
+      - APP_DEBUG=true
       - APP_URL=http://localhost:${BACKEND_PORT}
     command: >
       bash -c "
       composer install --no-interaction --optimize-autoloader &&
       [ ! -f /var/www/html/.env ] && cp /var/www/html/.env.example /var/www/html/.env || true &&
       php artisan key:generate --no-interaction &&
-      php artisan config:cache &&
-      php artisan route:cache &&
-      php artisan view:cache &&
       php artisan migrate --force &&
       echo 'Server started' &&
       apache2-foreground
@@ -105,9 +102,52 @@ services:
       - frontend
     networks:
       - dishly-network
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: always
+    ports:
+      - "${N8N_PORT}:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE}
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - TZ=Europe/Madrid
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./input:/files #Directorio donde tendremos el archivo PDF
+    networks:
+      - dishly-network
+  ollama:
+    image: ollama/ollama
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics
+    gpus: all
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - dishly-network
+
+  ollama-setup:
+    image: ollama/ollama
+    container_name: ollama_setup
+    networks:
+      - dishly-network
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: /bin/sh
+    command: -c "ollama serve & sleep 5 && ollama pull gemma3:1b"
 
 volumes:
   mysql_data:
+  ollama_data:
+  n8n_data:
 
 networks:
   dishly-network:

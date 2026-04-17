@@ -1,0 +1,130 @@
+<!-- recipe-chatbot.html -->
+<div class="chatbot-container">
+  <!-- Header con acciones -->
+  <div class="chat-header">
+    <div class="header-info">
+      <span class="status-dot online"></span>
+      <span class="status-text">Conectado a Dishly AI</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-clear" (click)="limpiarChat()" title="Limpiar chat">
+        🗑️
+      </button>
+    </div>
+  </div>
+  
+  <!-- Área de mensajes -->
+  <div class="messages-area" #messagesContainer>
+    @for (message of messages; track message.id) {
+      <div class="message-wrapper">
+        <!-- Mensaje de usuario -->
+        @if (message.role === 'user') {
+          <div class="message user-message">
+            <div class="message-avatar">👤</div>
+            <div class="message-content">
+              <div class="message-text">{{ message.content }}</div>
+              <div class="message-time">{{ message.timestamp | date:'HH:mm' }}</div>
+            </div>
+          </div>
+        }
+        
+        <!-- Mensaje del asistente -->
+        @if (message.role === 'assistant') {
+          <div class="message assistant-message">
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+              <!-- Removido pipe markdown para evitar errores si no está implementado -->
+              <div class="message-text">{{ message.content }}</div>
+              <div class="message-time">{{ message.timestamp | date:'HH:mm' }}</div>
+              
+              <!-- Tarjeta de receta si existe -->
+              @if (message.receta) {
+                <div class="recipe-card">
+                  @if (message.receta.imagen_principal) {
+                    <img 
+                      [src]="message.receta.imagen_principal" 
+                      [alt]="message.receta.titulo"
+                      class="recipe-image"
+                    >
+                  }
+                  <div class="recipe-info">
+                    <h4>{{ message.receta.titulo }}</h4>
+                    <div class="recipe-meta">
+                      <span class="badge" [class]="message.receta.dificultad">
+                        {{ message.receta.dificultad_texto }}
+                      </span>
+                      <span class="badge time">
+                        ⏱️ {{ message.receta.tiempo_texto }}
+                      </span>
+                      <span class="badge servings">
+                        🍽️ {{ message.receta.porciones }} porciones
+                      </span>
+                    </div>
+                    <div class="recipe-ingredients-preview">
+                      <strong>Ingredientes principales:</strong>
+                      <ul>
+                        @for (ing of message.receta.ingredientes.slice(0, 3); track $index) {
+                          <li>
+                            {{ ing.nombre }} {{ ing.cantidad }} {{ ing.unidad_texto }}
+                          </li>
+                        }
+                      </ul>
+                    </div>
+                    <button class="btn-view-recipe" (click)="verRecetaCompleta(message.receta.id_receta)">
+                      Ver receta completa →
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+    
+    <!-- Indicador de escritura -->
+    @if (isLoading()) {
+      <div class="typing-indicator">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    }
+  </div>
+  
+  <!-- Sugerencias -->
+  @if (messages.length < 3) {
+    <div class="suggestions-area">
+      <p class="suggestions-title">💡 Sugerencias para empezar:</p>
+      <div class="suggestions-list">
+        @for (sugerencia of sugerencias; track $index) {
+          <button 
+            class="suggestion-btn"
+            (click)="usarSugerencia(sugerencia)"
+          >
+            {{ sugerencia }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+  
+  <!-- Input area -->
+  <div class="input-area">
+    <textarea
+      #messageInput
+      [(ngModel)]="newMessage"
+      (keydown)="handleKeyPress($event)"
+      placeholder="Escribe tu pregunta aquí... (ej: 'Busco una receta fácil con pollo')"
+      [disabled]="isLoading()"
+      rows="1"
+    ></textarea>
+    <button 
+      class="btn-send" 
+      (click)="sendMessage()" 
+      [disabled]="!newMessage.trim() || isLoading()"
+    >
+      📤
+    </button>
+  </div>
+</div>

@@ -1,3 +1,4 @@
+// routes.ts - Actualizado con la ruta del chatbot
 import { Routes } from '@angular/router';
 import { Homepage } from './Pages/homepage/homepage';
 import { Login } from './Pages/auth/login/login';
@@ -17,8 +18,17 @@ import { Profile } from './Pages/profile/profile';
 import { EditProfile } from './Pages/edit-profile/edit-profile';
 import { EditRecipe } from './Pages/edit-recipe/upload';
 import { NotFound } from './Pages/not-found/not-found';
+import { RecipeChatbot } from './Pages/dishly-ai/recipe-chatbot/recipe-chatbot';
 
 export const routes: Routes = [
+    {
+        path: 'dishly-ai',
+        component: DishlyAi,
+        children: [
+            { path: '', redirectTo: 'chatbot', pathMatch: 'full' },
+            { path: 'chatbot', component: RecipeChatbot }
+        ]
+    },
     {
         path: '',
         component: Homepage
@@ -50,10 +60,7 @@ export const routes: Routes = [
             { path: ':id', component: RecipeDetail }
         ]
     },
-    {
-        path: 'dishly-ai',
-        component: DishlyAi
-    },
+
     {
         path: 'forum',
         component: Forum

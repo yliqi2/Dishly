@@ -1,0 +1,313 @@
+// recipe-chatbot.scss
+.chatbot-container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 200px);
+  min-height: 500px;
+  
+  .chat-header {
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .header-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        
+        &.online {
+          background: #4ade80;
+          animation: pulse 2s infinite;
+        }
+      }
+    }
+    
+    .btn-clear {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 8px;
+      transition: all 0.3s;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+      }
+    }
+  }
+  
+  .messages-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: #f8fafc;
+    
+    .message-wrapper {
+      margin-bottom: 1.5rem;
+      animation: fadeInUp 0.3s ease;
+    }
+    
+    .message {
+      display: flex;
+      gap: 0.75rem;
+      max-width: 80%;
+      
+      &.user-message {
+        flex-direction: row-reverse;
+        margin-left: auto;
+        
+        .message-content {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+        }
+      }
+      
+      &.assistant-message {
+        margin-right: auto;
+        
+        .message-content {
+          background: white;
+          border: 1px solid #e2e8f0;
+          color: #1e293b;
+        }
+      }
+      
+      .message-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+      
+      .message-content {
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        max-width: 100%;
+        position: relative;
+        
+        .message-text {
+          line-height: 1.5;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+        }
+        
+        .message-time {
+          font-size: 0.7rem;
+          opacity: 0.7;
+          margin-top: 0.25rem;
+        }
+      }
+    }
+    
+    .recipe-card {
+      margin-top: 1rem;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      
+      .recipe-image {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+      }
+      
+      .recipe-info {
+        padding: 1rem;
+        
+        h4 {
+          margin: 0 0 0.5rem 0;
+          font-size: 1.1rem;
+        }
+        
+        .recipe-meta {
+          display: flex;
+          gap: 0.5rem;
+          margin-bottom: 0.75rem;
+          flex-wrap: wrap;
+          
+          .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            
+            &.easy { background: #22c55e; color: white; }
+            &.medium { background: #eab308; color: white; }
+            &.hard { background: #ef4444; color: white; }
+            &.time { background: #3b82f6; color: white; }
+            &.servings { background: #8b5cf6; color: white; }
+          }
+        }
+        
+        .recipe-ingredients-preview {
+          font-size: 0.85rem;
+          
+          ul {
+            margin: 0.25rem 0 0 1rem;
+            padding: 0;
+          }
+        }
+        
+        .btn-view-recipe {
+          margin-top: 0.75rem;
+          background: #667eea;
+          color: white;
+          border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.3s;
+          width: 100%;
+          
+          &:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+          }
+        }
+      }
+    }
+  }
+  
+  .typing-indicator {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-radius: 12px;
+    width: fit-content;
+    margin-bottom: 1rem;
+    
+    span {
+      width: 8px;
+      height: 8px;
+      background: #94a3b8;
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+      
+      &:nth-child(2) { animation-delay: 0.2s; }
+      &:nth-child(3) { animation-delay: 0.4s; }
+    }
+  }
+  
+  .suggestions-area {
+    padding: 1rem 1.5rem;
+    background: #f1f5f9;
+    border-top: 1px solid #e2e8f0;
+    
+    .suggestions-title {
+      margin: 0 0 0.75rem 0;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+    
+    .suggestions-list {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      
+      .suggestion-btn {
+        background: white;
+        border: 1px solid #e2e8f0;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 0.85rem;
+        
+        &:hover {
+          background: #667eea;
+          color: white;
+          border-color: #667eea;
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+  
+  .input-area {
+    padding: 1rem 1.5rem;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 0.75rem;
+    
+    textarea {
+      flex: 1;
+      padding: 0.75rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      resize: none;
+      font-family: inherit;
+      font-size: 0.95rem;
+      max-height: 100px;
+      
+      &:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+    }
+    
+    .btn-send {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1.2rem;
+      
+      &:hover:not(:disabled) {
+        transform: scale(1.05);
+      }
+      
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}

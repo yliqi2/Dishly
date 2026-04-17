@@ -1,0 +1,327 @@
+{
+  "name": "Chatbot Recetas - Con Ingredientes",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "api/chatbot/receta/buscar",
+        "responseMode": "responseNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "webhook-node",
+      "name": "Webhook Laravel",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT r.id_receta, r.titulo, r.descripcion, r.instrucciones, r.tiempo_preparacion, r.tiempo_preparacion_unidad, r.dificultad, r.porciones, r.price, r.imagen_1, r.imagen_2, r.imagen_3, r.imagen_4, r.imagen_5, r.fecha_creacion, u.name as autor_nombre, GROUP_CONCAT(CONCAT(i.nombre_ingrediente, ' (', ri.cantidad, ' ', ri.unidad, ')') SEPARATOR '|') as ingredientes_completos, GROUP_CONCAT(i.nombre_ingrediente SEPARATOR ', ') as solo_ingredientes FROM receta_original r LEFT JOIN users u ON r.id_autor = u.id_usuario LEFT JOIN receta_ingrediente ri ON r.id_receta = ri.id_receta LEFT JOIN ingrediente i ON ri.id_ingrediente = i.id_ingrediente WHERE r.active = 1 GROUP BY r.id_receta, r.titulo, r.descripcion, r.instrucciones, r.tiempo_preparacion, r.tiempo_preparacion_unidad, r.dificultad, r.porciones, r.price, r.imagen_1, r.imagen_2, r.imagen_3, r.imagen_4, r.imagen_5, r.fecha_creacion, u.name ORDER BY r.fecha_creacion DESC",
+        "options": {
+          "nodeVersion": 1
+        }
+      },
+      "id": "mysql-node",
+      "name": "MySQL - receta_original con ingredientes",
+      "type": "n8n-nodes-base.mySql",
+      "position": [
+        450,
+        300
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "1",
+          "name": "MySQL Laravel"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener datos de Laravel\nconst laravelData = $input.first().json;\nconst userMessage = laravelData.mensaje || laravelData.message || laravelData.pregunta || '';\nconst userId = laravelData.user_id || laravelData.usuario_id || null;\n\n// Obtener recetas de MySQL\nlet recetas = $node['MySQL - receta_original con ingredientes'].json;\nif (recetas && !Array.isArray(recetas)) {\n  recetas = [recetas];\n}\n\n// Limpiar recetas que no tienen título (por si acaso)\nrecetas = recetas.filter(r => r.titulo && r.titulo.trim() !== '');\n\n// Limitar para rendimiento (máximo 30 recetas)\nif (recetas.length > 30) {\n  recetas = recetas.slice(0, 30);\n}\n\n// Mapeo de dificultad para mostrar\nconst dificultadMap = {\n  'easy': 'Fácil',\n  'medium': 'Media', \n  'hard': 'Difícil'\n};\n\n// Formatear para Gemma 3 (versión simplificada)\nconst recetasFormateadas = recetas.map(r => ({\n  id: r.id_receta,\n  titulo: r.titulo,\n  ingredientes: r.solo_ingredientes ? r.solo_ingredientes.substring(0, 200) : 'Sin ingredientes especificados',\n  dificultad: dificultadMap[r.dificultad] || r.dificultad,\n  tiempo: `${r.tiempo_preparacion} ${r.tiempo_preparacion_unidad === 'minutes' ? 'minutos' : 'horas'}`,\n  porciones: r.porciones\n}));\n\nreturn { \n  userMessage,\n  userId,\n  recetas: recetasFormateadas,\n  recetasCompletas: recetas\n};"
+      },
+      "id": "code-preprocess",
+      "name": "Procesar Petición Laravel",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gemma3:1b"
+            },
+            {
+              "name": "prompt",
+              "value": "={{$node['Procesar Petición Laravel'].json.userMessage}}\n\nRecetas disponibles:\n{{$node['Procesar Petición Laravel'].json.recetas.map(r => r.id + ': ' + r.titulo + ' | Ingredientes: ' + r.ingredientes).join('\\n')}}\n\nID de la mejor receta (o 0):"
+            },
+            {
+              "name": "system",
+              "value": "Eres un chef asistente. Selecciona la receta MÁS ADECUADA según la pregunta del usuario. Analiza el título y los ingredientes. Responde SOLO con el número ID de la receta. Si ninguna es adecuada responde 0. Solo el número, nada más."
+            },
+            {
+              "name": "stream",
+              "value": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ollama-selector",
+      "name": "Ollama - Seleccionar Receta",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        850,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extraer ID de respuesta de Ollama\nlet responseText = '';\nconst ollamaResponse = $node['Ollama - Seleccionar Receta'].json;\n\nif (ollamaResponse.message?.content) {\n  responseText = ollamaResponse.message.content;\n} else if (ollamaResponse.response) {\n  responseText = ollamaResponse.response;\n}\n\nconst match = responseText.match(/\\d+/);\nlet selectedId = match ? parseInt(match[0]) : 0;\n\nconst recetasCompletas = $node['Procesar Petición Laravel'].json.recetasCompletas;\nlet recetaSeleccionada = null;\n\n// Buscar por ID exacto\nif (selectedId > 0 && Array.isArray(recetasCompletas)) {\n  recetaSeleccionada = recetasCompletas.find(r => r.id_receta === selectedId);\n}\n\n// Si no encontró por ID, buscar por coincidencia en título o ingredientes\nif (!recetaSeleccionada && recetasCompletas.length > 0) {\n  const userMsg = $node['Procesar Petición Laravel'].json.userMessage.toLowerCase();\n  let mejorPuntaje = 0;\n  \n  for (const receta of recetasCompletas) {\n    let puntaje = 0;\n    const textoCompleto = (receta.titulo + ' ' + (receta.solo_ingredientes || '')).toLowerCase();\n    \n    // Dividir mensaje en palabras significativas\n    const palabras = userMsg.split(/\\s+/).filter(p => p.length > 2);\n    \n    for (const palabra of palabras) {\n      if (textoCompleto.includes(palabra)) {\n        puntaje += palabra.length;\n      }\n    }\n    \n    // Bonus si la palabra está en el título\n    const tituloLower = receta.titulo.toLowerCase();\n    for (const palabra of palabras) {\n      if (tituloLower.includes(palabra)) {\n        puntaje += palabra.length * 2;\n      }\n    }\n    \n    if (puntaje > mejorPuntaje && puntaje > 0) {\n      mejorPuntaje = puntaje;\n      recetaSeleccionada = receta;\n      selectedId = receta.id_receta;\n    }\n  }\n}\n\n// Parsear ingredientes de la receta\nconst parsearIngredientes = (receta) => {\n  if (!receta.ingredientes_completos) return [];\n  \n  const ingredientesArray = receta.ingredientes_completos.split('|').filter(i => i && i.trim());\n  return ingredientesArray.map(ing => {\n    // Intentar extraer nombre, cantidad y unidad\n    const match = ing.match(/^(.+?)\\s*\\(([\\d.]+)\\s*(\\w+)\\)$/);\n    if (match) {\n      return {\n        nombre: match[1].trim(),\n        cantidad: parseFloat(match[2]),\n        unidad: match[3]\n      };\n    }\n    return { nombre: ing, cantidad: null, unidad: null };\n  });\n};\n\nreturn { \n  recetaSeleccionada, \n  selectedId, \n  ollamaResponse: responseText,\n  userId: $node['Procesar Petición Laravel'].json.userId,\n  ingredientesParseados: recetaSeleccionada ? parsearIngredientes(recetaSeleccionada) : []\n};"
+      },
+      "id": "code-filter",
+      "name": "Filtrar Receta por ID",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1050,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node['Filtrar Receta por ID'].json.recetaSeleccionada}}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "if-node",
+      "name": "¿Receta Encontrada?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gemma3:1b"
+            },
+            {
+              "name": "prompt",
+              "value": "=Título: {{$node['Filtrar Receta por ID'].json.recetaSeleccionada.titulo}}\nDescripción: {{$node['Filtrar Receta por ID'].json.recetaSeleccionada.descripcion}}\nIngredientes:\n{{$node['Filtrar Receta por ID'].json.ingredientesParseados.map(i => '- ' + i.nombre + (i.cantidad ? ': ' + i.cantidad + ' ' + i.unidad : '')).join('\\n')}}\nInstrucciones: {{$node['Filtrar Receta por ID'].json.recetaSeleccionada.instrucciones}}\nDificultad: {{$node['Filtrar Receta por ID'].json.recetaSeleccionada.dificultad}}\nTiempo: {{$node['Filtrar Receta por ID'].json.recetaSeleccionada.tiempo_preparacion}} {{$node['Filtrar Receta por ID'].json.recetaSeleccionada.tiempo_preparacion_unidad}}\nPorciones: {{$node['Filtrar Receta por ID'].json.recetaSeleccionada.porciones}}\n\nPresenta esta receta de forma atractiva y útil:"
+            },
+            {
+              "name": "system",
+              "value": "Eres un chef profesional y amigable. Presenta la receta de forma clara, estructurada y atractiva. Usa emojis apropiados. Sé conciso pero completo. Máximo 350 palabras."
+            },
+            {
+              "name": "stream",
+              "value": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ollama-response",
+      "name": "Ollama - Generar Respuesta",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1450,
+        250
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "let mensaje = '';\nconst ollamaRespuesta = $node['Ollama - Generar Respuesta'].json;\n\n// Ajustado para HTTP Request\nif (ollamaRespuesta.response) {\n  mensaje = ollamaRespuesta.response;\n} else if (ollamaRespuesta.message?.content) {\n  mensaje = ollamaRespuesta.message.content;\n}\n\nconst receta = $node['Filtrar Receta por ID'].json.recetaSeleccionada;\nconst ingredientes = $node['Filtrar Receta por ID'].json.ingredientesParseados;\n\n// Formato compatible con Angular\nreturn {\n  status: 'success',\n  receta: {\n    id_receta: receta.id_receta,\n    titulo: receta.titulo,\n    descripcion: receta.descripcion,\n    instrucciones: receta.instrucciones,\n    tiempo_preparacion: receta.tiempo_preparacion,\n    tiempo_preparacion_unidad: receta.tiempo_preparacion_unidad,\n    tiempo_texto: `${receta.tiempo_preparacion} ${receta.tiempo_preparacion_unidad === 'minutes' ? 'minutos' : 'horas'}`,\n    dificultad: receta.dificultad,\n    porciones: receta.porciones,\n    ingredientes: ingredientes.map(ing => ({\n      nombre: ing.nombre,\n      cantidad: ing.cantidad,\n      unidad: ing.unidad,\n      unidad_texto: ing.unidad\n    })),\n    imagenes: [receta.imagen_1, receta.imagen_2, receta.imagen_3, receta.imagen_4, receta.imagen_5].filter(img => img),\n    imagen_principal: receta.imagen_1,\n    mensaje_chat: mensaje\n  }\n};"
+      },
+      "id": "code-response",
+      "name": "Formato Respuesta Laravel",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1650,
+        250
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  status: 'error',\n  message: '🍳 No encontré ninguna receta que coincida con tu búsqueda. Intenta buscar por ingredientes o nombre de plato.'\n};"
+      },
+      "id": "code-not-found",
+      "name": "Formato No Encontrado",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1450,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "response-webhook",
+      "name": "Responder a Laravel",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        1850,
+        250
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "response-notfound",
+      "name": "Responder Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [
+        1650,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Laravel": {
+      "main": [
+        [
+          {
+            "node": "MySQL - receta_original con ingredientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MySQL - receta_original con ingredientes": {
+      "main": [
+        [
+          {
+            "node": "Procesar Petición Laravel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procesar Petición Laravel": {
+      "main": [
+        [
+          {
+            "node": "Ollama - Seleccionar Receta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama - Seleccionar Receta": {
+      "main": [
+        [
+          {
+            "node": "Filtrar Receta por ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar Receta por ID": {
+      "main": [
+        [
+          {
+            "node": "¿Receta Encontrada?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Receta Encontrada?": {
+      "main": [
+        [
+          {
+            "node": "Ollama - Generar Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Formato No Encontrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama - Generar Respuesta": {
+      "main": [
+        [
+          {
+            "node": "Formato Respuesta Laravel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formato Respuesta Laravel": {
+      "main": [
+        [
+          {
+            "node": "Responder a Laravel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formato No Encontrado": {
+      "main": [
+        [
+          {
+            "node": "Responder Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "5",
+  "triggerCount": 1
+}
