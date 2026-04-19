@@ -20,8 +20,8 @@
   justify-content: center;
   gap: 8px;
   background: var(--highlight-focus);
-  border: 1px solid var(--highlight-glow);
   color: var(--highlight);
+  border: 1px solid var(--highlight);
   border-radius: var(--border-radius);
   padding: 6px 14px;
   font-size: 1rem;

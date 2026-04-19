@@ -9,6 +9,12 @@
 	box-shadow: 0 8px 24px var(--shadow-sm);
 }
 
+.upload-card-intro {
+	color: var(--neutral-900);
+	font-size: 1rem;
+	line-height: 1.45;
+}
+
 .upload-form .invalid-feedback,
 .upload-form .alert,
 .upload-form p.text-danger[role='alert'] {
@@ -30,6 +36,8 @@
 	background: var(--gray-200);
 	color: var(--neutral-900);
 	font-weight: 700;
+	border: 1px solid var(--neutral-900);
+	border-radius: var(--border-radius) !important;
 }
 
 .photo-dropzone {
@@ -164,10 +172,13 @@
 }
 
 .preview-remove .bi {
-	font-size: 1rem;
-}
-
-.preview-remove .bi {
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	transition: transform 0.2s ease;
 }
 
@@ -517,7 +528,13 @@
 }
 
 .ingredients-remove-btn .bi {
-	font-size: 1rem;
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .ingredients-remove-btn:hover {

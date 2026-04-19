@@ -16,7 +16,7 @@
       <input id="uploadPhotos" #uploadPhotosInput class="d-none" type="file" multiple accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
         (change)="onPhotosSelected($event)" />
 
-      <p class="text-secondary mb-0 mt-1">Click any slot to upload photos. Choose which one will be the cover.</p>
+      <p class="upload-card-intro mb-0 mt-1">Click any slot to upload photos. Choose which one will be the cover.</p>
       @if (photosError$ | async) {
       <p class="text-danger mb-0 mt-1" role="alert" aria-live="polite">
         <i class="bi bi-exclamation-circle me-1"></i>You must upload at least one photo.

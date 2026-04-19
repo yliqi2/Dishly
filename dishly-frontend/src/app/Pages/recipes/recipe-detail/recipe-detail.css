@@ -4,6 +4,39 @@
 
 .recipe-page {
   background: var(--surface-page-warm);
+  color: var(--neutral-900);
+}
+
+.ingredient-name,
+.ingredient-qty {
+  color: var(--neutral-900);
+}
+
+.reviews-subtitle {
+  font-size: 1rem;
+  color: var(--neutral-900);
+}
+
+.reviews-average__value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--neutral-900);
+}
+
+.review-rating-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--neutral-900);
+}
+
+.review-comment {
+  font-size: 1rem;
+  color: var(--neutral-900);
+}
+
+.empty-text {
+  color: var(--neutral-900);
 }
 
 .page-layout-container {

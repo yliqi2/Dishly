@@ -114,7 +114,7 @@
             <div class="d-flex flex-wrap align-items-center gap-2">
               <h1 class="recipe-title mb-0" id="recipe-main-title">{{ recipe.titulo }}</h1>
             </div>
-            <p class="detail-text mb-0 text-muted">{{ recipe.descripcion }}</p>
+            <p class="detail-text mb-0">{{ recipe.descripcion }}</p>
           </div>
 
           <div class="stats-row mb-4">
@@ -217,8 +217,8 @@
             <div class="ingredients-container d-flex flex-column gap-2">
               @for (ing of recipe.ingredientes; track $index) {
               <div class="ingredient-row d-flex justify-content-between p-2 px-3 bg-light-custom rounded-3 shadow-sm">
-                <span class="text-secondary fw-medium">{{ ing.nombre }}</span>
-                <span class="fw-bold text-dark">{{ ing.cantidad }} {{ ing.unidad }}</span>
+                <span class="ingredient-name fw-medium">{{ ing.nombre }}</span>
+                <span class="ingredient-qty fw-bold">{{ ing.cantidad }} {{ ing.unidad }}</span>
               </div>
               }
             </div>
@@ -239,7 +239,7 @@
                   <div class="step-number-custom d-flex align-items-center justify-content-center flex-shrink-0 mt-1 shadow-sm fw-bold">
                     {{ i + 1 }}
                   </div>
-                  <p class="detail-text mb-0 pt-1 lh-sm text-muted">{{ step }}</p>
+                  <p class="detail-text mb-0 pt-1 lh-sm">{{ step }}</p>
                 </div>
                 }
               </div>
@@ -353,7 +353,7 @@
               <lucide-icon name="chef-hat" [size]="26"></lucide-icon>
             </div>
             <p class="empty-text h5 mb-1">There are no reviews yet</p>
-            <p class="empty-subtext mb-0 text-muted">Be the first to review this recipe!</p>
+            <p class="empty-subtext mb-0">Be the first to review this recipe!</p>
           </div>
           } @else {
           <div class="reviews-list pt-3 d-flex flex-column gap-3">
