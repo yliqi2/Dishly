@@ -83,7 +83,7 @@
 }
 
 .footer__copyright {
-	color: var(--gray-muted-icon);
+	color: var(--gray-500);
 	font-size: 16px;
 	margin: 0;
 }

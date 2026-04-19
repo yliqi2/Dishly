@@ -578,7 +578,7 @@
   background: var(--green-light-bg);
   color: var(--emerald-700);
   border: 1px solid var(--emerald-border-light);
-  border-radius: 999px;
+  border-radius: var(--border-radius);
   padding: 8px 20px;
   font-weight: 700;
   font-size: 1rem;

@@ -8,12 +8,12 @@
   align-items: center;
   gap: 12px;
   background: var(--background);
-  border-radius: 50px;
+  border-radius: var(--border-radius);
   padding: 10px 10px 10px 24px;
   box-shadow: 0 4px 12px var(--black-alpha-08);
   width: 100%;
   border: 1px solid var(--neutral-900);
-  color: var(--gray-500-mid);
+  color: var(--gray-500);
 }
 
 .recipes-search-bar svg {
@@ -44,7 +44,7 @@
   border: 1px solid var(--neutral-900) !important;
   background-color: var(--background) !important;
   box-shadow: 0 4px 20px var(--black-alpha-05) !important;
-  border-radius: 20px !important;
+  border-radius: var(--border-radius) !important;
   padding: 24px !important;
 }
 
@@ -108,7 +108,7 @@
   color: var(--PrimaryText);
   padding: 10px 20px !important;
   min-height: 44px;
-  border-radius: 50px !important;
+  border-radius: var(--border-radius) !important;
   transition: all 0.2s ease;
   box-shadow: none !important;
   appearance: none;
@@ -129,7 +129,7 @@
 .form-select-custom:focus, 
 .dropdown-input-custom:focus-within {
   border-color: var(--highlight) !important;
-  box-shadow: 0 0 0 4px var(--highlight-alpha-10) !important;
+  box-shadow: 0 0 0 4px var(--highlight-focus) !important;
 }
 
 .dropdown-input-custom input:focus {
@@ -144,7 +144,7 @@
   font-weight: 700;
   font-size: 1rem;
   padding: 6px 14px !important;
-  border-radius: 50px !important;
+  border-radius: var(--border-radius) !important;
   transition: all 0.2s ease;
 }
 

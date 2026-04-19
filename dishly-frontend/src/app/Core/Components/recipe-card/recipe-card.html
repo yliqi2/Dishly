@@ -85,7 +85,7 @@
         Edit recipe
       </a>
       <button type="button" class="btn-danger btn-sm btn-recipe-deactivate w-100" [disabled]="isDeactivating()"
-        (click)="deactivateRecipe()">
+        (click)="openDeleteModal()">
         @if (isDeactivating()) {
         <span class="btn-loading-icon" aria-hidden="true"></span>
         } @else {
@@ -97,3 +97,12 @@
   </div>
 
 </article>
+
+@if (showDeleteModal()) {
+  <app-delete-recipe-modal
+    [recipeTitle]="receta().titulo"
+    [isProcessing]="isDeactivating()"
+    (confirmed)="confirmDelete()"
+    (cancelled)="cancelDelete()"
+  ></app-delete-recipe-modal>
+}

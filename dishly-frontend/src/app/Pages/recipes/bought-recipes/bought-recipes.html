@@ -2,21 +2,35 @@
 
   <section class="page-header page-container mb-4">
     <div class="page-header__inner">
-      <h1 id="bought-recipes-title" class="page-title">My Purchased Recipes</h1>
+      <h1 id="bought-recipes-title" class="page-title">{{ isAdminUser() ? 'All Recipes' : 'My Purchased Recipes' }}</h1>
       <div class="page-underline" aria-hidden="true"></div>
     </div>
   </section>
 
   <div class="page-container">
-    <div class="row">
-
-      <!-- Sidebar filters -->
-      <aside class="col-lg-3 mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+    <div class="row bought-recipes-toolbar align-items-center g-3 mb-4">
+      <aside class="col-lg-3">
+        <div class="d-flex justify-content-between align-items-center px-2 bought-recipes-toolbar__filters">
           <h2 class="h4 fw-bold mb-0 text-dark">Filters</h2>
           <button class="btn btn-clear-all" (click)="clearFilters()" [disabled]="!hasActiveFilters()">Clear All</button>
         </div>
+      </aside>
+      <div class="col-lg-9">
+        <div class="recipes-search-bar bought-recipes-toolbar__search">
+          <lucide-icon name="search" [size]="20"></lucide-icon>
+          <input
+            class="recipes-search-bar__input"
+            type="text"
+            placeholder="Search purchased recipes..."
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+          />
+        </div>
+      </div>
+    </div>
 
+    <div class="row">
+      <aside class="col-lg-3 mb-4">
         <div class="filter-card shadow-sm border bg-white">
 
           <!-- Category -->
@@ -76,22 +90,7 @@
         </div>
       </aside>
 
-      <!-- Main content -->
       <div class="col-lg-9" role="region" aria-label="Purchased recipes list">
-
-        <!-- Search bar -->
-        <div class="mb-4">
-          <div class="recipes-search-bar">
-            <lucide-icon name="search" [size]="20"></lucide-icon>
-            <input
-              class="recipes-search-bar__input"
-              type="text"
-              placeholder="Search purchased recipes..."
-              [value]="searchQuery()"
-              (input)="searchQuery.set($any($event.target).value)"
-            />
-          </div>
-        </div>
 
         <!-- Loading -->
         @if (loading()) {
@@ -106,7 +105,7 @@
         @if (!loading() && error()) {
           <div class="alert alert-danger d-flex align-items-center gap-2 rounded-3" role="alert">
             <lucide-icon name="circle-alert" [size]="20"></lucide-icon>
-            <span>Could not load your purchased recipes. Please try again later.</span>
+            <span>{{ isAdminUser() ? 'Could not load recipes.' : 'Could not load your purchased recipes.' }} Please try again later.</span>
           </div>
         }
 

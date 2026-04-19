@@ -5,7 +5,7 @@
 .upload-card {
 	background: var(--background);
 	border: 1.5px solid var(--neutral-900);
-	border-radius: 18px;
+	border-radius: var(--border-radius);
 	box-shadow: 0 8px 24px var(--shadow-sm);
 }
 
@@ -30,7 +30,7 @@
 	width: 140px;
 	height: 140px;
 	border: 2px dashed var(--neutral-900);
-	border-radius: 16px;
+	border-radius: var(--border-radius);
 	background: var(--background);
 	color: var(--gray-500);
 	cursor: pointer;
@@ -60,7 +60,7 @@
 
 .preview-item {
 	position: relative;
-	border-radius: 14px;
+	border-radius: var(--border-radius);
 	overflow: hidden;
 	border: 1px solid var(--neutral-900);
 }
@@ -81,7 +81,7 @@
 	left: 0.5rem;
 	background: var(--highlight);
 	color: var(--on-highlight);
-	border-radius: 999px;
+	border-radius: var(--border-radius) !important;
 	font-size: 1rem;
 	font-weight: 600;
 	padding: 0.2rem 0.65rem;
@@ -102,7 +102,7 @@
 }
 
 .bento-placeholder {
-	border-radius: 14px;
+	border-radius: var(--border-radius);
 	border: 2px dashed var(--neutral-900);
 	background: var(--gray-100);
 	padding: 0;
@@ -152,7 +152,7 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	border-radius: 10px;
+	border-radius: var(--border-radius);
 	min-height: 44px;
 	transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, filter 0.2s ease;
 }
@@ -194,7 +194,7 @@
 	border: 1px solid var(--highlight);
 	background: var(--highlight);
 	color: var(--on-highlight);
-	border-radius: 999px;
+	border-radius: var(--border-radius);
 	font-size: 1rem;
 	font-weight: 600;
 	padding: 0.2rem 0.6rem;
@@ -213,7 +213,7 @@
 	border: 1.5px solid var(--neutral-900);
 	background: var(--background);
 	color: var(--PrimaryText);
-	border-radius: 12px;
+	border-radius: var(--border-radius);
 	padding: 10px 20px;
 	font-size: 1rem;
 	min-height: 44px;
@@ -298,7 +298,7 @@
 
 .btn-difficulty {
 	border: 2px solid var(--neutral-900);
-	border-radius: 16px;
+	border-radius: var(--border-radius);
 	background: var(--background);
 	color: var(--PrimaryText);
 	min-height: 96px;
@@ -324,7 +324,7 @@
 .chef-hat-badge {
 	width: 36px;
 	height: 36px;
-	border-radius: 12px;
+	border-radius: var(--border-radius);
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -394,7 +394,7 @@
 }
 
 .difficulty-pill {
-	border-radius: 999px;
+	border-radius: var(--border-radius);
 	padding: 0.2rem 0.8rem;
 	border: 1px solid currentColor;
 	font-weight: 700;
@@ -422,7 +422,7 @@
 .ingredient-badge {
 	width: 44px;
 	height: 44px;
-	border-radius: 10px;
+	border-radius: var(--border-radius);
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -449,7 +449,7 @@
 	gap: 0.75rem;
 	padding: 0.25rem 0;
 	border: none;
-	border-radius: 12px;
+	border-radius: var(--border-radius);
 	background: transparent;
 	transition: none;
 }
@@ -515,7 +515,7 @@
 	align-items: center;
 	justify-content: center;
 	border: 1px solid var(--danger);
-	border-radius: 10px;
+	border-radius: var(--border-radius);
 	background: var(--danger);
 	color: var(--on-highlight);
 	padding: 0;
@@ -552,7 +552,7 @@
 	background: var(--highlight);
 	min-height: 44px;
 	padding: 0 1.25rem;
-	border-radius: 10px;
+	border-radius: var(--border-radius);
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -589,7 +589,7 @@
 	justify-content: center;
 	padding: 0.75rem 1.5rem;
 	min-height: 52px;
-	border-radius: 10px;
+	border-radius: var(--border-radius);
 	font-family: var(--font-display);
 	font-weight: 700;
 	font-size: 18px;
@@ -631,7 +631,7 @@
 	background: var(--highlight);
 	border-color: var(--highlight);
 	color: var(--on-highlight);
-	border-radius: 10px;
+	border-radius: var(--border-radius);
 }
 
 .btn-publish:focus-visible {
@@ -719,7 +719,7 @@
 	padding: 10px 20px;
 	min-height: 44px;
 	border: 1px solid var(--neutral-900);
-	border-radius: 12px;
+	border-radius: var(--border-radius);
 	font-size: 1rem;
 	font-family: inherit;
 	color: var(--PrimaryText);
@@ -805,7 +805,7 @@
 	list-style: none;
 	background: var(--background);
 	border: 1px solid var(--neutral-900);
-	border-radius: 12px;
+	border-radius: var(--border-radius);
 	box-shadow: 0 8px 24px var(--black-alpha-08);
 	max-height: 280px;
 	overflow-y: auto;
@@ -838,7 +838,7 @@
 .category-search-input:focus-visible {
 	outline: 3px solid var(--highlight);
 	outline-offset: 4px;
-	border-radius: 10px;
+	border-radius: var(--border-radius);
 	background: var(--highlight-focus);
 }
 
@@ -908,7 +908,7 @@
 	background: var(--bs-warning-bg-subtle);
 	color: var(--bs-warning-text-emphasis);
 	border: 1px solid var(--bs-warning-border-alpha);
-	border-radius: 2rem;
+	border-radius: var(--border-radius);
 	padding: .25rem .35rem .25rem .7rem;
 	font-size: .85rem;
 	font-weight: 600;
@@ -935,7 +935,7 @@
 	font-size: 1.15rem;
 	opacity: .85;
 	transition: opacity .15s, background .15s, transform .15s;
-	border-radius: 50%;
+	border-radius: var(--border-radius);
 }
 
 .category-tag__remove i {

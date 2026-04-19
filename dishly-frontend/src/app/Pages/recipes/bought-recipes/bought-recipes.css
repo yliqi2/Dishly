@@ -7,7 +7,7 @@
   border: 1px solid var(--neutral-900) !important;
   background-color: var(--background) !important;
   box-shadow: 0 4px 20px var(--black-alpha-05) !important;
-  border-radius: 20px !important;
+  border-radius: var(--border-radius) !important;
   padding: 24px !important;
 }
 
@@ -15,7 +15,7 @@
   color: var(--highlight);
   border: 1.5px solid var(--highlight);
   padding: 6px 20px;
-  border-radius: 50px;
+  border-radius: var(--border-radius);
   font-weight: 700;
   font-size: 1rem;
   background: transparent;
@@ -54,7 +54,7 @@
 .filter-dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: var(--border-radius);
   background: var(--highlight);
   flex-shrink: 0;
 }
@@ -67,7 +67,7 @@
 }
 
 .form-select-custom {
-  border-radius: 12px !important;
+  border-radius: var(--border-radius) !important;
   padding: 10px 20px !important;
   font-size: 1rem !important;
   min-height: 44px;
@@ -79,7 +79,7 @@
 
 .form-select-custom:focus {
   border-color: var(--highlight) !important;
-  box-shadow: 0 0 0 4px var(--highlight-alpha-10) !important;
+  box-shadow: 0 0 0 4px var(--highlight-focus) !important;
 }
 
 .price-box {
@@ -99,7 +99,7 @@
   width: 100%;
   height: 6px;
   background-color: var(--gray-200);
-  border-radius: 3px;
+  border-radius: var(--border-radius);
   z-index: 1;
 }
 
@@ -118,7 +118,7 @@
 .range-input::-webkit-slider-thumb {
   height: 24px;
   width: 24px;
-  border-radius: 50%;
+  border-radius: var(--border-radius);
   background: var(--highlight);
   border: 4px solid var(--background);
   box-shadow: 0 2px 8px var(--highlight-alpha-30);
@@ -135,7 +135,7 @@
 .range-input::-moz-range-thumb {
   height: 24px;
   width: 24px;
-  border-radius: 50%;
+  border-radius: var(--border-radius);
   background: var(--highlight);
   border: 4px solid var(--background);
   pointer-events: auto;
@@ -148,7 +148,7 @@
   align-items: center;
   gap: 12px;
   background: var(--background);
-  border-radius: 50px;
+  border-radius: var(--border-radius);
   padding: 10px 10px 10px 24px;
   box-shadow: 0 4px 12px var(--black-alpha-08);
   width: 100%;
@@ -157,7 +157,19 @@
 
 .recipes-search-bar lucide-icon {
   flex-shrink: 0;
-  color: var(--highlight);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  line-height: 0;
+  color: var(--gray-500);
+}
+
+.recipes-search-bar lucide-icon svg {
+  display: block;
+  width: 20px;
+  height: 20px;
 }
 
 .recipes-search-bar__input {
@@ -165,6 +177,8 @@
   border: none;
   outline: none;
   font-size: 1rem;
+  line-height: 1.25;
+  padding-block: 0;
   color: var(--gray-700);
   background: transparent;
 }
@@ -201,7 +215,7 @@
 
 .empty-subtitle {
   font-size: 1rem;
-  color: var(--gray-muted-icon);
+  color: var(--gray-500);
   margin-top: 6px;
 }
 
@@ -209,7 +223,7 @@
   background-color: var(--highlight);
   color: var(--on-highlight);
   border: none;
-  border-radius: 50px;
+  border-radius: var(--border-radius);
   padding: 10px 28px;
   font-weight: 700;
   font-size: 1rem;
@@ -229,4 +243,13 @@
   color: var(--on-highlight);
   transform: translateY(0) scale(0.97);
   box-shadow: none;
+}
+
+.alert lucide-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
 }

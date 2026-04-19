@@ -3,7 +3,7 @@
 	top: 0;
 	z-index: 1;
 	border-bottom: 1px solid var(--neutral-900);
-	background: var(--background);
+	background: var(--secondaryBackground);
 	box-shadow: 0 4px 10px var(--shadow-sm);
 }
 
@@ -29,13 +29,13 @@
 .brand:focus-visible {
 	outline: 3px solid var(--highlight);
 	outline-offset: 4px;
-	border-radius: 10px;
+	border-radius: var(--border-radius-sm);
 }
 
 .brand-icon-box {
 	width: 55px;
 	height: 55px;
-	border-radius: 14px;
+	border-radius: var(--border-radius-sm);
 	background: var(--highlight);
 	display: grid;
 	place-items: center;
@@ -122,7 +122,7 @@
 .menu-link:focus-visible {
 	outline: 3px solid var(--highlight);
 	outline-offset: 4px;
-	border-radius: 6px;
+	border-radius: var(--border-radius-sm);
 }
 
 .actions {
@@ -165,7 +165,7 @@
 	font-weight: 500;
 	color: var(--PrimaryText);
 	padding: 12px 16px;
-	border-radius: 8px;
+	border-radius: var(--border-radius-sm);
 	transition: all 0.2s ease;
 }
 
@@ -203,7 +203,7 @@
 	background: transparent;
 	cursor: pointer;
 	padding: 6px 8px;
-	border-radius: 18px;
+	border-radius: var(--border-radius-sm);
 	transition:
 		background 0.2s ease,
 		box-shadow 0.2s ease,
@@ -241,7 +241,7 @@
 	justify-content: center;
 	text-transform: uppercase;
 	overflow: hidden;
-	border: 2px solid var(--neutral-900);
+	border: 1px solid var(--neutral-900);
 }
 
 .avatar img {
@@ -298,7 +298,7 @@
 	top: calc(100% + 10px);
 	background: var(--background);
 	border: 1px solid var(--neutral-900);
-	border-radius: 16px;
+	border-radius: var(--border-radius);
 	box-shadow: 0 16px 40px var(--shadow-dark);
 	min-width: 180px;
 	padding: 10px;
@@ -315,7 +315,7 @@
 	text-align: left;
 	padding: 10px 12px;
 	font-size: 16px;
-	border-radius: 12px;
+	border-radius: var(--border-radius-sm);
 	color: var(--PrimaryText);
 	cursor: pointer;
 	text-decoration: none;
@@ -339,7 +339,7 @@
 .dropdown-button:focus-visible {
 	outline: 3px solid var(--highlight);
 	outline-offset: 2px;
-	border-radius: 12px;
+	border-radius: var(--border-radius-sm);
 }
 
 .dropdown-icon {
@@ -366,7 +366,7 @@
 
 .cta {
 	border: 0;
-	border-radius: 16px;
+	border-radius: var(--border-radius-sm);
 	background: var(--highlight);
 	color: var(--on-highlight);
 	font-size: 18px;

@@ -319,14 +319,16 @@
           }
 
           @if (reviews.length > 1) {
-          <div class="reviews-toolbar d-flex justify-content-end align-items-center gap-2 mb-3">
-            <label class="reviews-sort-label" for="reviews-sort">Sort by</label>
-            <select id="reviews-sort" class="reviews-sort-select" [value]="reviewSort"
-              (change)="setReviewSort($any($event.target).value)">
-              <option value="latest">Latest reviews</option>
-              <option value="highest">Highest rated</option>
-              <option value="lowest">Lowest rated</option>
-            </select>
+          <div class="reviews-toolbar d-flex justify-content-end align-items-center gap-2 mb-3 flex-wrap">
+            <label class="reviews-sort-label mb-0" id="reviews-sort-label">Sort by</label>
+            <app-dishly-select
+              class="reviews-sort-select"
+              [options]="reviewSortOptions"
+              placeholder="Latest reviews"
+              [value]="reviewSort"
+              (valueChange)="setReviewSort($event)"
+              aria-labelledby="reviews-sort-label"
+            ></app-dishly-select>
           </div>
           }
 
@@ -369,13 +371,13 @@
                   @if (isOwnReview(review)) {
                   <button class="btn-review-action edit" (click)="startEdit(review)" title="Edit review">
                     <lucide-icon name="pencil" [size]="15"></lucide-icon>
-                    <span>Editar</span>
+                    <span>Edit</span>
                   </button>
                   }
                   @if (canDeleteReview(review)) {
                   <button class="btn-review-action delete" (click)="openDeleteModal(review)" title="Delete review">
                     <lucide-icon name="trash-2" [size]="15"></lucide-icon>
-                    <span>Eliminar</span>
+                    <span>Remove</span>
                   </button>
                   }
                 </div>

@@ -19,7 +19,7 @@
 }
 
 .confirm-delete-modal-content {
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   background: var(--modal-content-bg);
   padding: 1.5rem;
   box-shadow: var(--modal-card-shadow);
@@ -64,6 +64,14 @@
 
 .confirm-delete-modal-footer .btn-secondary {
   flex: 1;
+  background-color: var(--gray-600);
+  color: var(--on-highlight);
+}
+
+.confirm-delete-modal-footer .btn-secondary:focus-visible {
+  outline: 3px solid var(--gray-500);
+  outline-offset: 4px;
+  border-radius: var(--border-radius-sm);
 }
 
 @keyframes modalPop {

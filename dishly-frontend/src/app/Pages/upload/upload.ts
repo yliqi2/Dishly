@@ -15,20 +15,25 @@ import { UploadPreview } from '../../Core/Interfaces/UploadPreview';
 import { Categoria } from '../../Core/Services/Categoria/categoria';
 import { CategoriaItem } from '../../Core/Interfaces/CategoriaItem';
 import { Router } from '@angular/router';
+import { DishlySelectComponent, SelectOption } from '../../Core/Components/dishly-select/dishly-select';
 
 type DifficultyLevel = 'easy' | 'medium' | 'hard';
-type TimeUnit = 'minutes' | 'hours';
 
 
 @Component({
   selector: 'app-upload',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, DishlySelectComponent],
   templateUrl: './upload.html',
   styleUrl: './upload.css',
 })
 export class Upload implements OnDestroy, OnInit {
   readonly maxPhotos = 5;
   readonly ingredientUnits = ['g', 'kg', 'mg', 'l', 'ml', 'unit'] as const;
+  readonly timeUnitOptions: SelectOption[] = [
+    { value: 'minutes', label: 'Minutes' },
+    { value: 'hours', label: 'Hours' },
+  ];
+  readonly ingredientUnitOptions: SelectOption[] = this.ingredientUnits.map(u => ({ value: u, label: u }));
 
   readonly photos$ = new BehaviorSubject<UploadPreview[]>([]);
   readonly selectedDifficulty$ = new BehaviorSubject<DifficultyLevel>('easy');
@@ -42,7 +47,6 @@ export class Upload implements OnDestroy, OnInit {
   categoryOpen = false;
   categorySearch = '';
   filteredCategorias: CategoriaItem[] = [];
-  timeUnitOpen = false;
 
   readonly vm$ = combineLatest([this.photos$, this.coverIndex$]).pipe(
     map(([photos, coverIndex]) => {
@@ -246,27 +250,6 @@ export class Upload implements OnDestroy, OnInit {
     this.closeCategoryDropdown();
   }
 
-  toggleTimeUnitDropdown(): void {
-    this.timeUnitOpen = !this.timeUnitOpen;
-  }
-
-  closeTimeUnitDropdown(): void {
-    this.timeUnitOpen = false;
-  }
-
-  setTimeUnit(unit: TimeUnit): void {
-    this.form.patchValue({ tiempo_preparacion_unidad: unit });
-    this.form.get('tiempo_preparacion_unidad')?.markAsTouched();
-    this.closeTimeUnitDropdown();
-  }
-
-  onTimeUnitFocusOut(event: FocusEvent): void {
-    const wrapper = event.currentTarget as HTMLElement | null;
-    const next = event.relatedTarget as Node | null;
-    if (!wrapper || (next && wrapper.contains(next))) return;
-    this.closeTimeUnitDropdown();
-  }
-
   onCategorySearch(event: Event): void {
     this.categorySearch = (event.target as HTMLInputElement).value;
     this.applyCategoryFilter();
@@ -301,7 +284,6 @@ export class Upload implements OnDestroy, OnInit {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.categoryOpen) this.closeCategoryDropdown();
-    if (this.timeUnitOpen) this.closeTimeUnitDropdown();
   }
 
   onPhotosSelected(event: Event): void {

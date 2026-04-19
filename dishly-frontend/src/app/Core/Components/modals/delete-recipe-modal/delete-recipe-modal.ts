@@ -1,14 +1,18 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 
 @Component({
-  selector: 'app-delete-account-modal',
+  selector: 'app-delete-recipe-modal',
+  standalone: true,
   imports: [],
-  templateUrl: './delete-account-modal.html',
-  styleUrl: './delete-account-modal.css',
+  templateUrl: './delete-recipe-modal.html',
+  styleUrl: './delete-recipe-modal.css',
 })
-export class DeleteAccountModal implements AfterViewInit {
-  @Input({ required: true }) profileContext!: any;
-  @Output() closeModal = new EventEmitter<void>();
+export class DeleteRecipeModal implements AfterViewInit {
+  @Input() recipeTitle = '';
+  @Input() isProcessing = false;
+  @Output() confirmed = new EventEmitter<void>();
+  @Output() cancelled = new EventEmitter<void>();
+
   @ViewChild('dialogRoot') dialogRoot?: ElementRef<HTMLElement>;
 
   ngAfterViewInit(): void {
@@ -16,15 +20,14 @@ export class DeleteAccountModal implements AfterViewInit {
   }
 
   onBackdropClick(): void {
-    this.closeModal.emit();
+    this.cancelled.emit();
   }
 
   onModalKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
-      this.closeModal.emit();
+      this.cancelled.emit();
       return;
     }
-
     if (event.key !== 'Tab') return;
     this.trapFocus(event);
   }
@@ -40,34 +43,20 @@ export class DeleteAccountModal implements AfterViewInit {
     const root = this.dialogRoot?.nativeElement;
     if (!root) return;
     const focusable = this.getFocusableElements(root);
-    if (focusable.length === 0) {
-      event.preventDefault();
-      root.focus();
-      return;
-    }
+    if (focusable.length === 0) { event.preventDefault(); root.focus(); return; }
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
     const active = document.activeElement as HTMLElement | null;
-    if (event.shiftKey && active === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && active === last) {
-      event.preventDefault();
-      first.focus();
-    }
+    if (event.shiftKey && active === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && active === last) { event.preventDefault(); first.focus(); }
   }
 
   private getFocusableElements(root: HTMLElement): HTMLElement[] {
     const selector = [
-      'a[href]',
-      'button:not([disabled])',
-      'textarea:not([disabled])',
-      'input:not([disabled])',
-      'select:not([disabled])',
-      '[tabindex]:not([tabindex="-1"])',
+      'a[href]', 'button:not([disabled])', 'textarea:not([disabled])',
+      'input:not([disabled])', 'select:not([disabled])', '[tabindex]:not([tabindex="-1"])',
     ].join(',');
-
     return Array.from(root.querySelectorAll<HTMLElement>(selector))
-      .filter(element => !element.hasAttribute('disabled') && element.tabIndex !== -1);
+      .filter(el => !el.hasAttribute('disabled') && el.tabIndex !== -1);
   }
 }

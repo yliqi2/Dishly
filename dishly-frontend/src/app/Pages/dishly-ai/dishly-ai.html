@@ -56,43 +56,6 @@
         <p>No recipes found for <strong>"{{ searchQuery }}"</strong>. Try different keywords.</p>
       </div>
     } @else {
-      <p class="ai-results-count">{{ recipes().length }} recipes found</p>
-
-      <div class="ai-grid">
-        @for (recipe of recipes(); track recipe.id) {
-          <div class="ai-card" [class.ai-card--selected]="selectedRecipe()?.id === recipe.id" (click)="selectRecipe(recipe)">
-            <div class="ai-card__img-wrapper">
-              <img [src]="recipe.image" [alt]="recipe.title" class="ai-card__img" loading="lazy" />
-              <div class="ai-card__badges">
-                @if (recipe.vegan) { <span class="ai-badge ai-badge--green">Vegan</span> }
-                @if (recipe.glutenFree) { <span class="ai-badge ai-badge--blue">Gluten‑free</span> }
-              </div>
-            </div>
-            <div class="ai-card__body">
-              <h3 class="ai-card__title">{{ recipe.title }}</h3>
-              <div class="ai-card__meta">
-                @if (recipe.readyInMinutes) {
-                  <span class="ai-meta-item">
-                    <lucide-icon name="clock" [size]="13"></lucide-icon> {{ recipe.readyInMinutes }} min
-                  </span>
-                }
-                @if (recipe.servings) {
-                  <span class="ai-meta-item">
-                    <lucide-icon name="users" [size]="13"></lucide-icon> {{ recipe.servings }} servings
-                  </span>
-                }
-                @if (recipe.healthScore) {
-                  <span class="ai-meta-item ai-meta-item--score">
-                    <lucide-icon name="star" [size]="13"></lucide-icon> {{ recipe.healthScore }}
-                  </span>
-                }
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-
-      <!-- Detail panel -->
       @if (selectedRecipe()) {
         <div class="ai-detail">
           <div class="ai-detail__header">

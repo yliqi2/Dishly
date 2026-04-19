@@ -11,13 +11,14 @@ import { RecetaOriginal } from '../../../Core/Interfaces/RecetaOriginal';
 import { Review } from '../../../Core/Interfaces/Review';
 import { LoadingPage } from '../../loading-page/loading-page';
 import { DeleteReviewModal } from '../../../Core/Components/modals/delete-review-modal/delete-review-modal';
+import { DishlySelectComponent, SelectOption } from '../../../Core/Components/dishly-select/dishly-select';
 
 type ReviewSortOption = 'latest' | 'highest' | 'lowest';
 
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, FormsModule, RouterLink, LoadingPage, DeleteReviewModal],
+  imports: [CommonModule, LucideAngularModule, FormsModule, RouterLink, LoadingPage, DeleteReviewModal, DishlySelectComponent],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.css',
 })
@@ -47,6 +48,11 @@ export class RecipeDetail implements OnInit {
   readonly reviewsPerPage = 5;
   currentReviewPage = 1;
   reviewSort: ReviewSortOption = 'latest';
+  readonly reviewSortOptions: SelectOption[] = [
+    { value: 'latest', label: 'Latest reviews' },
+    { value: 'highest', label: 'Highest rated' },
+    { value: 'lowest', label: 'Lowest rated' },
+  ];
   reviewComment = '';
   submitError: string | null = null;
   cartNotice: string | null = null;
@@ -303,9 +309,7 @@ export class RecipeDetail implements OnInit {
     this.cartService.addRecipe(this.recipe).subscribe({
       next: (result) => {
         this.isInCart = result.added || result.duplicate;
-        this.cartNotice = result.added
-          ? 'Recipe added to your cart.'
-          : 'This recipe is already in your cart.';
+        this.cartNotice = result.added ? null : 'This recipe is already in your cart.';
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -433,7 +437,11 @@ export class RecipeDetail implements OnInit {
     return this.reviews.length > this.reviewsPerPage;
   }
 
-  setReviewSort(sort: ReviewSortOption): void {
+  setReviewSort(value: string): void {
+    if (value !== 'latest' && value !== 'highest' && value !== 'lowest') {
+      return;
+    }
+    const sort = value as ReviewSortOption;
     if (this.reviewSort === sort) {
       return;
     }

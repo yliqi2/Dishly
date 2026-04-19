@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { SpoonacularService, SpoonacularRecipe } from '../../Core/Services/Spoonacular/spoonacular.service';
-import { debounceTime, Subject, switchMap, catchError, of, finalize } from 'rxjs';
+import { catchError, of, finalize } from 'rxjs';
 
 @Component({
   selector: 'app-dishly-ai',
@@ -22,8 +22,6 @@ export class DishlyAi {
   error = signal<string | null>(null);
   hasSearched = signal(false);
 
-  private searchSubject = new Subject<string>();
-
   onSearch(): void {
     const query = this.searchQuery.trim();
     if (!query) return;
@@ -31,7 +29,6 @@ export class DishlyAi {
     this.loading.set(true);
     this.error.set(null);
     this.hasSearched.set(true);
-    this.selectedRecipe.set(null);
 
     this.spoonacular.searchRecipes(query).pipe(
       catchError(() => {
@@ -41,11 +38,8 @@ export class DishlyAi {
       finalize(() => this.loading.set(false))
     ).subscribe(res => {
       this.recipes.set(res.results);
+      this.selectedRecipe.set(res.results[0] ?? null);
     });
-  }
-
-  selectRecipe(recipe: SpoonacularRecipe): void {
-    this.selectedRecipe.set(recipe === this.selectedRecipe() ? null : recipe);
   }
 
   clearSearch(): void {

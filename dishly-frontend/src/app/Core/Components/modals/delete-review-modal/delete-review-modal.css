@@ -20,7 +20,7 @@
 }
 
 .drm-content {
-  border-radius: 14px;
+  border-radius: var(--border-radius);
   background: var(--modal-content-bg);
   padding: 1.5rem;
   box-shadow: var(--modal-card-shadow);
@@ -57,57 +57,20 @@
   justify-content: flex-end;
 }
 
-.drm-btn-cancel {
+.drm-footer .btn-secondary {
   flex: 1;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: 1.5px solid var(--neutral-900);
-  background: transparent;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--PrimaryText);
-  cursor: pointer;
-  transition: background-color 0.15s ease;
+  background-color: var(--gray-600);
+  color: var(--on-highlight);
 }
 
-.drm-btn-cancel:hover {
-  background: var(--secondaryBackground);
+.drm-footer .btn-secondary:focus-visible {
+  outline: 3px solid var(--gray-500);
+  outline-offset: 4px;
+  border-radius: var(--border-radius-sm);
 }
 
-.drm-btn-cancel:active {
-  background: var(--gray-200);
-}
-
-.drm-btn-confirm {
+.drm-footer .btn-danger {
   flex: 1;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: 0;
-  background: var(--danger);
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: filter 0.15s ease, transform 0.1s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.drm-btn-confirm:hover:not(:disabled) {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.drm-btn-confirm:active:not(:disabled) {
-  filter: brightness(0.9);
-  transform: translateY(0) scale(0.97);
-}
-
-.drm-btn-confirm:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
 }
 
 @keyframes modalPop {

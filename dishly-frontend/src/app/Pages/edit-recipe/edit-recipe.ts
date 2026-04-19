@@ -17,9 +17,9 @@ import { RecetaOriginal } from '../../Core/Interfaces/RecetaOriginal';
 import { AuthServices } from '../../Core/Services/Auth/auth-services';
 import { Categoria } from '../../Core/Services/Categoria/categoria';
 import { RecetaDetailsService } from '../../Core/Services/Core/receta-details-service';
+import { DishlySelectComponent, SelectOption } from '../../Core/Components/dishly-select/dishly-select';
 
 type DifficultyLevel = 'easy' | 'medium' | 'hard';
-type TimeUnit = 'minutes' | 'hours';
 type EditablePhoto = {
   file: File | null;
   url: string;
@@ -29,13 +29,19 @@ type EditablePhoto = {
 
 @Component({
   selector: 'app-edit-recipe',
-  imports: [CommonModule, ReactiveFormsModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, DishlySelectComponent],
   templateUrl: './edit-recipe.html',
   styleUrls: ['./edit-recipe.css'],
 })
 export class EditRecipe implements OnDestroy, OnInit {
   readonly maxPhotos = 5;
   readonly ingredientUnits = ['g', 'kg', 'mg', 'l', 'ml', 'unit'] as const;
+  readonly timeUnitOptions: SelectOption[] = [
+    { value: 'minutes', label: 'Minutes' },
+    { value: 'hours', label: 'Hours' },
+  ];
+  readonly ingredientUnitOptions: SelectOption[] = this.ingredientUnits.map(u => ({ value: u, label: u }));
 
   readonly photos$ = new BehaviorSubject<EditablePhoto[]>([]);
   readonly selectedDifficulty$ = new BehaviorSubject<DifficultyLevel>('easy');
@@ -53,7 +59,6 @@ export class EditRecipe implements OnDestroy, OnInit {
   categoryOpen = false;
   categorySearch = '';
   filteredCategorias: CategoriaItem[] = [];
-  timeUnitOpen = false;
   private recipeId: number | null = null;
 
   readonly vm$ = combineLatest([this.photos$, this.coverIndex$]).pipe(
@@ -237,27 +242,6 @@ export class EditRecipe implements OnDestroy, OnInit {
     this.closeCategoryDropdown();
   }
 
-  toggleTimeUnitDropdown(): void {
-    this.timeUnitOpen = !this.timeUnitOpen;
-  }
-
-  closeTimeUnitDropdown(): void {
-    this.timeUnitOpen = false;
-  }
-
-  setTimeUnit(unit: TimeUnit): void {
-    this.form.patchValue({ tiempo_preparacion_unidad: unit });
-    this.form.get('tiempo_preparacion_unidad')?.markAsTouched();
-    this.closeTimeUnitDropdown();
-  }
-
-  onTimeUnitFocusOut(event: FocusEvent): void {
-    const wrapper = event.currentTarget as HTMLElement | null;
-    const next = event.relatedTarget as Node | null;
-    if (!wrapper || (next && wrapper.contains(next))) return;
-    this.closeTimeUnitDropdown();
-  }
-
   onCategorySearch(event: Event): void {
     this.categorySearch = (event.target as HTMLInputElement).value;
     this.applyCategoryFilter();
@@ -292,7 +276,6 @@ export class EditRecipe implements OnDestroy, OnInit {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.categoryOpen) this.closeCategoryDropdown();
-    if (this.timeUnitOpen) this.closeTimeUnitDropdown();
   }
 
   onPhotosSelected(event: Event): void {

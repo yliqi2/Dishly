@@ -123,51 +123,12 @@
         </div>
 
         <div class="col-12 col-md-4">
-          <label class="form-label fw-semibold" for="unidadTiempo-trigger">Time to Make</label>
-          <div class="custom-select-wrapper" (focusout)="onTimeUnitFocusOut($event)">
-            <button type="button" id="unidadTiempo-trigger" class="btn custom-select-trigger"
-              [class.is-open]="timeUnitOpen" [class.input-error]="isFieldInvalid('tiempo_preparacion_unidad')"
-              [attr.aria-expanded]="timeUnitOpen" [attr.aria-haspopup]="'listbox'"
-              [attr.aria-describedby]="getError('tiempo_preparacion_unidad') ? 'upload-tiempo-unidad-error' : null"
-              [attr.aria-invalid]="isFieldInvalid('tiempo_preparacion_unidad')" (click)="toggleTimeUnitDropdown()">
-              <span class="custom-select-trigger-label">
-                @if (form.get('tiempo_preparacion_unidad')?.value === 'minutes') {
-                <i class="bi bi-clock me-2 time-unit-icon" aria-hidden="true"></i>
-                Minutes
-                } @else {
-                <i class="bi bi-hourglass-split me-2 time-unit-icon" aria-hidden="true"></i>
-                Hours
-                }
-              </span>
-              <i class="bi bi-chevron-down" aria-hidden="true"></i>
-            </button>
-
-            @if (timeUnitOpen) {
-            <div class="custom-select-backdrop" (click)="closeTimeUnitDropdown()" aria-hidden="true"></div>
-            <div class="custom-select-dropdown">
-              <ul class="category-list" role="listbox" aria-labelledby="unidadTiempo-trigger">
-                <li role="option" tabindex="0"
-                  [attr.aria-selected]="form.get('tiempo_preparacion_unidad')?.value === 'minutes'"
-                  class="category-list__item"
-                  [class.is-selected]="form.get('tiempo_preparacion_unidad')?.value === 'minutes'"
-                  (click)="setTimeUnit('minutes')" (keydown.enter)="setTimeUnit('minutes'); $event.preventDefault()"
-                  (keydown.space)="setTimeUnit('minutes'); $event.preventDefault()">
-                  <i class="bi bi-clock me-2 time-unit-icon" aria-hidden="true"></i>
-                  Minutes
-                </li>
-                <li role="option" tabindex="0"
-                  [attr.aria-selected]="form.get('tiempo_preparacion_unidad')?.value === 'hours'"
-                  class="category-list__item"
-                  [class.is-selected]="form.get('tiempo_preparacion_unidad')?.value === 'hours'"
-                  (click)="setTimeUnit('hours')" (keydown.enter)="setTimeUnit('hours'); $event.preventDefault()"
-                  (keydown.space)="setTimeUnit('hours'); $event.preventDefault()">
-                  <i class="bi bi-hourglass-split me-2 time-unit-icon" aria-hidden="true"></i>
-                  Hours
-                </li>
-              </ul>
-            </div>
-            }
-          </div>
+          <label class="form-label fw-semibold">Time Unit</label>
+          <app-dishly-select
+            [options]="timeUnitOptions"
+            [value]="form.get('tiempo_preparacion_unidad')?.value"
+            (valueChange)="form.get('tiempo_preparacion_unidad')?.setValue($event)"
+          ></app-dishly-select>
           @if (getError('tiempo_preparacion_unidad')) {
           <div id="upload-tiempo-unidad-error" class="invalid-feedback d-block mt-1" role="status" aria-live="polite">
             {{ getError('tiempo_preparacion_unidad') }}
@@ -368,16 +329,12 @@
               </div>
             </div>
             <div class="ingredient-field ingredient-field--unit">
-              <label for="upload-ingrediente-unidad-{{ i }}" class="visually-hidden">Ingredient unit</label>
-              <div class="select-wrap">
-                <select id="upload-ingrediente-unidad-{{ i }}" class="form-control input-soft input-soft-select"
-                  formControlName="unidad" [attr.aria-invalid]="isFieldInvalid('unidad', ingredient)">
-                  @for (unit of ingredientUnits; track unit) {
-                  <option [value]="unit">{{ unit }}</option>
-                  }
-                </select>
-                <span class="select-caret"><i class="bi bi-chevron-down"></i></span>
-              </div>
+              <span class="visually-hidden">Ingredient unit</span>
+              <app-dishly-select
+                [options]="ingredientUnitOptions"
+                [value]="ingredient.get('unidad')?.value"
+                (valueChange)="ingredient.get('unidad')?.setValue($event)"
+              ></app-dishly-select>
             </div>
           </div>
           <div class="ingredients-remove-wrap">
