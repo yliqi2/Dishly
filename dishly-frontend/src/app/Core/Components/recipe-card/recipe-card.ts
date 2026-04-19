@@ -84,7 +84,8 @@ export class RecipeCardComponent {
     }
 
     const roundedUp = Math.ceil(numericMedia * 10) / 10;
-    return roundedUp.toFixed(1);
+    const fixed = roundedUp.toFixed(1);
+    return fixed.endsWith('.0') ? fixed.slice(0, -2) : fixed;
   });
 
   protected readonly mainImage = computed(() => {

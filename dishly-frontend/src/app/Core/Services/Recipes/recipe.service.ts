@@ -19,5 +19,10 @@ export class RecipeService extends ApiBaseService {
     if (!this.auth.isAuthenticated()) return of([]);
     return this.http.get<RecetaOriginal[]>(`${this.apiUrl}/owned-recipes`);
   }
-  
+
+  getAllRecipesAdmin(): Observable<RecetaCard[]> {
+    if (!this.auth.isAuthenticated()) return of([]);
+    return this.http.get<RecetaCard[]>(`${this.apiUrl}/admin/recipes`);
+  }
+
 }

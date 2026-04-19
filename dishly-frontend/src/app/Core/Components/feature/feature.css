@@ -39,8 +39,8 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: var(--highlight, #f97316);
-    color: #ffffff;
+    background: var(--highlight);
+    color: var(--on-highlight);
     text-align: center;
     padding: 14px 36px;
     border-radius: 12px;
@@ -50,12 +50,12 @@
     transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+    box-shadow: 0 4px 12px var(--orange-500-alpha-25);
 }
 
 .btn-view-all:hover {
-    background: #ea580c;
-    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.35);
+    background: var(--orange-600);
+    box-shadow: 0 6px 16px var(--orange-500-alpha-35);
     transform: translateY(-2px);
 }
 

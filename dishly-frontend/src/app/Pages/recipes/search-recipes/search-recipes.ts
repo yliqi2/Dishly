@@ -6,17 +6,20 @@ import { FormsModule } from '@angular/forms';
 import { RecipeCardComponent } from '../../../Core/Components/recipe-card/recipe-card';
 import { RecipeService } from '../../../Core/Services/Recipes/recipe.service';
 import { RecetaCard } from '../../../Core/Interfaces/RecetaCard';
+import { DishlySelectComponent, SelectOption } from '../../../Core/Components/dishly-select/dishly-select';
+import { AuthServices } from '../../../Core/Services/Auth/auth-services';
 
 @Component({
   selector: 'app-search-recipes',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, FormsModule, RecipeCardComponent],
+  imports: [CommonModule, LucideAngularModule, FormsModule, RecipeCardComponent, DishlySelectComponent],
   templateUrl: './search-recipes.html',
   styleUrl: './search-recipes.css',
 })
 export class SearchRecipes implements OnInit {
   private recipeService = inject(RecipeService);
   private route = inject(ActivatedRoute);
+  private authService = inject(AuthServices);
 
   recipes = signal<RecetaCard[]>([]);
   loading = signal(true);
@@ -29,7 +32,6 @@ export class SearchRecipes implements OnInit {
   priceMin = signal(0);
   priceMax = signal(200);
 
-  // New signals for Tags, Ingredients, Persons
   selectedTags = signal<string[]>([]);
   showTagsDropdown = signal(false);
   tagSearch = signal('');
@@ -42,11 +44,23 @@ export class SearchRecipes implements OnInit {
   showPersonsDropdown = signal(false);
   personsSearch = signal('');
 
+  readonly difficultyOptions: SelectOption[] = [
+    { value: '', label: 'All Levels' },
+    { value: 'easy', label: 'Easy' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'hard', label: 'Hard' },
+  ];
+
   categories = computed(() => {
     const cats = new Set<string>();
     this.recipes().forEach(r => r.categorias?.forEach(c => cats.add(c.nombre)));
     return Array.from(cats).sort();
   });
+
+  categoryOptions = computed<SelectOption[]>(() => [
+    { value: '', label: 'All Categories' },
+    ...this.categories().map(c => ({ value: c, label: c })),
+  ]);
 
   // Filtered dropdown options
   filteredTagsOptions = computed(() => {
@@ -122,10 +136,18 @@ export class SearchRecipes implements OnInit {
     this.loadRecipes();
   }
 
+  isAdminUser(): boolean {
+    const user = this.authService.getUser() as { rol?: string } | null;
+    return user?.rol === 'admin';
+  }
+
   loadRecipes() {
     this.loading.set(true);
     this.error.set(false);
-    this.recipeService.getRecipes().subscribe({
+    const source$ = this.isAdminUser()
+      ? this.recipeService.getAllRecipesAdmin()
+      : this.recipeService.getRecipes();
+    source$.subscribe({
       next: (data) => {
         this.recipes.set(data);
         this.loading.set(false);

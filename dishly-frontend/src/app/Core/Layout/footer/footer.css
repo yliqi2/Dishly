@@ -1,6 +1,6 @@
 .footer {
-	background: #1a1a1a;
-	color: #e0e0e0;
+	background: var(--footer-surface-alt);
+	color: var(--footer-text-primary);
 	padding: 60px 0 32px;
 	margin-top: 80px;
 }
@@ -37,7 +37,7 @@
 	background: var(--highlight);
 	display: grid;
 	place-items: center;
-	color: white;
+	color: var(--on-highlight);
 }
 
 .brand-icon {
@@ -60,13 +60,13 @@
 }
 
 .brand-subtitle {
-	color: #b0b0b0;
+	color: var(--footer-text-muted);
 	font-size: 16px;
 	margin-top: 4px;
 }
 
 .footer__description {
-	color: #b0b0b0;
+	color: var(--footer-text-muted);
 	line-height: 1.6;
 	margin: 0;
 	font-size: 16px;
@@ -79,11 +79,11 @@
 	align-items: center;
 	padding-top: 32px;
 	margin: 0;
-	border-top: 1px solid #333;
+	border-top: 1px solid var(--footer-divider);
 }
 
 .footer__copyright {
-	color: #888;
+	color: var(--gray-muted-icon);
 	font-size: 16px;
 	margin: 0;
 }
@@ -95,7 +95,7 @@
 }
 
 .footer__social-link {
-	color: #b0b0b0;
+	color: var(--footer-text-muted);
 	transition: color 0.2s;
 	display: flex;
 	align-items: center;

@@ -1,0 +1,121 @@
+.dishly-select {
+  position: relative;
+  width: 100%;
+  outline: none;
+}
+
+.dishly-select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 20px;
+  background-color: var(--background);
+  border: 1px solid var(--neutral-900);
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--PrimaryText);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  gap: 8px;
+}
+
+.dishly-select__trigger.is-placeholder {
+  color: var(--gray-500);
+}
+
+.dishly-select__trigger:hover {
+  border-color: var(--highlight);
+}
+
+.dishly-select__trigger:active {
+  box-shadow: 0 0 0 3px var(--highlight-alpha-10);
+}
+
+.dishly-select.is-open .dishly-select__trigger {
+  border-color: var(--highlight);
+  box-shadow: 0 0 0 4px var(--highlight-alpha-10);
+  border-radius: 16px 16px 0 0;
+}
+
+.dishly-select:focus-within .dishly-select__trigger {
+  border-color: var(--highlight);
+  box-shadow: 0 0 0 4px var(--highlight-alpha-10);
+}
+
+.dishly-select__label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1rem;
+}
+
+.dishly-select__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--slate-600);
+  transition: transform 0.2s ease;
+}
+
+.dishly-select.is-open .dishly-select__icon {
+  transform: rotate(180deg);
+  color: var(--highlight);
+}
+
+.dishly-select__listbox {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: var(--background);
+  border: 1px solid var(--highlight);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 8px 24px var(--black-alpha-12);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.dishly-select__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--PrimaryText);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.dishly-select__option:hover,
+.dishly-select__option.is-focused {
+  background-color: var(--highlight-focus);
+  color: var(--highlight);
+}
+
+.dishly-select__option.is-selected {
+  background-color: var(--highlight-focus);
+  color: var(--highlight);
+  font-weight: 700;
+}
+
+.dishly-select__option:active {
+  background-color: var(--highlight-alpha-15);
+}
+
+.dishly-select__check {
+  display: flex;
+  align-items: center;
+  color: var(--highlight);
+  flex-shrink: 0;
+}

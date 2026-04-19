@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, signal, inject, NgModule } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, inject, HostListener } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthServices } from '../../Services/Auth/auth-services';
@@ -60,6 +60,18 @@ export class Header {
     this.menuOpen.set(false);
   }
 
+  protected onMenuFocusOut(event: FocusEvent): void {
+    const wrapper = event.currentTarget as HTMLElement | null;
+    const next = event.relatedTarget as Node | null;
+    if (!wrapper || (next && wrapper.contains(next))) return;
+    this.closeMenu();
+  }
+
+  @HostListener('document:keydown.escape')
+  protected onEscapeKey(): void {
+    if (this.menuOpen()) this.closeMenu();
+  }
+
   protected toggleMobileMenu(): void {
     this.mobileMenuOpen.update(value => !value);
   }
@@ -72,6 +84,8 @@ export class Header {
     this.isLoggingOut.set(true);
     this.closeMenu();
     this.closeMobileMenu();
-    this.authService.logout();
+    this.authService.logout().subscribe({
+      error: () => this.isLoggingOut.set(false),
+    });
   }
 }

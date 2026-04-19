@@ -4,12 +4,11 @@ import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LucideAngularModule } from 'lucide-angular';
 import { CartService } from '../../../Core/Services/Cart/cart.service';
-import { PaymentMethod } from '../payment-method/payment-method';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule, PaymentMethod],
+  imports: [CommonModule, RouterLink, LucideAngularModule],
   templateUrl: './cart.html',
   styleUrl: './cart.css',
 })

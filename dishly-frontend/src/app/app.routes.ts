@@ -20,77 +20,91 @@ import { EditRecipe } from './Pages/edit-recipe/edit-recipe';
 import { NotFound } from './Pages/not-found/not-found';
 
 export const routes: Routes = [
-    {
-        path: '',
-        component: Homepage
-    },
-    {
-        path: 'login',
-        component: Login,
-        canActivate: [GuestGuard]
-    },
-    {
-        path: 'register',
-        component: Register,
-        canActivate: [GuestGuard]
-    },
-    {
-        path: 'forgot-password',
-        component: ForgotPassword
-    },
-    {
-        path: 'verifyEmail',
-        component: VerifyEmail,
-        canActivate: [GuestGuard]
-    },
-    {
-        path: 'recipes',
-        children: [
-            { path: '', component: SearchRecipes },
-            { path: ':id/edit', component: EditRecipe, canActivate: [AuthGuard] },
-            { path: ':id', component: RecipeDetail }
-        ]
-    },
-    {
-        path: 'my-recipes',
-        component: BoughtRecipes,
-        canActivate: [AuthGuard]
-    },
-    {
-        path: 'dishly-ai',
-        component: DishlyAi
-    },
-    {
-        path: 'forum',
-        component: Forum
-    },
-    {
-        path: 'upload',
-        component: Upload,
-        canActivate: [AuthGuard]
-    },
-    {
-        path: 'cart',
-        component: Cart,
-        canActivate: [AuthGuard]
-    },
-    {
-        path: 'payment',
-        component: PaymentMethod,
-        canActivate: [AuthGuard]
-    },
-    {
-        path: 'profile',
-        component: Profile,
-        canActivate: [AuthGuard]
-    },
-    {
-        path: 'profile/edit',
-        component: EditProfile,
-        canActivate: [AuthGuard]
-    },
-    {
-        path: '**',
-        component: NotFound
-    }
+  {
+    path: '',
+    component: Homepage,
+    title: 'Home',
+  },
+  {
+    path: 'login',
+    component: Login,
+    canActivate: [GuestGuard],
+    title: 'Login',
+  },
+  {
+    path: 'register',
+    component: Register,
+    canActivate: [GuestGuard],
+    title: 'Register',
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPassword,
+    title: 'Forgot Password',
+  },
+  {
+    path: 'verifyEmail',
+    component: VerifyEmail,
+    canActivate: [GuestGuard],
+    title: 'Verify Email',
+  },
+  {
+    path: 'recipes',
+    children: [
+      { path: '', component: SearchRecipes, title: 'Recipes' },
+      { path: ':id/edit', component: EditRecipe, canActivate: [AuthGuard], title: 'Edit Recipe' },
+      { path: ':id', component: RecipeDetail, title: 'Recipe' },
+    ],
+  },
+  {
+    path: 'my-recipes',
+    component: BoughtRecipes,
+    canActivate: [AuthGuard],
+    title: 'My Purchased Recipes',
+  },
+  {
+    path: 'dishly-ai',
+    component: DishlyAi,
+    title: 'Dishly AI',
+  },
+  {
+    path: 'forum',
+    component: Forum,
+    title: 'Forum',
+  },
+  {
+    path: 'upload',
+    component: Upload,
+    canActivate: [AuthGuard],
+    title: 'Upload Recipe',
+  },
+  {
+    path: 'cart',
+    component: Cart,
+    canActivate: [AuthGuard],
+    title: 'Cart',
+  },
+  {
+    path: 'payment',
+    component: PaymentMethod,
+    canActivate: [AuthGuard],
+    title: 'Payment',
+  },
+  {
+    path: 'profile',
+    component: Profile,
+    canActivate: [AuthGuard],
+    title: 'Profile',
+  },
+  {
+    path: 'profile/edit',
+    component: EditProfile,
+    canActivate: [AuthGuard],
+    title: 'Edit Profile',
+  },
+  {
+    path: '**',
+    component: NotFound,
+    title: '404 Not Found',
+  },
 ];

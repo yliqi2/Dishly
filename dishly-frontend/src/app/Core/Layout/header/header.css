@@ -1,8 +1,8 @@
 .header {
 	position: sticky;
 	top: 0;
-	z-index: 40;
-	border-bottom: 1px solid var(--gray-800);
+	z-index: 1;
+	border-bottom: 1px solid var(--neutral-900);
 	background: var(--background);
 	box-shadow: 0 4px 10px var(--shadow-sm);
 }
@@ -204,10 +204,28 @@
 	cursor: pointer;
 	padding: 6px 8px;
 	border-radius: 18px;
+	transition:
+		background 0.2s ease,
+		box-shadow 0.2s ease,
+		transform 0.15s ease;
 }
 
 .user-trigger:hover {
-	background: var(--gray-100);
+	background: var(--orange-50);
+	box-shadow:
+		0 0 0 2px var(--highlight-focus-strong),
+		0 6px 16px var(--orange-500-alpha-15);
+	transform: translateY(-1px);
+}
+
+.user-trigger:active {
+	transform: translateY(0);
+	box-shadow: 0 0 0 2px var(--highlight-alpha-15);
+}
+
+.user-trigger:focus-visible {
+	outline: 3px solid var(--highlight);
+	outline-offset: 3px;
 }
 
 .avatar {
@@ -223,6 +241,7 @@
 	justify-content: center;
 	text-transform: uppercase;
 	overflow: hidden;
+	border: 2px solid var(--neutral-900);
 }
 
 .avatar img {
@@ -278,7 +297,7 @@
 	right: 0;
 	top: calc(100% + 10px);
 	background: var(--background);
-	border: 1px solid var(--gray-800);
+	border: 1px solid var(--neutral-900);
 	border-radius: 16px;
 	box-shadow: 0 16px 40px var(--shadow-dark);
 	min-width: 180px;
@@ -286,12 +305,12 @@
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
-	z-index: 20;
+	z-index: 2;
 }
 
 .dropdown-link,
 .dropdown-button {
-	border: none;
+	border: 1px solid transparent;
 	background: transparent;
 	text-align: left;
 	padding: 10px 12px;
@@ -303,12 +322,24 @@
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	transition: all 0.2s ease;
+	transition:
+		background 0.2s ease,
+		border-color 0.2s ease,
+		transform 0.15s ease;
 }
 
 .dropdown-link:hover,
 .dropdown-button:hover {
-	background: var(--gray-100);
+	background: var(--orange-50);
+	border-color: var(--neutral-900);
+	transform: translateY(-1px);
+}
+
+.dropdown-link:focus-visible,
+.dropdown-button:focus-visible {
+	outline: 3px solid var(--highlight);
+	outline-offset: 2px;
+	border-radius: 12px;
 }
 
 .dropdown-icon {
@@ -330,6 +361,7 @@
 
 .dropdown-button:hover {
 	background: var(--danger-bg);
+	border-color: var(--danger);
 }
 
 .cta {
@@ -349,6 +381,11 @@
 
 .cta-link {
 	text-decoration: none;
+}
+
+.cta-link:focus-visible {
+	outline: 3px solid var(--on-highlight);
+	outline-offset: 3px;
 }
 
 .cta:hover {
@@ -374,7 +411,7 @@
 	border: none;
 	cursor: pointer;
 	padding: 0;
-	z-index: 100;
+	z-index: 2;
 }
 
 .hamburger__line {
@@ -406,7 +443,10 @@
 	cursor: pointer;
 	padding: 8px;
 	border-radius: 50px;
-	transition: background 0.2s ease;
+	transition:
+		background 0.2s ease,
+		box-shadow 0.2s ease,
+		transform 0.15s ease;
 }
 
 .action-button--cart {
@@ -414,12 +454,32 @@
 }
 
 .action-button:hover {
-	background: var(--gray-100);
+	background: var(--orange-50);
+	box-shadow:
+		0 0 0 2px var(--highlight-focus-strong),
+		0 6px 16px var(--orange-500-alpha-15);
+	transform: translateY(-1px);
+}
+
+.action-button:active {
+	transform: translateY(0);
+	box-shadow: 0 0 0 2px var(--highlight-alpha-15);
+}
+
+.action-button:focus-visible {
+	outline: 3px solid var(--highlight);
+	outline-offset: 3px;
 }
 .my-icon {
 	width: 24px;
 	height: 24px;
 	color: var(--highlight);
+	transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.action-button:hover .my-icon {
+	color: var(--highlight-hover);
+	transform: scale(1.08);
 }
 
 .cart-badge {
@@ -478,11 +538,11 @@
 		left: 0;
 		right: 0;
 		background: var(--background);
-		border-bottom: 1px solid var(--gray-800);
+		border-bottom: 1px solid var(--neutral-900);
 		padding: 24px 16px;
 		flex-direction: column;
 		gap: 24px;
-		z-index: 50;
+		z-index: 3;
 		box-shadow: 0 4px 12px var(--shadow-lg);
 	}
 
@@ -516,7 +576,7 @@
 		width: 100%;
 		padding-top: 16px;
 		margin-top: 8px;
-		border-top: 1px solid var(--gray-800);
+		border-top: 1px solid var(--neutral-900);
 	}
 
 	.user-menu--desktop {

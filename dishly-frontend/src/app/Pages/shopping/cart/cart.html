@@ -61,6 +61,7 @@
           <div class="cart-card__actions">
             <button type="button" class="cart-remove-btn" (click)="removeItem(item.id_receta)" aria-label="Remove recipe from cart">
               <lucide-icon name="trash-2" [size]="15"></lucide-icon>
+              <span>Remove</span>
             </button>
             <strong class="cart-card__price">{{ item.price | number:'1.2-2' }} €</strong>
           </div>
@@ -71,7 +72,7 @@
 
     <aside class="cart-summary shadow-sm">
       <h2 class="cart-summary__title">Order Summary</h2>
-      <p class="cart-summary__subtitle">Review the recipes you’ve selected before completing your purchase.</p>
+      <p class="cart-summary__subtitle">Review the recipes you've selected before completing your purchase.</p>
 
       <div class="cart-summary__divider"></div>
 

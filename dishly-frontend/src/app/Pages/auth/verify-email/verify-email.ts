@@ -1,11 +1,10 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { NgOptimizedImage } from '@angular/common';
 import { AuthServices } from '../../../Core/Services/Auth/auth-services';
 
 @Component({
   selector: 'app-verify-email',
-  imports: [RouterLink, NgOptimizedImage],
+  imports: [RouterLink],
   templateUrl: './verify-email.html',
   styleUrls: ['./verify-email.css'],
 })

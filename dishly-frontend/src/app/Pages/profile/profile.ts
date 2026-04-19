@@ -51,8 +51,8 @@ export class Profile {
   protected readonly myRecipes = toSignal(this.profileService.getMyRecipes(), { initialValue: [] });
   protected readonly hiddenRecipeIds = signal<number[]>([]);
   protected readonly visibleRecipes = computed(() => {
-    const hiddenIds = new Set(this.hiddenRecipeIds());
-    return this.myRecipes().filter((recipe) => !hiddenIds.has(recipe.id_receta));
+    const hiddenIds = this.hiddenRecipeIds();
+    return this.myRecipes().filter((recipe) => !hiddenIds.includes(recipe.id_receta));
   });
 
   protected get memberSince(): string {
@@ -74,7 +74,9 @@ export class Profile {
 
   protected logout(): void {
     this.isLoggingOut.set(true);
-    this.authService.logout();
+    this.authService.logout().subscribe({
+      error: () => this.isLoggingOut.set(false),
+    });
   }
 
   protected onRecipeDeactivated(recipeId: number): void {

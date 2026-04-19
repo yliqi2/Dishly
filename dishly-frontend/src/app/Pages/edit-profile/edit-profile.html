@@ -1,4 +1,4 @@
-<main class="edit-profile-main">
+<div class="edit-profile-main">
   <section class="page-header page-container">
     <div class="page-header__inner">
       <h1 class="page-title">Edit Profile</h1>
@@ -146,18 +146,18 @@
         <div>
           <h3 id="danger-title" class="danger-title">Delete your Account</h3>
           <p class="danger-desc">Permanently delete your profile and all data.</p>
-          @if (deleteError()) {
-            <p id="delete-error" class="danger-error" role="status" aria-live="polite">{{ deleteError() }}</p>
-          }
         </div>
-        <button type="button" class="btn-danger btn-sm" [disabled]="isDeleting()" (click)="deleteAccount()" [attr.aria-describedby]="deleteError() ? 'delete-error' : null" [attr.aria-busy]="isDeleting()">
-          @if (isDeleting()) {
-            <span class="btn-loading-icon" aria-hidden="true"></span>
-          } @else {
-            Delete Account
-          }
+        <button type="button" class="btn-danger btn-sm" (click)="openDeleteModal()">
+          Delete Account
         </button>
       </section>
     </section>
   </div>
-</main>
+</div>
+
+@if (showDeleteModal()) {
+  <app-confirm-delete-modal
+    [context]="deleteContext()"
+    (closeModal)="closeDeleteModal()"
+  />
+}

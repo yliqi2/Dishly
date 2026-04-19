@@ -219,10 +219,10 @@
 	margin-bottom: 18px;
 	padding: 14px 16px;
 	border-radius: 12px;
-	background: #ecfdf5;
-	color: #166534;
-	border: 1px solid #a7f3d0;
-	font-size: 15px;
+	background: var(--emerald-50);
+	color: var(--emerald-700);
+	border: 1px solid var(--emerald-200);
+	font-size: 16px;
 }
 
 .error-message {
@@ -248,7 +248,6 @@
 }
 
 .form-footer .remember-me {
-	min-width: 0;
 }
 
 .form-footer .forgot-link {
@@ -272,7 +271,7 @@
 	appearance: none;
 	-webkit-appearance: none;
 	background: transparent;
-	border: 2px solid var(--gray-400);
+	border: 2px solid var(--neutral-900);
 	border-radius: 4px;
 	display: inline-block;
 	vertical-align: middle;
@@ -319,7 +318,7 @@
 	top: 50%;
 	width: 100%;
 	height: 1px;
-	background: var(--gray-300);
+	background: var(--neutral-900);
 }
 
 .divider span {
@@ -342,7 +341,7 @@
 	justify-content: center;
 	gap: 8px;
 	padding: 12px 16px;
-	border: 1.5px solid var(--gray-300);
+	border: 1.5px solid var(--neutral-900);
 	border-radius: 12px;
 	background: var(--background);
 	color: var(--PrimaryText);
@@ -430,7 +429,7 @@
 		top: 24px;
 		left: 20px;
 		font-size: 16px;
-		z-index: 2;
+		z-index: 1;
 	}
 
 	.login-card {

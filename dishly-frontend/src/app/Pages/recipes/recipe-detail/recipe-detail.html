@@ -1,4 +1,4 @@
-<div class="recipe-page bg-white min-vh-100 py-3">
+<article class="recipe-page bg-white min-vh-100 py-3">
   <div class="page-layout-container">
 
     @if (loading) {
@@ -39,7 +39,7 @@
     <div class="recipe-content-grid">
       <div class="recipe-visuals-column">
         <div class="recipe-hero-grid mb-4">
-          <div class="recipe-media-stack" [class.recipe-media-stack--single]="!hasMultipleImages()">
+          <div class="recipe-media-stack shadow-sm border p-3 rounded-4 bg-white" [class.recipe-media-stack--single]="!hasMultipleImages()">
             <div class="main-image-container position-relative overflow-hidden shadow-sm d-flex align-items-stretch justify-content-center" [class.single-image]="!hasMultipleImages()">
               <img [src]="thumbnails[selectedThumbnailIndex]"
                    alt="Recipe main image"
@@ -94,10 +94,10 @@
             }
           </div>
 
-          <div class="recipe-details recipe-details--inline shadow-sm border p-4 rounded-4 bg-white">
+          <section class="recipe-details recipe-details--inline shadow-sm border p-4 rounded-4 bg-white" aria-labelledby="recipe-main-title">
           <div class="mb-4 d-flex flex-column gap-3">
             <div class="d-flex flex-wrap align-items-center gap-2">
-              <h1 class="recipe-title mb-0">{{ recipe.titulo }}</h1>
+              <h1 class="recipe-title mb-0" id="recipe-main-title">{{ recipe.titulo }}</h1>
             </div>
             <p class="detail-text mb-0 text-muted">{{ recipe.descripcion }}</p>
           </div>
@@ -144,6 +144,13 @@
               <lucide-icon name="pencil" [size]="18"></lucide-icon>
               Edit Recipe
             </a>
+            } @else if (isAdminUser()) {
+            <a
+              [routerLink]="['/recipes', recipe.id_receta, 'edit']"
+              class="btn btn-buy-custom btn-lg rounded-3 fw-bold d-inline-flex align-items-center justify-content-center gap-2 text-decoration-none">
+              <lucide-icon name="shield-check" [size]="18"></lucide-icon>
+              Edit Recipe
+            </a>
             } @else if (isPremium() && !hasPurchased) {
             <button
               type="button"
@@ -167,13 +174,13 @@
           @if (cartNotice) {
           <p class="cart-feedback mb-0">{{ cartNotice }}</p>
           }
-          </div>
+          </section>
         </div>
 
-        <div class="categories-block shadow-sm border p-4 rounded-4 bg-white mb-4">
+        <section class="categories-block shadow-sm border p-4 rounded-4 bg-white mb-4" aria-labelledby="categories-heading">
           <div class="categories-header d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mb-3">
             <div>
-              <h2 class="section-title mb-1">Categories</h2>
+              <h2 class="section-title mb-1" id="categories-heading">Categories</h2>
               <p class="categories-subtitle mb-0">Quick labels for this recipe.</p>
             </div>
             <span class="categories-count">{{ recipe.categorias.length }} {{ recipe.categorias.length === 1 ? 'tag' : 'tags' }}</span>
@@ -184,11 +191,11 @@
             <span class="badge recipe-tag-category">{{ cat.nombre }}</span>
             }
           </div>
-        </div>
+        </section>
 
-        <div class="detail-card shadow-sm border p-4 rounded-4 bg-white mb-4">
+        <section class="detail-card shadow-sm border p-4 rounded-4 bg-white mb-4" aria-labelledby="ingredients-heading">
           <div class="detail-section mb-0">
-            <h3 class="detail-title mb-3 d-flex align-items-center gap-2 h5 fw-bold">
+            <h3 class="detail-title mb-3 d-flex align-items-center gap-2 h5 fw-bold" id="ingredients-heading">
               <lucide-icon name="clipboard-list" [size]="20" class="text-highlight-color"></lucide-icon>
               Ingredients
             </h3>
@@ -201,11 +208,11 @@
               }
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="detail-card shadow-sm border p-4 rounded-4 bg-white mb-4">
+        <section class="detail-card shadow-sm border p-4 rounded-4 bg-white mb-4" aria-labelledby="instructions-heading">
           <div class="detail-section mb-0">
-            <h3 class="detail-title mb-3 d-flex align-items-center gap-2 h5 fw-bold">
+            <h3 class="detail-title mb-3 d-flex align-items-center gap-2 h5 fw-bold" id="instructions-heading">
               <lucide-icon name="chef-hat" [size]="20" class="text-highlight-color"></lucide-icon>
               Instructions
             </h3>
@@ -239,17 +246,17 @@
               }
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="reviews-section shadow-sm border p-4 p-lg-4 mb-4 rounded-4 bg-white">
+        <section class="reviews-section shadow-sm border p-4 p-lg-4 mb-4 rounded-4 bg-white" aria-labelledby="reviews-heading">
           <div class="reviews-header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-3">
             <div>
-              <h2 class="section-title mb-1">Reviews</h2>
+              <h2 class="section-title mb-1" id="reviews-heading">Reviews</h2>
               <p class="reviews-subtitle mb-0">See what people think about this recipe.</p>
             </div>
             <div class="reviews-overview d-flex align-items-center gap-3">
               <div class="reviews-average text-end">
-                <span class="reviews-average__value">{{ reviewAverageSignal() | number:'1.1-1' }}</span>
+                <span class="reviews-average__value">{{ reviewAverageSignal() | number:'1.0-1' }}</span>
                 <span class="reviews-average__meta">/ 5 average</span>
               </div>
               <span class="reviews-count">{{ reviews.length }} {{ reviews.length === 1 ? 'review' : 'reviews' }}</span>
@@ -358,16 +365,20 @@
                     <span class="review-date">{{ formatDate(review.fecha) }}</span>
                   </div>
                 </div>
-                @if (isOwnReview(review)) {
                 <div class="d-flex gap-2 flex-shrink-0">
-                  <button class="btn-review-action edit" (click)="startEdit(review)" title="Edit">
+                  @if (isOwnReview(review)) {
+                  <button class="btn-review-action edit" (click)="startEdit(review)" title="Edit review">
                     <lucide-icon name="pencil" [size]="15"></lucide-icon>
+                    <span>Editar</span>
                   </button>
-                  <button class="btn-review-action delete" (click)="deleteReview(review)" title="Delete">
+                  }
+                  @if (canDeleteReview(review)) {
+                  <button class="btn-review-action delete" (click)="openDeleteModal(review)" title="Delete review">
                     <lucide-icon name="trash-2" [size]="15"></lucide-icon>
+                    <span>Eliminar</span>
                   </button>
+                  }
                 </div>
-                }
               </div>
               @if (editingReviewId === review.id_valoracion) {
               <div class="review-edit-panel d-flex flex-column gap-2 mt-2">
@@ -424,10 +435,19 @@
             </button>
           </div>
           }
-        </div>
+        </section>
       </div>
     </div>
 
-    } <!-- end @else if (recipe) -->67
+    @if (reviewToDelete) {
+      <app-delete-review-modal
+        [review]="reviewToDelete"
+        [isProcessing]="isDeletingReview"
+        (confirmed)="confirmDeleteReview()"
+        (cancelled)="closeDeleteModal()"
+      ></app-delete-review-modal>
+    }
+
+    } <!-- end @else if (recipe) -->
   </div>
-</div>
+</article>

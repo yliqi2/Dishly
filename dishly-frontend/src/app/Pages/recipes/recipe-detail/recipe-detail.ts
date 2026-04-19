@@ -10,13 +10,14 @@ import { RecetaDetailsService } from '../../../Core/Services/Core/receta-details
 import { RecetaOriginal } from '../../../Core/Interfaces/RecetaOriginal';
 import { Review } from '../../../Core/Interfaces/Review';
 import { LoadingPage } from '../../loading-page/loading-page';
+import { DeleteReviewModal } from '../../../Core/Components/modals/delete-review-modal/delete-review-modal';
 
 type ReviewSortOption = 'latest' | 'highest' | 'lowest';
 
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, FormsModule, RouterLink, LoadingPage],
+  imports: [CommonModule, LucideAngularModule, FormsModule, RouterLink, LoadingPage, DeleteReviewModal],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.css',
 })
@@ -56,6 +57,8 @@ export class RecipeDetail implements OnInit {
   editingHoverRating = 0;
   isInCart = false;
   hasPurchased = false;
+  reviewToDelete: Review | null = null;
+  isDeletingReview = false;
   private currentUserId: number | null = null;
   private currentUserRole: string | null = null;
   private currentUserIconPath: string | null = null;
@@ -556,20 +559,43 @@ export class RecipeDetail implements OnInit {
     });
   }
 
+  openDeleteModal(review: Review): void {
+    this.reviewToDelete = review;
+  }
+
+  closeDeleteModal(): void {
+    this.reviewToDelete = null;
+    this.isDeletingReview = false;
+  }
+
+  confirmDeleteReview(): void {
+    if (!this.reviewToDelete) return;
+    this.isDeletingReview = true;
+    this.deleteReview(this.reviewToDelete);
+  }
+
   deleteReview(review: Review): void {
     this.reviewService.deleteReview(review.id_valoracion).subscribe({
       next: () => {
         this.reviews = this.reviews.filter(r => r.id_valoracion !== review.id_valoracion);
         this.currentReviewPage = Math.min(this.currentReviewPage, this.totalReviewPages);
         this.bumpReviewChanges();
+        this.reviewToDelete = null;
+        this.isDeletingReview = false;
         this.cdr.detectChanges();
       },
-      error: () => {}
+      error: () => {
+        this.isDeletingReview = false;
+      }
     });
   }
 
   isOwnReview(review: Review): boolean {
     return this.currentUserId !== null && review.id_usuario === this.currentUserId;
+  }
+
+  canDeleteReview(review: Review): boolean {
+    return this.isOwnReview(review) || this.isAdminUser();
   }
 
   formatDate(dateStr: string): string {

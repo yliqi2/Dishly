@@ -23,7 +23,7 @@
   color: var(--highlight);
   border-radius: 50px;
   padding: 4px 14px;
-  font-size: 0.78rem;
+  font-size: 1rem;
   font-weight: 600;
   font-family: var(--font-display);
   text-transform: uppercase;
@@ -59,15 +59,15 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: white;
+  background: var(--background);
   border-radius: 50px;
   padding: 10px 10px 10px 24px;
   box-shadow: 0 4px 12px var(--shadow-md);
-  border: 1.5px solid var(--gray-200);
+  border: 1.5px solid var(--neutral-900);
   max-width: 720px;
   margin: 0 auto;
   transition: border-color 0.2s, box-shadow 0.2s;
-  color: var(--gray-400);
+  color: var(--gray-500);
 }
 
 .ai-search-bar:focus-within,
@@ -80,22 +80,21 @@
   flex: 1;
   border: none;
   outline: none;
-  font-size: 15px;
+  font-size: 1rem;
   color: var(--PrimaryText);
   background: transparent;
-  min-width: 0;
   font-family: var(--font-sans);
 }
 
 .ai-search-bar__input::placeholder {
-  color: var(--gray-400);
+  color: var(--gray-500);
 }
 
 .ai-search-bar__clear {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--gray-400);
+  color: var(--gray-500);
   display: flex;
   align-items: center;
   padding: 4px;
@@ -110,12 +109,12 @@
 
 .ai-search-bar__btn {
   background: var(--highlight);
-  color: white;
+  color: var(--on-highlight);
   border: none;
   border-radius: 50px;
   padding: 10px 28px;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 1rem;
   font-family: var(--font-display);
   cursor: pointer;
   transition: background 0.2s, transform 0.1s;
@@ -139,8 +138,8 @@
 .ai-spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(255,255,255,0.35);
-  border-top-color: white;
+  border: 2px solid var(--white-alpha-35);
+  border-top-color: var(--on-highlight);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   display: inline-block;
@@ -157,7 +156,7 @@
   gap: 10px;
   background: var(--danger-bg);
   color: var(--danger);
-  border: 1px solid #fca5a5;
+  border: 1px solid var(--red-300);
   border-radius: 12px;
   padding: 14px 20px;
   font-weight: 500;
@@ -171,7 +170,7 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  color: var(--gray-400);
+  color: var(--gray-500);
   padding: 64px 0;
   text-align: center;
 }
@@ -187,7 +186,7 @@
 }
 
 .ai-results-count {
-  font-size: 0.88rem;
+  font-size: 1rem;
   color: var(--gray-500);
   margin-bottom: 20px;
   font-weight: 500;
@@ -203,10 +202,10 @@
 
 /* ─── Card ────────────────────────────────────────────────── */
 .ai-card {
-  border: 1.5px solid var(--gray-200);
+  border: 1.5px solid var(--neutral-900);
   border-radius: 16px;
   overflow: hidden;
-  background: white;
+  background: var(--background);
   box-shadow: 0 2px 8px var(--shadow-sm);
   cursor: pointer;
   transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
@@ -245,7 +244,7 @@
 }
 
 .ai-badge {
-  font-size: 0.68rem;
+  font-size: 1rem;
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 50px;
@@ -254,13 +253,13 @@
 }
 
 .ai-badge--green {
-  background: #d1fae5;
-  color: #065f46;
+  background: var(--emerald-100);
+  color: var(--emerald-800);
 }
 
 .ai-badge--blue {
-  background: #dbeafe;
-  color: #1e40af;
+  background: var(--blue-100);
+  color: var(--blue-800);
 }
 
 .ai-card__body {
@@ -269,7 +268,7 @@
 
 .ai-card__title {
   font-family: var(--font-display);
-  font-size: 0.92rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--PrimaryText);
   margin: 0 0 10px;
@@ -290,7 +289,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.78rem;
+  font-size: 1rem;
   color: var(--gray-500);
 }
 
@@ -301,9 +300,9 @@
 
 /* ─── Detail panel ────────────────────────────────────────── */
 .ai-detail {
-  border: 1.5px solid var(--gray-200);
+  border: 1.5px solid var(--neutral-900);
   border-radius: 20px;
-  background: white;
+  background: var(--background);
   box-shadow: 0 4px 24px var(--shadow-md);
   overflow: hidden;
   margin-top: 8px;
@@ -346,7 +345,7 @@
 }
 
 .ai-tag {
-  font-size: 0.75rem;
+  font-size: 1rem;
   font-weight: 600;
   background: var(--highlight-focus);
   color: var(--highlight);
@@ -357,9 +356,9 @@
 }
 
 .ai-tag--cuisine {
-  background: #f3e8ff;
-  color: #7c3aed;
-  border-color: #ddd6fe;
+  background: var(--violet-50);
+  color: var(--violet-600);
+  border-color: var(--violet-200);
 }
 
 .ai-detail__stats {
@@ -372,13 +371,13 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--gray-500);
 }
 
 .ai-detail__summary {
-  font-size: 0.88rem;
+  font-size: 1rem;
   color: var(--gray-500);
   line-height: 1.6;
   display: -webkit-box;
@@ -391,7 +390,7 @@
 /* ─── Detail body ─────────────────────────────────────────── */
 .ai-detail__body {
   padding: 28px 32px;
-  border-top: 1px solid var(--gray-200);
+  border-top: 1px solid var(--neutral-900);
   display: grid;
   grid-template-columns: 260px 1fr;
   gap: 32px;
@@ -418,7 +417,7 @@
 }
 
 .ai-ingredient {
-  font-size: 0.88rem;
+  font-size: 1rem;
   color: var(--gray-600);
   padding: 6px 12px;
   background: var(--gray-100);
@@ -427,7 +426,7 @@
 }
 
 .ai-step-group {
-  font-size: 0.88rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--highlight);
   margin: 0 0 10px;
@@ -452,12 +451,12 @@
 
 .ai-step__num {
   flex-shrink: 0;
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   background: var(--highlight);
-  color: white;
+  color: var(--on-highlight);
   border-radius: 50%;
-  font-size: 0.78rem;
+  font-size: 1rem;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -466,13 +465,13 @@
 }
 
 .ai-step__text {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--gray-600);
   line-height: 1.6;
 }
 
 .ai-plain-instructions {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--gray-600);
   line-height: 1.7;
   white-space: pre-line;
@@ -481,14 +480,14 @@
 /* ─── Detail footer ───────────────────────────────────────── */
 .ai-detail__footer {
   padding: 16px 32px;
-  border-top: 1px solid var(--gray-200);
+  border-top: 1px solid var(--neutral-900);
   text-align: right;
 }
 
 .ai-source-link {
   color: var(--highlight);
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: 1rem;
   text-decoration: none;
 }
 

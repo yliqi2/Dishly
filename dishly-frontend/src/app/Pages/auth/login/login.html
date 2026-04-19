@@ -1,4 +1,4 @@
-<div class="login-container">
+<section class="login-container" aria-labelledby="login-title">
 	<a routerLink="/" class="back-link">
 		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 			<path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -6,12 +6,12 @@
 		Go back home
 	</a>
 
-	<div class="login-card">
+	<article class="login-card">
 		<div class="header">
 			<span class="brand-icon-box" aria-hidden="true">
 				<img class="brand-icon" ngSrc="assets/icons/DishlyIcon.svg" width="55" height="55" alt="Dishly logo" priority />
 			</span>
-			<h1 class="title">Welcome Back</h1>
+			<h1 id="login-title" class="title">Welcome Back</h1>
 			<p class="subtitle">Sign in to continue your culinary journey</p>
 		</div>
 
@@ -100,6 +100,6 @@
 			<span>You don't have an account?</span>
 			<a routerLink="/register" class="register-link">Register Now</a>
 		</div>
-	</div>
+	</article>
 
-</div>
+</section>

@@ -107,7 +107,7 @@
 }
 
 .subtitle {
-	font-size: 15px;
+	font-size: 1rem;
 	color: var(--PrimaryText);
 	margin: 0;
 	line-height: 1.35;
@@ -119,8 +119,8 @@
 	gap: 10px;
 }
 .error-message {
-	font-size: 14px;
-	color: #EF4444;
+	font-size: 1rem;
+	color: var(--danger-alt);
 	margin-top: -2px;
 	line-height: 1.25;
 	animation: fadeIn 0.3s ease;
@@ -133,7 +133,7 @@
 }
 
 .label {
-	font-size: 15px;
+	font-size: 1rem;
 	font-weight: 500;
 	color: var(--PrimaryText);
 }
@@ -155,7 +155,7 @@
 .input:focus {
 	outline: none;
 	border-color: var(--highlight);
-	box-shadow: 0 0 0 3px rgba(253, 137, 35, 0.1);
+	box-shadow: 0 0 0 3px var(--highlight-alpha-10);
 }
 
 .input::placeholder {
@@ -206,7 +206,7 @@
 }
 
 .error-message {
-	font-size: 14px;
+	font-size: 1rem;
 	color: var(--danger-alt);
 	margin-top: -2px;
 	line-height: 1.25;
@@ -228,7 +228,7 @@
 	display: flex;
 	align-items: flex-start;
 	gap: 8px;
-	font-size: 14px;
+	font-size: 1rem;
 	color: var(--PrimaryText);
 	cursor: pointer;
 	line-height: 1.35;
@@ -241,7 +241,7 @@
 	appearance: none;
 	-webkit-appearance: none;
 	background: transparent;
-	border: 2px solid var(--gray-400);
+	border: 2px solid var(--neutral-900);
 	border-radius: 4px;
 	display: inline-block;
 	vertical-align: middle;
@@ -288,7 +288,7 @@
 	top: 50%;
 	width: 100%;
 	height: 1px;
-	background: var(--gray-300);
+	background: var(--neutral-900);
 }
 
 .divider span {
@@ -311,7 +311,7 @@
 	justify-content: center;
 	gap: 8px;
 	padding: 10px 12px;
-	border: 1.5px solid var(--gray-300);
+	border: 1.5px solid var(--neutral-900);
 	border-radius: 12px;
 	background: var(--background);
 	color: var(--PrimaryText);
@@ -330,7 +330,7 @@
 .login-prompt {
 	text-align: center;
 	margin-top: 8px;
-	font-size: 14px;
+	font-size: 1rem;
 	color: var(--PrimaryText);
 }
 
@@ -383,7 +383,7 @@
 		top: 24px;
 		left: 20px;
 		font-size: 16px;
-		z-index: 2;
+		z-index: 1;
 	}
 
 	.register-card {
@@ -532,7 +532,7 @@
 	}
 
 	.terms-accept {
-		font-size: 15px;
+		font-size: 1rem;
 		line-height: 1.35;
 	}
 }
@@ -576,7 +576,7 @@
 	}
 
 	.subtitle {
-		font-size: 15px;
+		font-size: 1rem;
 		line-height: 1.35;
 	}
 
@@ -608,7 +608,7 @@
 	}
 
 	.terms-accept {
-		font-size: 15px;
+		font-size: 1rem;
 		line-height: 1.35;
 	}
 }

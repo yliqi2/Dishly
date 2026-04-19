@@ -1,4 +1,4 @@
-<main class="profile-main">
+<div class="profile-main">
   <section class="page-header page-container">
     <div class="page-header__inner">
       <h1 class="page-title">My Profile</h1>
@@ -33,17 +33,17 @@
 
       <section class="profile-stats" aria-label="Profile statistics">
         <article class="profile-stat">
-          <header class="profile-stat-header">
+          <div class="profile-stat-header">
             <h2 class="profile-stat-label">My Recipes</h2>
             <lucide-icon name="chef-hat" class="profile-stat-icon" size="24" strokeWidth="2"></lucide-icon>
-          </header>
+          </div>
           <h3 class="profile-stat-value">{{ myRecipesCount() }}</h3>
         </article>
         <article class="profile-stat">
-          <header class="profile-stat-header">
+          <div class="profile-stat-header">
             <h2 class="profile-stat-label">Bought Recipes</h2>
             <lucide-icon name="shopping-cart" class="profile-stat-icon" size="24" strokeWidth="2"></lucide-icon>
-          </header>
+          </div>
           <h3 class="profile-stat-value">{{ acquiredRecipesCount() }}</h3>
         </article>
       </section>
@@ -81,4 +81,4 @@
       </div>
     </div>
   </div>
-</main>
+</div>

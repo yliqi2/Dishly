@@ -5,16 +5,19 @@ import { LucideAngularModule } from 'lucide-angular';
 import { RecipeCardComponent } from '../../../Core/Components/recipe-card/recipe-card';
 import { RecetaOriginal } from '../../../Core/Interfaces/RecetaOriginal';
 import { RecipeService } from '../../../Core/Services/Recipes/recipe.service';
+import { DishlySelectComponent, SelectOption } from '../../../Core/Components/dishly-select/dishly-select';
+import { AuthServices } from '../../../Core/Services/Auth/auth-services';
 
 @Component({
   selector: 'app-bought-recipes',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule, RecipeCardComponent],
+  imports: [CommonModule, RouterLink, LucideAngularModule, RecipeCardComponent, DishlySelectComponent],
   templateUrl: './bought-recipes.html',
   styleUrl: './bought-recipes.css',
 })
 export class BoughtRecipes implements OnInit {
   private recipeService = inject(RecipeService);
+  private authService = inject(AuthServices);
 
   recipes = signal<RecetaOriginal[]>([]);
   loading = signal(true);
@@ -26,11 +29,23 @@ export class BoughtRecipes implements OnInit {
   priceMin = signal(0);
   priceMax = signal(200);
 
+  readonly difficultyOptions: SelectOption[] = [
+    { value: '', label: 'All Levels' },
+    { value: 'easy', label: 'Easy' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'hard', label: 'Hard' },
+  ];
+
   categories = computed(() => {
     const cats = new Set<string>();
     this.recipes().forEach(r => r.categorias?.forEach(c => cats.add(c.nombre)));
     return Array.from(cats).sort();
   });
+
+  categoryOptions = computed<SelectOption[]>(() => [
+    { value: '', label: 'All Categories' },
+    ...this.categories().map(c => ({ value: c, label: c })),
+  ]);
 
   filteredRecipes = computed(() => {
     const q = this.searchQuery().toLowerCase();
@@ -81,16 +96,34 @@ export class BoughtRecipes implements OnInit {
     this.priceMax.set(200);
   }
 
+  isAdminUser(): boolean {
+    const user = this.authService.getUser() as { rol?: string } | null;
+    return user?.rol === 'admin';
+  }
+
   ngOnInit(): void {
-    this.recipeService.getAcquiredRecipes().subscribe({
-      next: (data) => {
-        this.recipes.set(data);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.error.set(true);
-        this.loading.set(false);
-      }
-    });
+    if (this.isAdminUser()) {
+      this.recipeService.getAllRecipesAdmin().subscribe({
+        next: (data) => {
+          this.recipes.set(data as unknown as RecetaOriginal[]);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.error.set(true);
+          this.loading.set(false);
+        }
+      });
+    } else {
+      this.recipeService.getAcquiredRecipes().subscribe({
+        next: (data) => {
+          this.recipes.set(data);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.error.set(true);
+          this.loading.set(false);
+        }
+      });
+    }
   }
 }
