@@ -72,6 +72,30 @@
 	font-size: 16px;
 }
 
+.footer__section {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.footer__section h3 {
+	margin: 0 0 8px;
+	color: var(--footer-text-primary);
+	font-size: 17px;
+	font-weight: 700;
+}
+
+.footer__section a {
+	color: var(--footer-text-muted);
+	text-decoration: none;
+	font-size: 15px;
+	transition: color 0.2s ease;
+}
+
+.footer__section a:hover {
+	color: var(--highlight);
+}
+
 
 .footer__bottom {
 	display: flex;
@@ -120,7 +144,7 @@
 		grid-template-columns: 1fr 1fr;
 		gap: 32px;
 		margin: 0 0 32px 0;
-		justify-items: center;
+		justify-items: stretch;
 	}
 
 	.footer__brand {
@@ -153,7 +177,7 @@
 		grid-template-columns: 1fr;
 		gap: 28px;
 		margin-bottom: 28px;
-		justify-items: center;
+		justify-items: stretch;
 	}
 
 	.brand-icon-box {

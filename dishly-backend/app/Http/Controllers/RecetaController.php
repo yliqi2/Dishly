@@ -20,6 +20,17 @@ class RecetaController extends Controller
         return response()->json($categorias);
     }
 
+    public function getIngredientes()
+    {
+        $ingredientes = DB::table('ingrediente')
+            ->select('nombre')
+            ->orderBy('nombre')
+            ->pluck('nombre')
+            ->values();
+
+        return response()->json($ingredientes);
+    }
+
     public function store(Request $request)
     {
         try {
@@ -522,53 +533,7 @@ class RecetaController extends Controller
     public function getAllRecetas()
     {
         try {
-            $recipes = DB::table('receta_original')
-                ->where('active', 1)
-                ->orderByDesc('fecha_creacion')
-                ->get();
-            
-            if ($recipes->isEmpty()) {
-                return response()->json([]);
-            }
-
-            $recipeIds = $recipes->pluck('id_receta')->toArray();
-            $authorIds = $recipes->pluck('id_autor')->unique()->toArray();
-
-            $categorias = DB::table('receta_categoria')
-                ->join('categoria', 'receta_categoria.id_categoria', '=', 'categoria.id_categoria')
-                ->whereIn('receta_categoria.id_receta', $recipeIds)
-                ->select('receta_categoria.id_receta', 'categoria.id_categoria', 'categoria.nombre')
-                ->get()
-                ->groupBy('id_receta')
-                ->map(function ($items) {
-                    return $items->values()->toArray();
-                });
-
-            $valoraciones = DB::table('valoracion')
-                ->whereIn('id_receta', $recipeIds)
-                ->select('id_receta', DB::raw('AVG(puntuacion) as media_valoraciones'))
-                ->groupBy('id_receta')
-                ->get()
-                ->keyBy('id_receta');
-
-            $autores = DB::table('users')
-                ->whereIn('id_usuario', $authorIds)
-                ->select('id_usuario', 'nombre', 'icon_path', 'updated_at')
-                ->get()
-                ->keyBy('id_usuario');
-
-            $recetasConDatos = $recipes->map(function ($receta) use ($categorias, $valoraciones, $autores) {
-                $receta->categorias = $categorias[$receta->id_receta] ?? [];
-                $receta->media_valoraciones = $valoraciones[$receta->id_receta]->media_valoraciones ?? null;
-                $receta->autor_nombre = $autores[$receta->id_autor]->nombre ?? null;
-                $receta->autor_icon_path = $autores[$receta->id_autor]->icon_path ?? null;
-                $receta->autor_updated_at = $autores[$receta->id_autor]->updated_at ?? null;
-                return $receta;
-            });
-
-            $sortedRecetas = $recetasConDatos->sortByDesc('fecha_creacion')->values();
-
-            return response()->json($sortedRecetas);
+            return response()->json($this->buildRecetasCardList(true));
         } catch (Throwable $e) {
             return response()->json([
                 'message' => 'Could not get recipes',
@@ -577,6 +542,74 @@ class RecetaController extends Controller
                 ],
             ], 500);
         }
+    }
+
+    public function getAllRecetasAdmin()
+    {
+        try {
+            return response()->json($this->buildRecetasCardList(false));
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get recipes',
+                'errors' => [
+                    'server' => [$e->getMessage()],
+                ],
+            ], 500);
+        }
+    }
+
+    /**
+     * @return array<int, mixed>|\Illuminate\Support\Collection<int, mixed>
+     */
+    private function buildRecetasCardList(bool $onlyActive)
+    {
+        $query = DB::table('receta_original')->orderByDesc('fecha_creacion');
+        if ($onlyActive) {
+            $query->where('active', 1);
+        }
+        $recipes = $query->get();
+
+        if ($recipes->isEmpty()) {
+            return [];
+        }
+
+        $recipeIds = $recipes->pluck('id_receta')->toArray();
+        $authorIds = $recipes->pluck('id_autor')->unique()->toArray();
+
+        $categorias = DB::table('receta_categoria')
+            ->join('categoria', 'receta_categoria.id_categoria', '=', 'categoria.id_categoria')
+            ->whereIn('receta_categoria.id_receta', $recipeIds)
+            ->select('receta_categoria.id_receta', 'categoria.id_categoria', 'categoria.nombre')
+            ->get()
+            ->groupBy('id_receta')
+            ->map(function ($items) {
+                return $items->values()->toArray();
+            });
+
+        $valoraciones = DB::table('valoracion')
+            ->whereIn('id_receta', $recipeIds)
+            ->select('id_receta', DB::raw('AVG(puntuacion) as media_valoraciones'))
+            ->groupBy('id_receta')
+            ->get()
+            ->keyBy('id_receta');
+
+        $autores = DB::table('users')
+            ->whereIn('id_usuario', $authorIds)
+            ->select('id_usuario', 'nombre', 'icon_path', 'updated_at')
+            ->get()
+            ->keyBy('id_usuario');
+
+        $recetasConDatos = $recipes->map(function ($receta) use ($categorias, $valoraciones, $autores) {
+            $receta->categorias = $categorias[$receta->id_receta] ?? [];
+            $receta->media_valoraciones = $valoraciones[$receta->id_receta]->media_valoraciones ?? null;
+            $receta->autor_nombre = $autores[$receta->id_autor]->nombre ?? null;
+            $receta->autor_icon_path = $autores[$receta->id_autor]->icon_path ?? null;
+            $receta->autor_updated_at = $autores[$receta->id_autor]->updated_at ?? null;
+
+            return $receta;
+        });
+
+        return $recetasConDatos->sortByDesc('fecha_creacion')->values();
     }
 
     public function getRecetaById($id)

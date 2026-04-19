@@ -49,28 +49,34 @@
 }
 
 .btn-clear-all {
-  color: var(--highlight);
-  border: 1.5px solid var(--highlight);
-  padding: 6px 20px;
-  border-radius: 50px;
+  background-color: var(--highlight);
+  color: var(--on-highlight);
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--border-radius);
+  min-height: 44px;
   font-weight: 700;
   font-size: 1rem;
-  background: transparent;
   transition: all 0.2s ease;
 }
 
-.btn-clear-all:hover {
-  background-color: var(--orange-50);
-  border-color: var(--highlight);
-  color: var(--highlight);
+.btn-clear-all:hover:not(:disabled) {
+  background-color: var(--highlight-press);
+  color: var(--on-highlight);
   transform: translateY(-1px);
-  box-shadow: 0 0 0 2px var(--highlight-focus-strong);
+  box-shadow: 0 4px 12px var(--highlight-alpha-30);
 }
 
-.btn-clear-all:active {
-  background-color: var(--highlight-alpha-15);
-  transform: translateY(0);
+.btn-clear-all:active:not(:disabled) {
+  background-color: var(--orange-600);
+  color: var(--on-highlight);
+  transform: translateY(0) scale(0.97);
   box-shadow: none;
+}
+
+.btn-clear-all:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .filter-section {
@@ -119,11 +125,21 @@
 }
 
 .dropdown-input-custom {
-  padding-right: 0 !important;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 44px;
+  padding: 0 20px !important;
+  border-radius: var(--border-radius) !important;
+  overflow: hidden;
 }
 
 .dropdown-input-custom input {
-  padding-right: 2.5rem;
+  height: 100%;
+  font-size: 1rem;
+  line-height: 1.2;
+  padding: 0 !important;
+  padding-right: 2.5rem !important;
 }
 
 .form-select-custom:focus, 
@@ -161,6 +177,10 @@
   font-size: 1rem;
 }
 
+.tag-cloud {
+  margin-top: 12px;
+}
+
 .price-box {
   background-color: var(--background) !important;
   color: var(--highlight);
@@ -187,7 +207,7 @@
   width: 100%;
   height: 6px;
   background: none;
-  pointer-events: none;
+  pointer-events: auto;
   -webkit-appearance: none;
   appearance: none;
   z-index: 2;
@@ -213,6 +233,10 @@
   filter: brightness(0.96);
 }
 
+.range-input:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px var(--highlight-focus-strong);
+}
+
 .range-input::-moz-range-thumb {
   height: 24px;
   width: 24px;
@@ -225,10 +249,20 @@
   border: none;
 }
 
+.range-input:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px var(--highlight-focus-strong);
+}
+
 .star-filter {
   color: var(--gray-200);
   transition: all 0.2s ease;
   cursor: pointer;
+}
+
+.star-filter:focus-visible {
+  outline: 3px solid var(--highlight);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 .star-filter:hover {

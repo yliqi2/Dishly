@@ -7,7 +7,6 @@ import { RecipeCardComponent } from '../../../Core/Components/recipe-card/recipe
 import { RecipeService } from '../../../Core/Services/Recipes/recipe.service';
 import { RecetaCard } from '../../../Core/Interfaces/RecetaCard';
 import { DishlySelectComponent, SelectOption } from '../../../Core/Components/dishly-select/dishly-select';
-import { AuthServices } from '../../../Core/Services/Auth/auth-services';
 
 @Component({
   selector: 'app-search-recipes',
@@ -19,7 +18,6 @@ import { AuthServices } from '../../../Core/Services/Auth/auth-services';
 export class SearchRecipes implements OnInit {
   private recipeService = inject(RecipeService);
   private route = inject(ActivatedRoute);
-  private authService = inject(AuthServices);
 
   recipes = signal<RecetaCard[]>([]);
   loading = signal(true);
@@ -29,27 +27,18 @@ export class SearchRecipes implements OnInit {
   selectedCategory = signal('');
   selectedDifficulty = signal('');
   minRating = signal(0);
+  hoveredRating = signal(0);
   priceMin = signal(0);
   priceMax = signal(200);
 
+  ingredientPickerValue = signal('');
+  personsPickerValue = signal('');
+  tagsPickerValue = signal('');
+  ingredientCatalog = signal<string[]>([]);
+
   selectedTags = signal<string[]>([]);
-  showTagsDropdown = signal(false);
-  tagSearch = signal('');
-
   selectedIngredients = signal<string[]>([]);
-  showIngredientDropdown = signal(false);
-  ingredientSearch = signal('');
-
   selectedPersons = signal<string[]>([]);
-  showPersonsDropdown = signal(false);
-  personsSearch = signal('');
-
-  readonly difficultyOptions: SelectOption[] = [
-    { value: '', label: 'All Levels' },
-    { value: 'easy', label: 'Easy' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'hard', label: 'Hard' },
-  ];
 
   categories = computed(() => {
     const cats = new Set<string>();
@@ -57,25 +46,73 @@ export class SearchRecipes implements OnInit {
     return Array.from(cats).sort();
   });
 
+  difficultyOptions = computed<SelectOption[]>(() => {
+    const levels = Array.from(
+      new Set(
+        this.recipes()
+          .map(r => (r.dificultad ?? '').toString().trim())
+          .filter(v => v !== ''),
+      ),
+    ).sort((a, b) => a.localeCompare(b));
+
+    return [
+      { value: '', label: 'All Levels' },
+      ...levels.map(level => ({
+        value: level,
+        label: level.charAt(0).toUpperCase() + level.slice(1),
+      })),
+    ];
+  });
+
   categoryOptions = computed<SelectOption[]>(() => [
     { value: '', label: 'All Categories' },
     ...this.categories().map(c => ({ value: c, label: c })),
   ]);
 
-  // Filtered dropdown options
-  filteredTagsOptions = computed(() => {
-    return this.categories().filter(t => t.toLowerCase().includes(this.tagSearch().toLowerCase()) && !this.selectedTags().includes(t));
+  ingredientOptions = computed<SelectOption[]>(() => {
+    return [
+      { value: '', label: 'Select ingredient...' },
+      ...this.ingredientCatalog()
+        .filter(i => !this.selectedIngredients().includes(i))
+        .map(i => ({ value: i, label: i })),
+    ];
   });
 
-  filteredIngredientsOptions = computed(() => {
-    const defaultIngs = ['Chicken', 'Beef', 'Pork', 'Fish', 'Rice', 'Pasta', 'Tomato', 'Onion', 'Garlic', 'Cheese'];
-    return defaultIngs.filter(i => i.toLowerCase().includes(this.ingredientSearch().toLowerCase()) && !this.selectedIngredients().includes(i));
+  personsOptions = computed<SelectOption[]>(() => {
+    const portions = Array.from(
+      new Set(
+        this.recipes()
+          .map(r => Number(r.porciones))
+          .filter(v => Number.isFinite(v) && v > 0),
+      ),
+    ).sort((a, b) => a - b);
+
+    const values = portions
+      .filter(v => v < 4)
+      .map(v => String(v));
+
+    if (portions.some(v => v >= 4)) {
+      values.push('4+');
+    }
+
+    return [
+      { value: '', label: 'Select persons...' },
+      ...values
+        .filter(p => !this.selectedPersons().includes(p))
+        .map(p => ({ value: p, label: p })),
+    ];
   });
 
-  filteredPersonsOptions = computed(() => {
-    const defaultPersons = ['1', '2', '3', '4', '5', '6+'];
-    return defaultPersons.filter(p => p.includes(this.personsSearch()) && !this.selectedPersons().includes(p));
+  tagsOptions = computed<SelectOption[]>(() => {
+    return [
+      { value: '', label: 'Select tag...' },
+      ...this.categories()
+        .filter(t => !this.selectedTags().includes(t))
+        .map(t => ({ value: t, label: t })),
+    ];
   });
+
+  displayRating = computed(() => this.hoveredRating() || this.minRating());
 
   filteredRecipes = computed(() => {
     const q = this.searchQuery().toLowerCase();
@@ -122,32 +159,37 @@ export class SearchRecipes implements OnInit {
       
       let matchesPersons = true;
       if (personsList.length > 0) {
-        matchesPersons = personsList.includes(String(recipe.porciones)) || (personsList.includes('6+') && recipe.porciones >= 6);
+        matchesPersons = personsList.includes(String(recipe.porciones)) || (personsList.includes('4+') && recipe.porciones >= 4);
       }
 
       return matchesSearch && matchesCategory && matchesDifficulty && matchesRating && matchesPrice && matchesTags && matchesIngredients && matchesPersons;
     });
   });
 
+  hasActiveFilters = computed(() => {
+    return !!this.searchQuery().trim()
+      || !!this.selectedCategory()
+      || !!this.selectedDifficulty()
+      || this.minRating() > 0
+      || this.priceMin() > 0
+      || this.priceMax() < 200
+      || this.selectedTags().length > 0
+      || this.selectedIngredients().length > 0
+      || this.selectedPersons().length > 0;
+  });
+
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       if (params['q']) this.searchQuery.set(params['q']);
     });
+    this.loadIngredients();
     this.loadRecipes();
-  }
-
-  isAdminUser(): boolean {
-    const user = this.authService.getUser() as { rol?: string } | null;
-    return user?.rol === 'admin';
   }
 
   loadRecipes() {
     this.loading.set(true);
     this.error.set(false);
-    const source$ = this.isAdminUser()
-      ? this.recipeService.getAllRecipesAdmin()
-      : this.recipeService.getRecipes();
-    source$.subscribe({
+    this.recipeService.getRecipes().subscribe({
       next: (data) => {
         this.recipes.set(data);
         this.loading.set(false);
@@ -159,8 +201,27 @@ export class SearchRecipes implements OnInit {
     });
   }
 
+  loadIngredients() {
+    this.recipeService.getIngredients().subscribe({
+      next: (data) => {
+        this.ingredientCatalog.set(data);
+      },
+      error: () => {
+        this.ingredientCatalog.set([]);
+      },
+    });
+  }
+
   setRating(r: number) {
     this.minRating.set(this.minRating() === r ? 0 : r);
+  }
+
+  setHoverRating(r: number) {
+    this.hoveredRating.set(r);
+  }
+
+  clearHoverRating() {
+    this.hoveredRating.set(0);
   }
 
   validateRange() {
@@ -172,34 +233,31 @@ export class SearchRecipes implements OnInit {
   }
 
   addTag(t: string) {
+    if (!t) return;
     if (!this.selectedTags().includes(t)) this.selectedTags.update(arr => [...arr, t]);
-    this.tagSearch.set('');
-    this.showTagsDropdown.set(false);
+    this.tagsPickerValue.set('');
   }
   removeTag(t: string) {
     this.selectedTags.update(arr => arr.filter(x => x !== t));
   }
-  closeTagsDropdown() { setTimeout(() => this.showTagsDropdown.set(false), 200); }
 
   addIngredient(i: string) {
+    if (!i) return;
     if (!this.selectedIngredients().includes(i)) this.selectedIngredients.update(arr => [...arr, i]);
-    this.ingredientSearch.set('');
-    this.showIngredientDropdown.set(false);
+    this.ingredientPickerValue.set('');
   }
   removeIngredient(i: string) {
     this.selectedIngredients.update(arr => arr.filter(x => x !== i));
   }
-  closeIngredientDropdown() { setTimeout(() => this.showIngredientDropdown.set(false), 200); }
 
   addPerson(p: string) {
+    if (!p) return;
     if (!this.selectedPersons().includes(p)) this.selectedPersons.update(arr => [...arr, p]);
-    this.personsSearch.set('');
-    this.showPersonsDropdown.set(false);
+    this.personsPickerValue.set('');
   }
   removePerson(p: string) {
     this.selectedPersons.update(arr => arr.filter(x => x !== p));
   }
-  closePersonsDropdown() { setTimeout(() => this.showPersonsDropdown.set(false), 200); }
 
   clearFilters() {
     this.searchQuery.set('');
@@ -211,9 +269,9 @@ export class SearchRecipes implements OnInit {
     this.selectedTags.set([]);
     this.selectedIngredients.set([]);
     this.selectedPersons.set([]);
-    this.tagSearch.set('');
-    this.ingredientSearch.set('');
-    this.personsSearch.set('');
+    this.tagsPickerValue.set('');
+    this.ingredientPickerValue.set('');
+    this.personsPickerValue.set('');
   }
 
   updateSearch(query: string) {

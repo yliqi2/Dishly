@@ -21,6 +21,7 @@ export class RecipeCardComponent {
   private readonly authService = inject(AuthServices);
 
   receta = input.required<RecetaCard>();
+  showPrice = input(true);
   recipeDeactivated = output<number>();
   protected readonly isDeactivating = signal(false);
   protected readonly showDeleteModal = signal(false);
@@ -48,6 +49,9 @@ export class RecipeCardComponent {
   });
 
   protected readonly displayPrice = computed(() => {
+    if (!this.showPrice()) {
+      return null;
+    }
     const p = this.receta().price;
     if (p !== null && Number(p) > 0) {
       return Number(p);

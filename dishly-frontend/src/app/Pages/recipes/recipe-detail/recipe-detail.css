@@ -658,7 +658,7 @@
 }
 
 .btn-review-action.edit:hover {
-  filter: brightness(1.1);
+  filter: brightness(0.96);
   transform: translateY(-1px);
 }
 
@@ -673,7 +673,7 @@
 }
 
 .btn-review-action.delete:hover {
-  filter: brightness(1.1);
+  filter: brightness(0.96);
   transform: translateY(-1px);
 }
 

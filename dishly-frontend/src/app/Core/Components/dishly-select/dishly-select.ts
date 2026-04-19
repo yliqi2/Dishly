@@ -1,6 +1,6 @@
 import {
   Component, Input, Output, EventEmitter,
-  signal, HostListener, ElementRef, OnChanges
+  signal, HostListener, ElementRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -16,23 +16,15 @@ export interface SelectOption {
   templateUrl: './dishly-select.html',
   styleUrl: './dishly-select.css',
 })
-export class DishlySelectComponent implements OnChanges {
+export class DishlySelectComponent {
   @Input() options: SelectOption[] = [];
   @Input() placeholder = 'Select...';
   @Input() value = '';
   @Output() valueChange = new EventEmitter<string>();
 
   isOpen = signal(false);
-  focusedIndex = signal(0);
 
   constructor(private el: ElementRef) {}
-
-  ngOnChanges(): void {
-    if (!this.isOpen()) {
-      const idx = this.options.findIndex(o => o.value === this.value);
-      this.focusedIndex.set(idx >= 0 ? idx : 0);
-    }
-  }
 
   get selectedLabel(): string {
     const opt = this.options.find(o => o.value === this.value);
@@ -45,48 +37,48 @@ export class DishlySelectComponent implements OnChanges {
 
   toggle(): void {
     this.isOpen.update(v => !v);
-    if (this.isOpen()) {
-      const idx = this.options.findIndex(o => o.value === this.value);
-      this.focusedIndex.set(idx >= 0 ? idx : 0);
-    }
   }
 
   select(option: SelectOption): void {
     this.valueChange.emit(option.value);
     this.isOpen.set(false);
+    this.focusCombobox();
   }
 
-  @HostListener('keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent): void {
-    if (!this.isOpen() && (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowDown')) {
+  private focusCombobox(): void {
+    const root = (this.el.nativeElement as HTMLElement).querySelector<HTMLElement>('.dishly-select');
+    queueMicrotask(() => root?.focus({ preventScroll: true }));
+  }
+
+  onContainerKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && this.isOpen()) {
       event.preventDefault();
-      this.isOpen.set(true);
-      const idx = this.options.findIndex(o => o.value === this.value);
-      this.focusedIndex.set(idx >= 0 ? idx : 0);
+      this.isOpen.set(false);
+      this.focusCombobox();
       return;
     }
-    if (!this.isOpen()) return;
+    if (!this.isOpen() && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      this.isOpen.set(true);
+      return;
+    }
+    if (this.isOpen() && event.key === ' ' && event.target === event.currentTarget) {
+      event.preventDefault();
+    }
+  }
 
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault();
-        this.focusedIndex.update(i => Math.min(i + 1, this.options.length - 1));
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        this.focusedIndex.update(i => Math.max(i - 1, 0));
-        break;
-      case 'Enter':
-      case ' ':
-        event.preventDefault();
-        if (this.focusedIndex() >= 0 && this.focusedIndex() < this.options.length) {
-          this.select(this.options[this.focusedIndex()]);
-        }
-        break;
-      case 'Escape':
-      case 'Tab':
-        this.isOpen.set(false);
-        break;
+  onOptionKeydown(event: KeyboardEvent, option: SelectOption): void {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.select(option);
+  }
+
+  onRootFocusOut(event: FocusEvent): void {
+    if (!this.isOpen()) return;
+    const next = event.relatedTarget as Node | null;
+    if (!next || !this.el.nativeElement.contains(next)) {
+      this.isOpen.set(false);
     }
   }
 

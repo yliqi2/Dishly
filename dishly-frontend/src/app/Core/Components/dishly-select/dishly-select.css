@@ -99,9 +99,13 @@
 }
 
 .dishly-select__option:hover,
-.dishly-select__option.is-focused {
+.dishly-select__option:focus-visible {
   background-color: var(--highlight-focus);
   color: var(--highlight);
+}
+
+.dishly-select__option:focus {
+  outline: none;
 }
 
 .dishly-select__option.is-selected {

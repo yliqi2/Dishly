@@ -39,7 +39,7 @@ class RecetaSeeder extends Seeder
                     'tiempo_preparacion'      => 30,
                     'tiempo_preparacion_unidad' => 'minutes',
                     'dificultad'              => 'easy',
-                    'porciones'               => 2,
+                    'porciones'               => 1,
                     'price'                   => '5.00',
                     'imagen_1'                => 'recipes/533agrsfqxqspdueyno58d9p.jpg',
                     'imagen_2'                => 'recipes/533agrsfqxqspdueyno58d9p.jpg',
@@ -142,7 +142,7 @@ class RecetaSeeder extends Seeder
                     'tiempo_preparacion'      => 25,
                     'tiempo_preparacion_unidad' => 'minutes',
                     'dificultad'              => 'hard',
-                    'porciones'               => 4,
+                    'porciones'               => 5,
                     'price'                   => '12.00',
                     'imagen_1'                => 'recipes/hjkdshgjksdflhgjklsd.jpg',
                     'fecha_creacion'          => '2026-02-12',
@@ -182,9 +182,7 @@ class RecetaSeeder extends Seeder
         ];
 
         // ── Insert each recipe ────────────────────────────────────────────
-        $recetaIds = [];
-
-        foreach ($recipes as $index => $entry) {
+        foreach ($recipes as $entry) {
             $recipeData = $entry['recipe'];
 
             $recipeData += [
@@ -196,7 +194,6 @@ class RecetaSeeder extends Seeder
             ];
 
             $recetaId = DB::table('receta_original')->insertGetId($recipeData);
-            $recetaIds[$index + 1] = $recetaId; // map 1-based index to DB ID
 
             // Categories
             $categoriaRows = [];
@@ -226,135 +223,5 @@ class RecetaSeeder extends Seeder
             }
         }
 
-        // ── Reviews (Valoraciones) ─────────────────────────────────────────
-        $user = function (string $email): int {
-            return (int) DB::table('users')
-                ->whereRaw('LOWER(email) = ?', [strtolower(trim($email))])
-                ->value('id_usuario');
-        };
-
-        $reviews = [
-            // Fettuccine Alfredo (Recipe 1, Author: Liqi)
-            [
-                'id_receta' => $recetaIds[1],
-                'id_usuario' => $user('pau@gmail.com'),
-                'puntuacion' => 5,
-                'comentario' => 'Amazing! Will cook again.',
-                'fecha' => now(),
-            ],
-            [
-                'id_receta' => $recetaIds[1],
-                'id_usuario' => $user('marc@gmail.com'),
-                'puntuacion' => 4,
-                'comentario' => 'A bit heavy, but very tasty cream sauce.',
-                'fecha' => now(),
-            ],
-
-            // Spaghetti alla Puttanesca (Recipe 2, Author: Marc)
-            [
-                'id_receta' => $recetaIds[2],
-                'id_usuario' => $user('1871649909yang@gmail.com'),
-                'puntuacion' => 5,
-                'comentario' => 'Incredible flavors. The olives give it such a great punch.',
-                'fecha' => now(),
-            ],
-
-            // Ultimate Smash Burger (Recipe 3, Author: Pau)
-            [
-                'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('1871649909yang@gmail.com'),
-                'puntuacion' => 4,
-                'comentario' => 'Great burger, though I prefer more cheddar.',
-                'fecha' => '2026-04-07',
-            ],
-            [
-                'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('marc@gmail.com'),
-                'puntuacion' => 5,
-                'comentario' => 'Best smash burger recipe out there.',
-                'fecha' => '2026-04-07',
-            ],
-            [
-                'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('alex@gmail.com'),
-                'puntuacion' => 5,
-                'comentario' => 'Super juicy and perfectly balanced.',
-                'fecha' => '2026-04-06',
-            ],
-            [
-                'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('mia@gmail.com'),
-                'puntuacion' => 4,
-                'comentario' => 'Loved the crispy edges on the patty.',
-                'fecha' => '2026-04-06',
-            ],
-            [
-                'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('noah@gmail.com'),
-                'puntuacion' => 5,
-                'comentario' => 'Restaurant quality burger at home.',
-                'fecha' => '2026-04-07',
-            ],
-            [
-                'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('sofia@gmail.com'),
-                'puntuacion' => 4,
-                'comentario' => 'The guacamole twist works really well.',
-                'fecha' => '2026-04-06',
-            ],
-            [
-                'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('emma@gmail.com'),
-                'puntuacion' => 5,
-                'comentario' => 'Crispy bacon and cheddar made it amazing.',
-                'fecha' => '2026-04-07',
-            ],
-            [
-                'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('leo@gmail.com'),
-                'puntuacion' => 4,
-                'comentario' => 'Easy to follow and very satisfying.',
-                'fecha' => '2026-04-06',
-            ],
-            [
-                'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('chloe@gmail.com'),
-                'puntuacion' => 5,
-                'comentario' => 'My family asked me to make these again.',
-                'fecha' => now(),
-            ],
-            [
-                'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('hugo@gmail.com'),
-                'puntuacion' => 4,
-                'comentario' => 'Very tasty, especially with the toasted bun.',
-                'fecha' => now(),
-            ],
-            [
-                'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('nora@gmail.com'),
-                'puntuacion' => 5,
-                'comentario' => 'Definitely one of the best burger recipes here.',
-                'fecha' => now(),
-            ],
-            [
-                'id_receta' => $recetaIds[3],
-                'id_usuario' => $user('lucas@gmail.com'),
-                'puntuacion' => 4,
-                'comentario' => 'Great texture and lots of flavor in every bite.',
-                'fecha' => now(),
-            ],
-
-            // Gourmet Smash Burger (Recipe 5, Author: Liqi)
-            [
-                'id_receta' => $recetaIds[5],
-                'id_usuario' => $user('pau@gmail.com'),
-                'puntuacion' => 3,
-                'comentario' => 'It was okay. Took a while to prep.',
-                'fecha' => now(),
-            ],
-        ];
-
-        DB::table('valoracion')->insert($reviews);
     }
 }

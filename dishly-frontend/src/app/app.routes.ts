@@ -18,6 +18,8 @@ import { Profile } from './Pages/profile/profile';
 import { EditProfile } from './Pages/edit-profile/edit-profile';
 import { EditRecipe } from './Pages/edit-recipe/edit-recipe';
 import { NotFound } from './Pages/not-found/not-found';
+import { TermsaAndConditions } from './Pages/termsa-and-conditions/termsa-and-conditions';
+import { Cookies } from './Pages/cookies/cookies';
 
 export const routes: Routes = [
   {
@@ -101,6 +103,16 @@ export const routes: Routes = [
     component: EditProfile,
     canActivate: [AuthGuard],
     title: 'Edit Profile',
+  },
+  {
+    path: 'terms-and-conditions',
+    component: TermsaAndConditions,
+    title: 'Terms and Conditions',
+  },
+  {
+    path: 'cookies',
+    component: Cookies,
+    title: 'Cookie Policy',
   },
   {
     path: '**',

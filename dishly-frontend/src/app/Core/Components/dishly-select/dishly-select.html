@@ -1,4 +1,12 @@
-<div class="dishly-select" [class.is-open]="isOpen()" tabindex="0" [attr.aria-haspopup]="'listbox'" [attr.aria-expanded]="isOpen()">
+<div
+  class="dishly-select"
+  [class.is-open]="isOpen()"
+  tabindex="0"
+  [attr.aria-haspopup]="'listbox'"
+  [attr.aria-expanded]="isOpen()"
+  (focusout)="onRootFocusOut($event)"
+  (keydown)="onContainerKeydown($event)"
+>
 
   <button
     type="button"
@@ -22,13 +30,14 @@
       role="listbox"
       [attr.aria-label]="placeholder"
     >
-      @for (option of options; track option.value; let i = $index) {
+      @for (option of options; track option.value) {
         <li
           class="dishly-select__option"
           role="option"
+          tabindex="0"
           [attr.aria-selected]="option.value === value"
-          [class.is-focused]="i === focusedIndex()"
           [class.is-selected]="option.value === value"
+          (keydown)="onOptionKeydown($event, option)"
           (mousedown)="$event.preventDefault()"
           (click)="select(option)"
         >

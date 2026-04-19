@@ -55,7 +55,7 @@
               <label class="filter-label" id="difficulty-label">Difficulty</label>
             </div>
             <app-dishly-select
-              [options]="difficultyOptions"
+              [options]="difficultyOptions()"
               placeholder="All Levels"
               [value]="selectedDifficulty()"
               (valueChange)="selectedDifficulty.set($event)"
@@ -63,27 +63,75 @@
             ></app-dishly-select>
           </div>
 
-          <!-- Price Range -->
+          <!-- Ingredients -->
           <div class="filter-section">
             <div class="d-flex align-items-center gap-2 mb-3">
               <span class="filter-dot"></span>
-              <label class="fw-bold filter-label">Price Range</label>
+              <label class="filter-label">Ingredients</label>
             </div>
-            <div class="dual-range-container position-relative mb-2">
-              <div class="range-track"></div>
-              <input type="range" class="range-input min-range"
-                [value]="priceMin()"
-                (input)="priceMin.set(+$any($event.target).value); validateRange()"
-                min="0" max="200" step="1">
-              <input type="range" class="range-input max-range"
-                [value]="priceMax()"
-                (input)="priceMax.set(+$any($event.target).value); validateRange()"
-                min="0" max="200" step="1">
+
+            <app-dishly-select
+              [options]="ingredientOptions()"
+              placeholder="Select ingredient..."
+              [value]="ingredientPickerValue()"
+              (valueChange)="addIngredient($event)"
+            ></app-dishly-select>
+
+            <div class="tag-cloud d-flex flex-wrap gap-2">
+              @for (ing of selectedIngredients(); track ing) {
+                <div class="filter-tag d-flex align-items-center gap-2 px-3 py-1 rounded-pill border">
+                  <span>{{ ing }}</span>
+                  <button class="btn-close filter-tag-close" (click)="removeIngredient(ing)"></button>
+                </div>
+              }
             </div>
-            <div class="d-flex justify-content-between align-items-center mt-3">
-              <div class="price-box px-3 py-1 rounded-2 fw-bold">{{ priceMin() }}€</div>
-              <span class="text-muted small">—</span>
-              <div class="price-box px-3 py-1 rounded-2 fw-bold">{{ priceMax() }}€</div>
+          </div>
+
+          <!-- Persons -->
+          <div class="filter-section">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <span class="filter-dot"></span>
+              <label class="filter-label">Persons</label>
+            </div>
+
+            <app-dishly-select
+              [options]="personsOptions()"
+              placeholder="Select persons..."
+              [value]="personsPickerValue()"
+              (valueChange)="addPerson($event)"
+            ></app-dishly-select>
+
+            <div class="tag-cloud d-flex flex-wrap gap-2">
+              @for (p of selectedPersons(); track p) {
+                <div class="filter-tag d-flex align-items-center gap-2 px-3 py-1 rounded-pill border">
+                  <span>{{ p }}</span>
+                  <button class="btn-close filter-tag-close" (click)="removePerson(p)"></button>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="filter-section">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <span class="filter-dot"></span>
+              <label class="filter-label">Tags</label>
+            </div>
+
+            <app-dishly-select
+              [options]="tagsOptions()"
+              placeholder="Select tag..."
+              [value]="tagsPickerValue()"
+              (valueChange)="addTag($event)"
+            ></app-dishly-select>
+
+            <div class="tag-cloud d-flex flex-wrap gap-2">
+              @for (t of selectedTags(); track t) {
+                <div class="filter-tag d-flex align-items-center gap-2 px-3 py-1 rounded-pill border">
+                  <span>{{ t }}</span>
+                  <button class="btn-close filter-tag-close" (click)="removeTag(t)"></button>
+                </div>
+              }
             </div>
           </div>
 
@@ -129,8 +177,8 @@
         @if (!loading() && !error() && filteredRecipes().length > 0) {
           <div class="row g-4">
             @for (recipe of filteredRecipes(); track recipe.id_receta) {
-              <div class="col-12 col-sm-6 col-xl-4">
-                <app-recipe-card [receta]="$any(recipe)"></app-recipe-card>
+              <div class="col-12 col-sm-6">
+                <app-recipe-card [receta]="$any(recipe)" [showPrice]="isAdminUser()"></app-recipe-card>
               </div>
             }
           </div>
