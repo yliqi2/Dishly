@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DishlySelect } from './dishly-select';
+import { DishlySelectComponent } from './dishly-select';
 
-describe('DishlySelect', () => {
-  let component: DishlySelect;
-  let fixture: ComponentFixture<DishlySelect>;
+describe('DishlySelectComponent', () => {
+  let component: DishlySelectComponent;
+  let fixture: ComponentFixture<DishlySelectComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DishlySelect]
+      imports: [DishlySelectComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(DishlySelect);
+    fixture = TestBed.createComponent(DishlySelectComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

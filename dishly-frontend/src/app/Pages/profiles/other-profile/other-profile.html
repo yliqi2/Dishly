@@ -1,0 +1,67 @@
+<div class="profile-main">
+  <section class="page-header page-container">
+    <div class="page-header__inner">
+      <h1 class="page-title">Profile</h1>
+      <div class="page-underline" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  @if (loading()) {
+  <div class="profile-wrapper page-container page-container--no-gutter py-4">
+    <div class="profile-card text-center">Loading profile...</div>
+  </div>
+  } @else if (error()) {
+  <div class="profile-wrapper page-container page-container--no-gutter py-4">
+    <div class="profile-card text-center">{{ error() }}</div>
+  </div>
+  } @else if (user()) {
+  <div class="profile-wrapper page-container page-container--no-gutter">
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-header-main">
+          <div class="profile-avatar" aria-hidden="true">
+            @if (iconUrl(); as url) {
+            <img [src]="url" alt="Profile icon" />
+            } @else {
+            <span class="profile-avatar-initial">{{ displayName.charAt(0).toUpperCase() }}</span>
+            }
+          </div>
+          <div class="profile-info">
+            <h1 id="profile-title" class="profile-name">
+              {{ displayName }}
+              @if (user()?.chef) {
+              <lucide-icon name="chef-hat" class="profile-chef-hat" size="18" strokeWidth="2"></lucide-icon>
+              }
+            </h1>
+            <p class="profile-meta">{{ memberSince }}</p>
+            <p class="profile-email">Public profile</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="page-header page-container">
+    <div class="page-header__inner">
+      <h1 class="page-title">{{ displayName }}'s Recipes</h1>
+      <div class="page-underline" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <div class="profile-wrapper page-container page-container--no-gutter">
+    <div class="profile-card">
+      <div class="profile-recipes-section">
+        @if (recipes().length > 0) {
+        <div class="recipes-grid">
+          @for (recipe of recipes(); track recipe.id_receta) {
+          <app-recipe-card [receta]="recipe"></app-recipe-card>
+          }
+        </div>
+        } @else {
+        <p class="no-recipes-message">This user has not published recipes yet.</p>
+        }
+      </div>
+    </div>
+  </div>
+  }
+</div>

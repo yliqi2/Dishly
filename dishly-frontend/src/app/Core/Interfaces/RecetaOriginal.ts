@@ -1,9 +1,6 @@
 import { CategoriaReceta } from "./CategoriaReceta";
 import { IngredienteReceta } from "./IngredienteReceta";
 
-
-
-
 export interface RecetaOriginal {
     active?: boolean;
     purchased?: boolean;

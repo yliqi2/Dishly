@@ -31,7 +31,12 @@ export class RecipeDetail implements OnInit {
   instructions: string[] = [];
 
   selectedThumbnailIndex = 0;
-  imageAnimationClass = '';
+  mainImageSlideLeftSrc = '';
+  mainImageSlideRightSrc = '';
+  mainImageSlideTransform = 'translateX(0)';
+  mainImageSlideNoTransition = true;
+  private mainImageSlideTransitioning = false;
+  private readonly mainImageSlideDurationMs = 480;
   userRating = 0;
   hoverRating = 0;
   isLocked = false;
@@ -103,7 +108,6 @@ export class RecipeDetail implements OnInit {
 
     this.recetaService.getRecipeById(id).subscribe({
       next: (data) => {
-        // If the recipe is inactive and the user hasn't purchased it, treat as not found
         if (data.active === false && !data.purchased) {
           this.error = 'This recipe is no longer available.';
           this.loading = false;
@@ -114,6 +118,8 @@ export class RecipeDetail implements OnInit {
         this.recipe = data;
         this.hasPurchased = Boolean(data.purchased);
         this.thumbnails = this.computeThumbnails(data);
+        this.selectedThumbnailIndex = 0;
+        this.syncMainImageSlideUrls();
         this.instructions = this.computeInstructions(data.instrucciones);
         this.isInCart = this.cartService.hasRecipe(data.id_receta);
         this.loading = false;
@@ -333,40 +339,95 @@ export class RecipeDetail implements OnInit {
 
   selectThumbnail(index: number): void {
     if (index === this.selectedThumbnailIndex) return;
-
-    this.triggerImageAnimation(index > this.selectedThumbnailIndex ? 'slide-next' : 'slide-prev');
-    this.selectedThumbnailIndex = index;
+    if (!this.hasMultipleImages()) {
+      this.selectedThumbnailIndex = index;
+      this.syncMainImageSlideUrls();
+      this.cdr.detectChanges();
+      return;
+    }
+    const from = this.selectedThumbnailIndex;
+    const to = index;
+    const direction: 'next' | 'prev' = to > from ? 'next' : 'prev';
+    this.startMainImageSlide(from, to, direction);
   }
 
   prevImage(): void {
-    this.triggerImageAnimation('slide-prev');
-    this.selectedThumbnailIndex = (this.selectedThumbnailIndex > 0)
-      ? this.selectedThumbnailIndex - 1
-      : this.thumbnails.length - 1;
+    if (!this.hasMultipleImages()) {
+      return;
+    }
+    const n = this.thumbnails.length;
+    const from = this.selectedThumbnailIndex;
+    const to = from > 0 ? from - 1 : n - 1;
+    this.startMainImageSlide(from, to, 'prev');
   }
 
   nextImage(): void {
-    this.triggerImageAnimation('slide-next');
-    this.selectedThumbnailIndex = (this.selectedThumbnailIndex < this.thumbnails.length - 1)
-      ? this.selectedThumbnailIndex + 1
-      : 0;
+    if (!this.hasMultipleImages()) {
+      return;
+    }
+    const n = this.thumbnails.length;
+    const from = this.selectedThumbnailIndex;
+    const to = from < n - 1 ? from + 1 : 0;
+    this.startMainImageSlide(from, to, 'next');
   }
 
-  private triggerImageAnimation(direction: 'slide-next' | 'slide-prev'): void {
-    this.imageAnimationClass = '';
-    this.cdr.detectChanges();
+  private syncMainImageSlideUrls(): void {
+    const src = this.thumbnails[this.selectedThumbnailIndex] ?? 'assets/placeholder.jpg';
+    this.mainImageSlideLeftSrc = src;
+    this.mainImageSlideRightSrc = src;
+    this.mainImageSlideTransform = 'translateX(0)';
+    this.mainImageSlideNoTransition = true;
+  }
 
-    requestAnimationFrame(() => {
-      this.imageAnimationClass = direction;
+  private startMainImageSlide(from: number, to: number, direction: 'next' | 'prev'): void {
+    if (!this.hasMultipleImages() || from === to) {
+      return;
+    }
+    if (this.mainImageSlideTransitioning) {
+      return;
+    }
+    this.mainImageSlideTransitioning = true;
+
+    if (direction === 'next') {
+      this.mainImageSlideLeftSrc = this.thumbnails[from] ?? '';
+      this.mainImageSlideRightSrc = this.thumbnails[to] ?? '';
+      this.mainImageSlideNoTransition = true;
+      this.mainImageSlideTransform = 'translateX(0)';
       this.cdr.detectChanges();
-
-      window.setTimeout(() => {
-        if (this.imageAnimationClass === direction) {
-          this.imageAnimationClass = '';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.mainImageSlideNoTransition = false;
+          this.mainImageSlideTransform = 'translateX(-50%)';
           this.cdr.detectChanges();
-        }
-      }, 320);
-    });
+          window.setTimeout(() => this.finishMainImageSlide(to), this.mainImageSlideDurationMs);
+        });
+      });
+    } else {
+      this.mainImageSlideLeftSrc = this.thumbnails[to] ?? '';
+      this.mainImageSlideRightSrc = this.thumbnails[from] ?? '';
+      this.mainImageSlideNoTransition = true;
+      this.mainImageSlideTransform = 'translateX(-50%)';
+      this.cdr.detectChanges();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.mainImageSlideNoTransition = false;
+          this.mainImageSlideTransform = 'translateX(0)';
+          this.cdr.detectChanges();
+          window.setTimeout(() => this.finishMainImageSlide(to), this.mainImageSlideDurationMs);
+        });
+      });
+    }
+  }
+
+  private finishMainImageSlide(to: number): void {
+    this.selectedThumbnailIndex = to;
+    const src = this.thumbnails[to] ?? 'assets/placeholder.jpg';
+    this.mainImageSlideNoTransition = true;
+    this.mainImageSlideLeftSrc = src;
+    this.mainImageSlideRightSrc = src;
+    this.mainImageSlideTransform = 'translateX(0)';
+    this.cdr.detectChanges();
+    this.mainImageSlideTransitioning = false;
   }
 
   setRating(rating: number): void { this.userRating = rating; }

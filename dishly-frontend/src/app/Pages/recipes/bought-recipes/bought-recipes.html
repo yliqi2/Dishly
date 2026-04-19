@@ -2,7 +2,7 @@
 
   <section class="page-header page-container mb-4">
     <div class="page-header__inner">
-      <h1 id="bought-recipes-title" class="page-title">{{ isAdminUser() ? 'All Recipes' : 'My Purchased Recipes' }}</h1>
+      <h1 id="bought-recipes-title" class="page-title">{{ isAdminUser() ? 'All Recipes' : 'Adquired Recipes' }}</h1>
       <div class="page-underline" aria-hidden="true"></div>
     </div>
   </section>
@@ -21,7 +21,7 @@
           <input
             class="recipes-search-bar__input"
             type="text"
-            placeholder="Search purchased recipes..."
+            placeholder="Search adquired recipes..."
             [value]="searchQuery()"
             (input)="searchQuery.set($any($event.target).value)"
           />
@@ -138,7 +138,7 @@
         </div>
       </aside>
 
-      <div class="col-lg-9" role="region" aria-label="Purchased recipes list">
+      <div class="col-lg-9" role="region" aria-label="Adquired recipes list">
 
         <!-- Loading -->
         @if (loading()) {
@@ -153,7 +153,7 @@
         @if (!loading() && error()) {
           <div class="alert alert-danger d-flex align-items-center gap-2 rounded-3" role="alert">
             <lucide-icon name="circle-alert" [size]="20"></lucide-icon>
-            <span>{{ isAdminUser() ? 'Could not load recipes.' : 'Could not load your purchased recipes.' }} Please try again later.</span>
+            <span>{{ isAdminUser() ? 'Could not load recipes.' : 'Could not load your adquired recipes.' }} Please try again later.</span>
           </div>
         }
 
@@ -166,7 +166,7 @@
               <p class="empty-subtitle">Try adjusting your filters or search term.</p>
               <button class="btn btn-primary-orange mt-3" (click)="clearFilters()">Clear Filters</button>
             } @else {
-              <h2 class="empty-title">No purchased recipes yet</h2>
+              <h2 class="empty-title">No adquired recipes yet</h2>
               <p class="empty-subtitle">Browse our catalogue and find a recipe you love!</p>
               <a routerLink="/recipes" class="btn btn-primary-orange mt-3">Explore Recipes</a>
             }
@@ -178,7 +178,10 @@
           <div class="row g-4">
             @for (recipe of filteredRecipes(); track recipe.id_receta) {
               <div class="col-12 col-sm-6">
-                <app-recipe-card [receta]="$any(recipe)" [showPrice]="isAdminUser()"></app-recipe-card>
+                <app-recipe-card
+                  [receta]="$any(recipe)"
+                  [showPrice]="isAdminUser()"
+                ></app-recipe-card>
               </div>
             }
           </div>

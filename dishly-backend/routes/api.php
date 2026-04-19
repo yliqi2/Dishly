@@ -1,13 +1,13 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarritoController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\OwnedRecipes;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 // No autenticado
 Route::post('/register', [AuthController::class, 'register']);
@@ -19,6 +19,7 @@ Route::post('/reset-password', [MailController::class, 'resetPassword']);
 Route::get('/recipes', [RecetaController::class, 'getAllRecetas']);
 Route::get('/recipes/{id}', [RecetaController::class, 'getRecetaById']);
 Route::get('/recipes/{id}/reviews', [RecetaController::class, 'getReviewsForRecipe']);
+Route::get('/profile/{id}', [UserController::class, 'showPublicProfile'])->whereNumber('id');
 Route::get('/recetas/categorias', [RecetaController::class, 'getCategorias']);
 Route::get('/recetas/ingredientes', [RecetaController::class, 'getIngredientes']);
 

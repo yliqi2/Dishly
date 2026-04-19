@@ -59,6 +59,19 @@ export class RecipeCardComponent {
     return null;
   });
 
+  protected readonly shouldShowAcquiredBadge = computed(() => {
+    const r = this.receta();
+    if (!r.purchased) {
+      return false;
+    }
+    const user = this.currentUser();
+    const myId = Number(user?.['id_usuario'] ?? 0);
+    if (!myId) {
+      return false;
+    }
+    return Number(r.id_autor) !== myId;
+  });
+
   protected readonly displayTime = computed(() => {
     const r = this.receta();
     const time = r.tiempo_preparacion;

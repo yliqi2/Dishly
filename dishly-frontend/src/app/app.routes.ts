@@ -14,7 +14,8 @@ import { Cart } from './Pages/shopping/cart/cart';
 import { PaymentMethod } from './Pages/shopping/payment-method/payment-method';
 import { AuthGuard } from './Guards/auth.guard';
 import { GuestGuard } from './Guards/guest.guard';
-import { Profile } from './Pages/profile/profile';
+import { Profile } from './Pages/profiles/profile/profile';
+import { OtherProfile } from './Pages/profiles/other-profile/other-profile';
 import { EditProfile } from './Pages/edit-profile/edit-profile';
 import { EditRecipe } from './Pages/edit-recipe/edit-recipe';
 import { NotFound } from './Pages/not-found/not-found';
@@ -96,6 +97,11 @@ export const routes: Routes = [
     path: 'profile',
     component: Profile,
     canActivate: [AuthGuard],
+    title: 'Profile',
+  },
+  {
+    path: 'profile/:id',
+    component: OtherProfile,
     title: 'Profile',
   },
   {

@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { AuthServices } from '../../Core/Services/Auth/auth-services';
+import { AuthServices } from '../../../Core/Services/Auth/auth-services';
 import { LucideAngularModule } from 'lucide-angular';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Profile as ProfileService } from '../../Core/Services/Profile/profile-services';
-import { RecipeCardComponent } from '../../Core/Components/recipe-card/recipe-card';
+import { Profile as ProfileService } from '../../../Core/Services/Profile/profile-services';
+import { RecipeCardComponent } from '../../../Core/Components/recipe-card/recipe-card';
 
 type User = {
   nombre?: string;

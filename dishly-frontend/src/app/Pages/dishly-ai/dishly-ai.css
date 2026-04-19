@@ -1,6 +1,6 @@
 /* ─── Header ─────────────────────────────────────────────── */
 .ai-header {
-  padding-top: 56px;
+  padding-top: var(--layout-gutter);
   padding-bottom: 40px;
   text-align: center;
 }
@@ -30,6 +30,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   line-height: 1;
+  margin-top: 8px;
 }
 
 .ai-header__badge lucide-icon {

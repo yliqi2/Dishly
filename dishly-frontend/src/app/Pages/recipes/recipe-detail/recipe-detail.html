@@ -1,4 +1,4 @@
-<article class="recipe-page bg-white min-vh-100 py-3">
+<article class="recipe-page bg-white min-vh-100 pb-3">
   <div class="page-layout-container">
 
     @if (loading) {
@@ -22,7 +22,7 @@
   </section>
 
     <div class="author-row d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
-      <div class="d-flex align-items-center gap-3">
+      <a class="author-link d-flex align-items-center gap-3" [routerLink]="['/profile', recipe.id_autor]">
         <div class="author-avatar d-flex align-items-center justify-content-center fw-bold shadow-sm">
           @if (getAuthorAvatarUrl(); as authorAvatarUrl) {
           <img [src]="authorAvatarUrl" [alt]="recipe.autor_nombre + ' profile photo'"
@@ -32,7 +32,7 @@
           }
         </div>
         <span class="author-name">{{ recipe.autor_nombre }}</span>
-      </div>
+      </a>
       <span class="published-date">Published {{ getPublishedDate() }}</span>
     </div>
 
@@ -41,11 +41,26 @@
         <div class="recipe-hero-grid mb-4">
           <div class="recipe-media-stack shadow-sm border p-3 rounded-4 bg-white" [class.recipe-media-stack--single]="!hasMultipleImages()">
             <div class="main-image-container position-relative overflow-hidden shadow-sm d-flex align-items-stretch justify-content-center" [class.single-image]="!hasMultipleImages()">
+              @if (!hasMultipleImages()) {
               <img [src]="thumbnails[selectedThumbnailIndex]"
                    alt="Recipe main image"
                    class="main-image current-main-image img-fluid w-100 h-100"
-                   [ngClass]="imageAnimationClass"
                    (error)="$any($event.target).src='assets/placeholder.jpg'">
+              } @else {
+              <div
+                class="main-image-track"
+                [class.main-image-track--no-transition]="mainImageSlideNoTransition"
+                [style.transform]="mainImageSlideTransform">
+                <div class="main-image-slide">
+                  <img [src]="mainImageSlideLeftSrc" alt="" class="main-image-slide-img"
+                    (error)="$any($event.target).src='assets/placeholder.jpg'">
+                </div>
+                <div class="main-image-slide">
+                  <img [src]="mainImageSlideRightSrc" alt="" class="main-image-slide-img"
+                    (error)="$any($event.target).src='assets/placeholder.jpg'">
+                </div>
+              </div>
+              }
 
               @if (isPremium()) {
               <div class="image-overlay top-right">
@@ -162,7 +177,7 @@
             </button>
             } @else if (isPremium() && hasPurchased) {
             <div class="free-access-badge d-flex align-items-center justify-content-center fw-bold">
-              Purchased
+              Adquired
             </div>
             } @else {
             <div class="free-access-badge d-flex align-items-center justify-content-center fw-bold">
@@ -353,7 +368,7 @@
                   {{ getInitials(review.autor_nombre) }}
                   }
                 </div>
-                <div class="flex-grow-1 min-w-0">
+                <div class="flex-grow-1 overflow-hidden">
                   <span class="review-author-name d-block">{{ review.autor_nombre }}</span>
                   <div class="d-flex align-items-center gap-2">
                     <div class="d-flex gap-1">

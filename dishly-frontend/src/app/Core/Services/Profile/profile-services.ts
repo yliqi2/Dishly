@@ -11,6 +11,10 @@ import { ApiBaseService } from '../api-base.service';
 export class Profile extends ApiBaseService {
   private auth = inject(AuthServices);
 
+  getPublicProfile(userId: number): Observable<PublicProfileResponse> {
+    return this.http.get<PublicProfileResponse>(`${this.apiUrl}/profile/${userId}`);
+  }
+
   getMyRecipes(): Observable<RecetaOriginal[]> {
     if (!this.auth.isAuthenticated()) return of([]);
     return this.http.get<RecetaOriginal[]>(`${this.apiUrl}/profile/my-recipes`).pipe(
@@ -39,3 +43,16 @@ export class Profile extends ApiBaseService {
     );
   }
 }
+
+export type PublicProfileResponse = {
+  user: {
+    id_usuario: number;
+    nombre: string;
+    icon_path: string | null;
+    updated_at: string | null;
+    created_at: string | null;
+    chef: boolean;
+  };
+  recipes_count: number;
+  recipes: RecetaOriginal[];
+};

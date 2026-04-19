@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Throwable;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class RecetaController extends Controller
 {
@@ -474,6 +475,7 @@ class RecetaController extends Controller
                 $recipe->ingredientes = $ingredientes->get($recipe->id_receta, []);
                 $recipe->media_valoraciones = $valoraciones->get($recipe->id_receta)->media_valoraciones ?? null;
                 $recipe->autor_nombre = $user->nombre;
+                $recipe->purchased = false;
             }
 
             $sortedRecipes = $recipes->sortByDesc('fecha_creacion')->values();
@@ -599,12 +601,25 @@ class RecetaController extends Controller
             ->get()
             ->keyBy('id_usuario');
 
-        $recetasConDatos = $recipes->map(function ($receta) use ($categorias, $valoraciones, $autores) {
+        $viewer = $this->optionalJwtApiUser();
+        $purchasedIdSet = [];
+        if ($viewer && $recipeIds !== []) {
+            $purchasedIds = DB::table('receta_adquirida')
+                ->where('id_usuario', $viewer->id_usuario)
+                ->whereIn('id_receta', $recipeIds)
+                ->pluck('id_receta');
+            foreach ($purchasedIds as $rid) {
+                $purchasedIdSet[(int) $rid] = true;
+            }
+        }
+
+        $recetasConDatos = $recipes->map(function ($receta) use ($categorias, $valoraciones, $autores, $purchasedIdSet) {
             $receta->categorias = $categorias[$receta->id_receta] ?? [];
             $receta->media_valoraciones = $valoraciones[$receta->id_receta]->media_valoraciones ?? null;
             $receta->autor_nombre = $autores[$receta->id_autor]->nombre ?? null;
             $receta->autor_icon_path = $autores[$receta->id_autor]->icon_path ?? null;
             $receta->autor_updated_at = $autores[$receta->id_autor]->updated_at ?? null;
+            $receta->purchased = isset($purchasedIdSet[(int) $receta->id_receta]);
 
             return $receta;
         });
@@ -918,5 +933,14 @@ class RecetaController extends Controller
             ->where('id_usuario', $user->id_usuario)
             ->where('id_receta', $recipe->id_receta)
             ->exists();
+    }
+
+    private function optionalJwtApiUser(): ?object
+    {
+        try {
+            return JWTAuth::parseToken()->authenticate();
+        } catch (Throwable) {
+            return null;
+        }
     }
 }

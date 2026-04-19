@@ -53,6 +53,8 @@ class OwnedRecipes extends Controller
                 $recipe->autor_nombre = $autores->get($recipe->id_autor)->nombre ?? null;
                 $recipe->autor_icon_path = $autores->get($recipe->id_autor)->icon_path ?? null;
                 $recipe->autor_updated_at = $autores->get($recipe->id_autor)->updated_at ?? null;
+                $recipe->purchased = true;
+
                 return $recipe;
             })->values();
 
