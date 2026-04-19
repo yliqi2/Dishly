@@ -38,7 +38,7 @@
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 	text-decoration: none;
 	font-size: 16px;
 	font-weight: 500;
@@ -51,9 +51,10 @@
 
 .login-card {
 	background: var(--background);
+	border: 1px solid var(--neutral-900);
 	border-radius: 24px;
 	box-shadow: 0 4px 24px var(--shadow-md);
-	padding: 48px 40px;
+	padding: 40px;
 	width: 100%;
 	max-width: 520px;
 	max-height: calc(100dvh - 80px);
@@ -91,14 +92,14 @@
 	font-family: var(--font-display);
 	font-size: 32px;
 	font-weight: 700;
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 	margin: 0 0 12px 0;
 	line-height: 1.2;
 }
 
 .subtitle {
 	font-size: 16px;
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 	margin: 0;
 	line-height: 1.5;
 }
@@ -119,7 +120,7 @@
 .label {
 	font-size: 16px;
 	font-weight: 500;
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 }
 
 .input {
@@ -130,7 +131,7 @@
 	border-radius: 10px;
 	font-size: 16px;
 	font-family: var(--font-sans);
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 	background: var(--background);
 	transition: all 0.2s;
 	box-sizing: border-box;
@@ -149,7 +150,7 @@
 }
 
 .input::placeholder {
-	color: var(--gray-600);
+	color: var(--neutral-900);
 }
 
 .input-error {
@@ -196,7 +197,7 @@
 	transform: translateY(-50%);
 	background: none;
 	border: none;
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 	cursor: pointer;
 	padding: 0;
 	min-width: 44px;
@@ -212,7 +213,7 @@
 }
 
 .toggle-password:hover {
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 }
 
 .success-banner {
@@ -260,7 +261,7 @@
 	align-items: center;
 	gap: 8px;
 	font-size: 16px;
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 	cursor: pointer;
 }
 
@@ -326,7 +327,7 @@
 	background: var(--background);
 	padding: 0 16px;
 	font-size: 16px;
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 }
 
 .social-buttons {
@@ -344,7 +345,7 @@
 	border: 1.5px solid var(--neutral-900);
 	border-radius: 12px;
 	background: var(--background);
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 	font-size: 16px;
 	font-weight: 500;
 	font-family: var(--font-sans);
@@ -361,7 +362,7 @@
 	text-align: center;
 	margin-top: 24px;
 	font-size: 16px;
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 }
 
 .register-link {

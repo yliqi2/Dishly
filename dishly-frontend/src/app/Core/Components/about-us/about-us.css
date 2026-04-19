@@ -12,7 +12,7 @@
 .about-title {
 	font-size: 40px;
 	margin: 0 0 12px 0;
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 	font-family: var(--font-display);
 	font-weight: var(--font-display-extrabold);
 }
@@ -82,20 +82,20 @@
 }
 
 .feature:hover .feature-title {
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 	transform: translateY(-2px);
 }
 
 .feature-title {
 	font-size: 20px;
 	margin: 0 0 12px 0;
-	color: var(--PrimaryText);
+	color: var(--neutral-900);
 	font-weight: 700;
 }
 
 .feature-desc {
 	margin: 0 auto;
-	color: var(--SecondaryText);
+	color: var(--neutral-900);
 	max-width: 320px;
 	line-height: 1.6;
 }

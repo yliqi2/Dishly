@@ -19,7 +19,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
   text-decoration: none;
   font-size: 16px;
   font-weight: 500;
@@ -223,7 +223,7 @@
   font-family: var(--font-display, 'Poppins', sans-serif);
   font-size: clamp(1.8rem, 4vw, 2.4rem);
   line-height: 1.2;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
 }
 
 .ve-subtitle {
@@ -231,7 +231,7 @@
   max-width: 420px;
   font-size: 1rem;
   line-height: 1.7;
-  color: var(--slate-600);
+  color: var(--neutral-900);
 }
 
 .ve-divider {
@@ -260,7 +260,7 @@
 .ve-helper {
   margin: 0 auto 24px;
   max-width: 400px;
-  color: var(--slate-500);
+  color: var(--neutral-900);
   line-height: 1.6;
 }
 

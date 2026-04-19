@@ -6,7 +6,7 @@
 </section>
 
 <section class="page-container">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-4">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="upload-form d-flex flex-column gap-4">
     <article class="upload-card p-4 p-md-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="upload-title m-0"><i class="bi bi-image me-2"></i>Recipe Photos</h2>
@@ -18,7 +18,7 @@
 
       <p class="text-secondary mb-0 mt-1">Click any slot to upload photos. Choose which one will be the cover.</p>
       @if (photosError$ | async) {
-      <p class="text-danger small mb-0 mt-1" role="alert" aria-live="polite">
+      <p class="text-danger mb-0 mt-1" role="alert" aria-live="polite">
         <i class="bi bi-exclamation-circle me-1"></i>You must upload at least one photo.
       </p>
       }

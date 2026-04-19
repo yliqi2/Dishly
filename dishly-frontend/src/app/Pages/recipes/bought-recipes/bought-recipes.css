@@ -65,7 +65,7 @@
 .filter-label {
   font-weight: 700;
   font-size: 1rem;
-  color: var(--text-near-black);
+  color: var(--neutral-900);
   margin: 0;
 }
 
@@ -90,7 +90,7 @@
   border: 1px solid var(--neutral-900) !important;
   font-size: 1rem;
   font-weight: 500;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
   min-height: 44px;
   border-radius: var(--border-radius) !important;
   transition: all 0.2s ease;
@@ -197,7 +197,7 @@
   width: 20px;
   height: 20px;
   line-height: 0;
-  color: var(--gray-500);
+  color: var(--neutral-900);
 }
 
 .recipes-search-bar lucide-icon svg {
@@ -213,12 +213,12 @@
   font-size: 1rem;
   line-height: 1.25;
   padding-block: 0;
-  color: var(--gray-700);
+  color: var(--neutral-900);
   background: transparent;
 }
 
 .recipes-search-bar__input::placeholder {
-  color: var(--gray-400-light);
+  color: var(--neutral-900);
 }
 
 .recipes-search-bar:focus-within {
@@ -232,7 +232,7 @@
 
 .empty-state {
   min-height: 320px;
-  color: var(--gray-400-light);
+  color: var(--neutral-900);
 }
 
 .empty-icon {
@@ -243,13 +243,13 @@
 .empty-title {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--gray-700);
+  color: var(--neutral-900);
   margin: 0;
 }
 
 .empty-subtitle {
   font-size: 1rem;
-  color: var(--gray-500);
+  color: var(--neutral-900);
   margin-top: 6px;
 }
 

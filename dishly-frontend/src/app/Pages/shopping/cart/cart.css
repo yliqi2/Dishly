@@ -11,7 +11,7 @@
 
 .page-title {
   margin: 0;
-  color: var(--neutral-800);
+  color: var(--neutral-900);
   font-size: clamp(2.2rem, 3.1vw, 3rem);
   font-weight: 900;
   letter-spacing: -0.03em;
@@ -26,7 +26,7 @@
 
 .page-subtitle {
   margin: 0;
-  color: var(--slate-500);
+  color: var(--neutral-900);
   font-size: 1rem;
 }
 
@@ -231,7 +231,7 @@
 
 .cart-empty p {
   margin: 0 0 20px;
-  color: var(--slate-500);
+  color: var(--neutral-900);
 }
 
 .cart-layout {
@@ -271,7 +271,7 @@
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--neutral-800);
+  color: var(--neutral-900);
 }
 
 .cart-info-banner__text strong {
@@ -304,14 +304,14 @@
 
 .cart-card__title {
   margin: 0 0 4px;
-  color: var(--neutral-800);
+  color: var(--neutral-900);
   font-size: 1.05rem;
   font-weight: 800;
 }
 
 .cart-card__description {
   margin: 0;
-  color: var(--slate-600);
+  color: var(--neutral-900);
   font-size: 1rem;
   line-height: 1.35;
   display: -webkit-box;
@@ -393,14 +393,14 @@
 
 .cart-summary__title {
   margin: 0 0 6px;
-  color: var(--neutral-800);
+  color: var(--neutral-900);
   font-size: 1.4rem;
   font-weight: 800;
 }
 
 .cart-summary__subtitle {
   margin: 0;
-  color: var(--slate-500);
+  color: var(--neutral-900);
   line-height: 1.35;
 }
 
@@ -416,7 +416,7 @@
   align-items: baseline;
   gap: 12px;
   padding: 8px 0;
-  color: var(--slate-600);
+  color: var(--neutral-900);
 }
 
 .cart-summary__row--taxes strong {
@@ -438,7 +438,7 @@
 .cart-summary__row--total span {
   font-size: 1.35rem;
   font-weight: 800;
-  color: var(--neutral-800);
+  color: var(--neutral-900);
 }
 
 .cart-summary__row--total strong {
@@ -463,7 +463,7 @@
   border-radius: var(--border-radius-sm);
   border: 1.5px solid var(--neutral-900);
   background: var(--background);
-  color: var(--slate-700);
+  color: var(--neutral-900);
   text-decoration: none;
   font-weight: 700;
   font-size: 1rem;
@@ -485,7 +485,7 @@
   margin-top: 10px;
   background: transparent;
   border: 0;
-  color: var(--slate-500);
+  color: var(--neutral-900);
   font-weight: 600;
   cursor: pointer;
 }
@@ -503,7 +503,7 @@
 .cart-summary__features li {
   position: relative;
   padding-left: 18px;
-  color: var(--slate-700);
+  color: var(--neutral-900);
 }
 
 .cart-summary__features li::before {

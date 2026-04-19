@@ -130,7 +130,7 @@
 						[attr.aria-describedby]="isFieldInvalid('acceptTerms') ? 'register-acceptTerms-error' : null"
 						[attr.aria-invalid]="isFieldInvalid('acceptTerms')"
 					/>
-					<span>I accept the <a routerLink="/terms" class="link">Terms and Conditions</a> and <a routerLink="/privacy" class="link">Privacy Policy</a></span>
+					<span>I accept the <a routerLink="/terms-and-conditions" class="link">Terms and Conditions</a> and <a routerLink="/cookies" class="link">Cookie Policy</a></span>
 				</label>
 				@if (isFieldInvalid('acceptTerms')) {
 					<span id="register-acceptTerms-error" class="error-message" aria-live="polite" role="alert"><span class="error-prefix">Error:</span> {{ getErrorMessage('acceptTerms') }}</span>

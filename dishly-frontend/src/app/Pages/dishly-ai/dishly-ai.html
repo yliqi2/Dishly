@@ -119,17 +119,16 @@
                   <lucide-icon name="chef-hat" [size]="18"></lucide-icon>
                   Instructions
                 </h3>
-                @for (block of selectedRecipe()!.analyzedInstructions; track $index) {
-                  @if (block.name) { <h4 class="ai-step-group">{{ block.name }}</h4> }
-                  <ol class="ai-steps">
+                <ol class="ai-steps">
+                  @for (block of selectedRecipe()!.analyzedInstructions; track $index) {
                     @for (step of block.steps; track step.number) {
                       <li class="ai-step">
                         <span class="ai-step__num">{{ step.number }}</span>
                         <span class="ai-step__text">{{ step.step }}</span>
                       </li>
                     }
-                  </ol>
-                }
+                  }
+                </ol>
               </div>
             } @else if (selectedRecipe()!.instructions) {
               <div class="ai-section">

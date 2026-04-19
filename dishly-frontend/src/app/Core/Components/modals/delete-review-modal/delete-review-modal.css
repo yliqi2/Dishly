@@ -46,7 +46,7 @@
 
 .drm-body p {
   margin: 0;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
   font-size: 1rem;
   line-height: 1.5;
 }

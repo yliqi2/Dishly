@@ -94,6 +94,12 @@ export const routes: Routes = [
     title: 'Payment',
   },
   {
+    path: 'profile/edit',
+    component: EditProfile,
+    canActivate: [AuthGuard],
+    title: 'Edit Profile',
+  },
+  {
     path: 'profile',
     component: Profile,
     canActivate: [AuthGuard],
@@ -103,12 +109,6 @@ export const routes: Routes = [
     path: 'profile/:id',
     component: OtherProfile,
     title: 'Profile',
-  },
-  {
-    path: 'profile/edit',
-    component: EditProfile,
-    canActivate: [AuthGuard],
-    title: 'Edit Profile',
   },
   {
     path: 'terms-and-conditions',

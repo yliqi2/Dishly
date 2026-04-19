@@ -80,13 +80,13 @@
 
 .author-name {
   font-weight: 700;
-  color: var(--slate-700);
+  color: var(--neutral-900);
 }
 
 .published-date {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--neutral-500);
+  color: var(--neutral-900);
 }
 
 .detail-chip {
@@ -297,7 +297,7 @@
 }
 
 .categories-subtitle {
-  color: var(--slate-500);
+  color: var(--neutral-900);
 }
 
 .categories-count {
@@ -355,7 +355,7 @@
 
 .recipe-tag-difficulty {
   background: var(--white-alpha-92);
-  color: var(--slate-700);
+  color: var(--neutral-900);
   font-size: 1rem;
   font-weight: 700;
   padding: 7px 14px;
@@ -440,7 +440,7 @@
 .reviews-count {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--neutral-500);
+  color: var(--neutral-900);
 }
 
 .reviews-average {
@@ -452,7 +452,7 @@
 }
 
 .reviews-average__meta {
-  color: var(--neutral-500);
+  color: var(--neutral-900);
   font-weight: 700;
 }
 
@@ -576,7 +576,7 @@
 .review-date,
 .empty-subtext,
 .detail-text {
-  color: var(--slate-500);
+  color: var(--neutral-900);
 }
 
 .detail-text {
@@ -599,7 +599,7 @@
 .reviews-sort-label {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--slate-500);
+  color: var(--neutral-900);
 }
 
 .reviews-toolbar .reviews-sort-select {
@@ -622,7 +622,7 @@
   border: 1px solid var(--neutral-900);
   border-radius: var(--border-radius);
   background: var(--background);
-  color: var(--slate-700);
+  color: var(--neutral-900);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -657,7 +657,7 @@
 
 .review-author-name {
   font-weight: 700;
-  color: var(--slate-700);
+  color: var(--neutral-900);
 }
 
 .btn-review-action {
@@ -740,12 +740,12 @@
 
 .stat-label {
   font-size: 1rem;
-  color: var(--slate-500);
+  color: var(--neutral-900);
 }
 
 .stat-value {
   font-weight: 700;
-  color: var(--neutral-800);
+  color: var(--neutral-900);
 }
 
 .buy-content {
@@ -847,12 +847,12 @@
 .lock-title {
   margin: 12px 0 4px;
   font-weight: 800;
-  color: var(--neutral-800);
+  color: var(--neutral-900);
 }
 
 .lock-subtitle {
   margin: 0;
-  color: var(--slate-500);
+  color: var(--neutral-900);
 }
 
 .step-number-custom {

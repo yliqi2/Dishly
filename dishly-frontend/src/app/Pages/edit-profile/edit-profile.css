@@ -24,13 +24,13 @@
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
   margin: 0 0 8px;
 }
 
 .edit-section-desc {
   font-size: 16px;
-  color: var(--gray-600);
+  color: var(--neutral-900);
   margin: 0 0 20px;
 }
 
@@ -141,7 +141,7 @@
 .edit-field label {
   font-size: 16px;
   font-weight: 600;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
 }
 
 .edit-field input {
@@ -152,7 +152,7 @@
   font-family: inherit;
   border: 2px solid var(--PrimaryText);
   border-radius: 10px;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
   background: var(--background);
   box-sizing: border-box;
 }
@@ -164,7 +164,7 @@
 }
 
 .edit-field input::placeholder {
-  color: var(--gray-600);
+  color: var(--neutral-900);
 }
 
 .password-wrap {
@@ -182,7 +182,7 @@
   transform: translateY(-50%);
   border: none;
   background: transparent;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
   cursor: pointer;
   padding: 8px;
   display: flex;

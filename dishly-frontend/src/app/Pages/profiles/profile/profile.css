@@ -76,7 +76,7 @@
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 700;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
   margin: 0 0 4px;
   display: flex;
   align-items: center;
@@ -104,7 +104,7 @@
 
 .profile-email {
   font-size: 16px;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
   margin: 8px 0 16px;
   word-break: break-word;
 }
@@ -156,7 +156,7 @@
 .profile-stat-label {
   font-size: 18px;
   font-weight: 500;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
   margin: 0;
 }
 
@@ -164,7 +164,7 @@
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 800;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
   margin: 0;
 }
 
@@ -182,7 +182,7 @@
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 700;
-  color: var(--PrimaryText);
+  color: var(--neutral-900);
   margin: 0 0 20px 0;
 }
 
@@ -193,7 +193,7 @@
 }
 
 .no-recipes-message {
-  color: var(--gray-600);
+  color: var(--neutral-900);
   font-style: italic;
   text-align: center;
   padding: 32px 24px;
