@@ -1,0 +1,76 @@
+:host {
+  display: contents;
+}
+
+.confirm-delete-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-overlay-bg);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.confirm-delete-modal-shell {
+  width: min(560px, 100%);
+  z-index: 3;
+}
+
+.confirm-delete-modal-content {
+  border-radius: 12px;
+  background: var(--modal-content-bg);
+  padding: 1.5rem;
+  box-shadow: var(--modal-card-shadow);
+}
+
+.confirm-delete-modal-header {
+  margin-bottom: 1rem;
+}
+
+.confirm-delete-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--danger-bootstrap);
+  margin: 0;
+}
+
+.confirm-delete-modal-body {
+  margin-bottom: 1.5rem;
+}
+
+.confirm-delete-modal-body p {
+  margin: 0;
+  color: var(--PrimaryText);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.form-message-error {
+  margin-top: 0.75rem;
+  color: var(--danger-bootstrap);
+  font-size: 1rem;
+}
+
+.confirm-delete-modal-footer {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.confirm-delete-modal-footer .btn-secondary {
+  flex: 1;
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-pop {
+  animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}

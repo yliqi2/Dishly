@@ -1,0 +1,155 @@
+<section class="register-container" aria-labelledby="register-title">
+	<a routerLink="/" class="back-link">
+		<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+		</svg>
+		Go back home
+	</a>
+
+	<article class="register-card">
+		<div class="header">
+			<span class="brand-icon-box" aria-hidden="true">
+				<img class="brand-icon" ngSrc="assets/icons/DishlyIcon.svg" width="55" height="55" alt="Dishly logo" priority />
+			</span>
+			<h1 id="register-title" class="title">Join Our Community</h1>
+			<p class="subtitle">Create your account and discover thousands of recipes</p>
+		</div>
+
+		<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="form">
+			@if (errorMessage()) {
+				<p id="register-error-general" class="error-message" role="alert" aria-live="polite"><span class="error-prefix">Error:</span> {{ errorMessage() }}</p>
+			}
+			<div class="form-group">
+				<label for="register-username" class="label">Username</label>
+				<input
+					type="text"
+					id="register-username"
+					formControlName="username"
+					placeholder="yourusername"
+					class="input"
+					[class.input-error]="isFieldInvalid('username')"
+					[attr.aria-describedby]="isFieldInvalid('username') ? 'register-username-error' : null"
+					[attr.aria-invalid]="isFieldInvalid('username')"
+				/>
+				@if (isFieldInvalid('username')) {
+					<span id="register-username-error" class="error-message" aria-live="polite" role="alert"><span class="error-prefix">Error:</span> {{ getErrorMessage('username') }}</span>
+				}
+			</div>
+
+			<div class="form-group">
+				<label for="register-email" class="label">Email</label>
+				<input
+					type="email"
+					id="register-email"
+					formControlName="email"
+					placeholder="youremail@address.com"
+					class="input"
+					[class.input-error]="isFieldInvalid('email')"
+					[attr.aria-describedby]="isFieldInvalid('email') ? 'register-email-error' : null"
+					[attr.aria-invalid]="isFieldInvalid('email')"
+				/>
+				@if (isFieldInvalid('email')) {
+					<span id="register-email-error" class="error-message" aria-live="polite" role="alert"><span class="error-prefix">Error:</span> {{ getErrorMessage('email') }}</span>
+				}
+			</div>
+
+			<div class="form-group">
+				<label for="register-password" class="label">Password</label>
+				<div class="password-wrapper">
+					<input
+						[type]="showPassword() ? 'text' : 'password'"
+						id="register-password"
+						formControlName="password"
+						placeholder="········"
+						class="input"
+						[class.input-error]="isFieldInvalid('password')"
+						[attr.aria-describedby]="isFieldInvalid('password') ? 'register-password-error' : null"
+						[attr.aria-invalid]="isFieldInvalid('password')"
+					/>
+					<button
+						type="button"
+						class="toggle-password"
+						(click)="togglePassword()"
+						aria-label="Toggle password visibility"
+					>
+						@if (showPassword()) {
+							<i class="bi bi-eye-fill" aria-hidden="true"></i>
+						} @else {
+							<i class="bi bi-eye-slash-fill" aria-hidden="true"></i>
+						}
+					</button>
+				</div>
+				@if (isFieldInvalid('password')) {
+					<span id="register-password-error" class="error-message" aria-live="polite" role="alert"><span class="error-prefix">Error:</span> {{ getErrorMessage('password') }}</span>
+				}
+			</div>
+
+			<div class="form-group">
+				<label for="register-confirmPassword" class="label">Confirm Password</label>
+				<div class="password-wrapper">
+					<input
+						[type]="showConfirmPassword() ? 'text' : 'password'"
+						id="register-confirmPassword"
+						formControlName="confirmPassword"
+						placeholder="········"
+						class="input"
+						[class.input-error]="isFieldInvalid('confirmPassword')"
+						[attr.aria-describedby]="isFieldInvalid('confirmPassword') ? 'register-confirmPassword-error' : null"
+						[attr.aria-invalid]="isFieldInvalid('confirmPassword')"
+					/>
+					<button
+						type="button"
+						class="toggle-password"
+						(click)="toggleConfirmPassword()"
+						aria-label="Toggle confirm password visibility"
+					>
+						@if (showConfirmPassword()) {
+							<i class="bi bi-eye-fill" aria-hidden="true"></i>
+						} @else {
+							<i class="bi bi-eye-slash-fill" aria-hidden="true"></i>
+						}
+					</button>
+				</div>
+				@if (isFieldInvalid('confirmPassword')) {
+					<span id="register-confirmPassword-error" class="error-message" aria-live="polite" role="alert"><span class="error-prefix">Error:</span> {{ getErrorMessage('confirmPassword') }}</span>
+				}
+			</div>
+
+			@if (errorMessage()) {
+				<div class="error-message">
+					{{ errorMessage() }}
+				</div>
+			}
+
+			<div class="form-footer">
+				<label for="register-acceptTerms" class="terms-accept" [class.checkbox-error]="isFieldInvalid('acceptTerms')">
+					<input
+						type="checkbox"
+						formControlName="acceptTerms"
+						id="register-acceptTerms"
+						[attr.aria-describedby]="isFieldInvalid('acceptTerms') ? 'register-acceptTerms-error' : null"
+						[attr.aria-invalid]="isFieldInvalid('acceptTerms')"
+					/>
+					<span>I accept the <a routerLink="/terms" class="link">Terms and Conditions</a> and <a routerLink="/privacy" class="link">Privacy Policy</a></span>
+				</label>
+				@if (isFieldInvalid('acceptTerms')) {
+					<span id="register-acceptTerms-error" class="error-message" aria-live="polite" role="alert"><span class="error-prefix">Error:</span> {{ getErrorMessage('acceptTerms') }}</span>
+				}
+			</div>
+
+			<button type="submit" class="btn-primary btn-full-width" [disabled]="isLoading()" [attr.aria-busy]="isLoading()">
+				@if (isLoading()) {
+					<span class="btn-loading-icon" aria-hidden="true"></span>
+				} @else {
+					Create Account
+				}
+			</button>
+		</form>
+
+		<div class="login-prompt">
+			<span>Already have an account?</span>
+			<a routerLink="/login" class="login-link">Log In</a>
+		</div>
+	</article>
+
+</section>

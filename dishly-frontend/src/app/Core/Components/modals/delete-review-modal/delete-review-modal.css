@@ -1,0 +1,120 @@
+:host {
+  display: contents;
+}
+
+.drm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--modal-overlay-bg);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.drm-shell {
+  width: min(480px, 100%);
+  z-index: 1051;
+  outline: none;
+}
+
+.drm-content {
+  border-radius: 14px;
+  background: var(--modal-content-bg);
+  padding: 1.5rem;
+  box-shadow: var(--modal-card-shadow);
+}
+
+.drm-header {
+  margin-bottom: 1rem;
+}
+
+.drm-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--danger);
+  margin: 0;
+}
+
+.drm-body {
+  margin-bottom: 1.5rem;
+}
+
+.drm-body p {
+  margin: 0;
+  color: var(--PrimaryText);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.drm-footer {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.drm-btn-cancel {
+  flex: 1;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1.5px solid var(--neutral-900);
+  background: transparent;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--PrimaryText);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.drm-btn-cancel:hover {
+  background: var(--secondaryBackground);
+}
+
+.drm-btn-cancel:active {
+  background: var(--gray-200);
+}
+
+.drm-btn-confirm {
+  flex: 1;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--danger);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.1s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.drm-btn-confirm:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.drm-btn-confirm:active:not(:disabled) {
+  filter: brightness(0.9);
+  transform: translateY(0) scale(0.97);
+}
+
+.drm-btn-confirm:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-pop {
+  animation: modalPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}

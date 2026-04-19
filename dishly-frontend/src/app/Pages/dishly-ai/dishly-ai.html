@@ -1,0 +1,194 @@
+<!-- Hero header -->
+<section class="ai-header page-container">
+  <div class="ai-header__inner">
+    <div class="ai-header__badge">
+      <lucide-icon name="cpu" [size]="16"></lucide-icon>
+      <span>Powered by Spoonacular</span>
+    </div>
+    <h1 class="ai-header__title">Dishly <span class="ai-header__highlight">AI</span></h1>
+    <p class="ai-header__subtitle">Search millions of recipes with full ingredients, nutritional info and step‑by‑step instructions.</p>
+  </div>
+</section>
+
+<!-- Search -->
+<section class="page-container ai-search-section">
+  <div class="ai-search-bar" [class.ai-search-bar--active]="searchQuery">
+    <lucide-icon name="search" [size]="20"></lucide-icon>
+    <input
+      class="ai-search-bar__input"
+      type="text"
+      placeholder="Search a recipe… e.g. pasta carbonara, tacos, sushi"
+      [(ngModel)]="searchQuery"
+      (keydown)="onKeydown($event)"
+    />
+    @if (searchQuery) {
+      <button class="ai-search-bar__clear" (click)="clearSearch()" aria-label="Clear search">
+        <lucide-icon name="x" [size]="16"></lucide-icon>
+      </button>
+    }
+    <button class="ai-search-bar__btn" (click)="onSearch()" [disabled]="loading()">
+      @if (loading()) {
+        <span class="ai-spinner"></span>
+      } @else {
+        Search
+      }
+    </button>
+  </div>
+</section>
+
+<!-- Error -->
+@if (error()) {
+  <section class="page-container">
+    <div class="ai-error">
+      <lucide-icon name="circle-alert" [size]="20"></lucide-icon>
+      <span>{{ error() }}</span>
+    </div>
+  </section>
+}
+
+<!-- Results -->
+@if (hasSearched() && !loading() && !error()) {
+  <section class="page-container ai-results-section">
+
+    @if (recipes().length === 0) {
+      <div class="ai-empty">
+        <lucide-icon name="search-x" [size]="48"></lucide-icon>
+        <p>No recipes found for <strong>"{{ searchQuery }}"</strong>. Try different keywords.</p>
+      </div>
+    } @else {
+      <p class="ai-results-count">{{ recipes().length }} recipes found</p>
+
+      <div class="ai-grid">
+        @for (recipe of recipes(); track recipe.id) {
+          <div class="ai-card" [class.ai-card--selected]="selectedRecipe()?.id === recipe.id" (click)="selectRecipe(recipe)">
+            <div class="ai-card__img-wrapper">
+              <img [src]="recipe.image" [alt]="recipe.title" class="ai-card__img" loading="lazy" />
+              <div class="ai-card__badges">
+                @if (recipe.vegan) { <span class="ai-badge ai-badge--green">Vegan</span> }
+                @if (recipe.glutenFree) { <span class="ai-badge ai-badge--blue">Gluten‑free</span> }
+              </div>
+            </div>
+            <div class="ai-card__body">
+              <h3 class="ai-card__title">{{ recipe.title }}</h3>
+              <div class="ai-card__meta">
+                @if (recipe.readyInMinutes) {
+                  <span class="ai-meta-item">
+                    <lucide-icon name="clock" [size]="13"></lucide-icon> {{ recipe.readyInMinutes }} min
+                  </span>
+                }
+                @if (recipe.servings) {
+                  <span class="ai-meta-item">
+                    <lucide-icon name="users" [size]="13"></lucide-icon> {{ recipe.servings }} servings
+                  </span>
+                }
+                @if (recipe.healthScore) {
+                  <span class="ai-meta-item ai-meta-item--score">
+                    <lucide-icon name="star" [size]="13"></lucide-icon> {{ recipe.healthScore }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Detail panel -->
+      @if (selectedRecipe()) {
+        <div class="ai-detail">
+          <div class="ai-detail__header">
+            <img [src]="selectedRecipe()!.image" [alt]="selectedRecipe()!.title" class="ai-detail__cover" />
+            <div class="ai-detail__header-info">
+              <h2 class="ai-detail__title">{{ selectedRecipe()!.title }}</h2>
+              <div class="ai-detail__tags">
+                @for (diet of selectedRecipe()!.diets; track diet) {
+                  <span class="ai-tag">{{ diet }}</span>
+                }
+                @for (cuisine of selectedRecipe()!.cuisines; track cuisine) {
+                  <span class="ai-tag ai-tag--cuisine">{{ cuisine }}</span>
+                }
+              </div>
+              <div class="ai-detail__stats">
+                @if (selectedRecipe()!.readyInMinutes) {
+                  <div class="ai-stat">
+                    <lucide-icon name="clock" [size]="18"></lucide-icon>
+                    <span>{{ selectedRecipe()!.readyInMinutes }} min</span>
+                  </div>
+                }
+                @if (selectedRecipe()!.servings) {
+                  <div class="ai-stat">
+                    <lucide-icon name="users" [size]="18"></lucide-icon>
+                    <span>{{ selectedRecipe()!.servings }} servings</span>
+                  </div>
+                }
+                @if (selectedRecipe()!.healthScore) {
+                  <div class="ai-stat">
+                    <lucide-icon name="star" [size]="18"></lucide-icon>
+                    <span>Health {{ selectedRecipe()!.healthScore }}%</span>
+                  </div>
+                }
+              </div>
+              @if (selectedRecipe()!.summary) {
+                <p class="ai-detail__summary">{{ stripHtml(selectedRecipe()!.summary) }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="ai-detail__body">
+            <!-- Ingredients -->
+            @if (selectedRecipe()!.extendedIngredients.length) {
+              <div class="ai-section">
+                <h3 class="ai-section__title">
+                  <lucide-icon name="clipboard-list" [size]="18"></lucide-icon>
+                  Ingredients
+                </h3>
+                <ul class="ai-ingredients">
+                  @for (ing of selectedRecipe()!.extendedIngredients; track ing.id) {
+                    <li class="ai-ingredient">{{ ing.original }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            <!-- Instructions -->
+            @if (selectedRecipe()!.analyzedInstructions.length) {
+              <div class="ai-section">
+                <h3 class="ai-section__title">
+                  <lucide-icon name="chef-hat" [size]="18"></lucide-icon>
+                  Instructions
+                </h3>
+                @for (block of selectedRecipe()!.analyzedInstructions; track $index) {
+                  @if (block.name) { <h4 class="ai-step-group">{{ block.name }}</h4> }
+                  <ol class="ai-steps">
+                    @for (step of block.steps; track step.number) {
+                      <li class="ai-step">
+                        <span class="ai-step__num">{{ step.number }}</span>
+                        <span class="ai-step__text">{{ step.step }}</span>
+                      </li>
+                    }
+                  </ol>
+                }
+              </div>
+            } @else if (selectedRecipe()!.instructions) {
+              <div class="ai-section">
+                <h3 class="ai-section__title">
+                  <lucide-icon name="chef-hat" [size]="18"></lucide-icon>
+                  Instructions
+                </h3>
+                <p class="ai-plain-instructions">{{ stripHtml(selectedRecipe()!.instructions) }}</p>
+              </div>
+            }
+          </div>
+
+          @if (selectedRecipe()!.sourceUrl) {
+            <div class="ai-detail__footer">
+              <a [href]="selectedRecipe()!.sourceUrl" target="_blank" rel="noopener noreferrer" class="ai-source-link">
+                View original recipe
+              </a>
+            </div>
+          }
+        </div>
+      }
+    }
+  </section>
+}
+

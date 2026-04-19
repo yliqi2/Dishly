@@ -1,0 +1,163 @@
+<div class="edit-profile-main">
+  <section class="page-header page-container">
+    <div class="page-header__inner">
+      <h1 class="page-title">Edit Profile</h1>
+      <div class="page-underline" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <div class="edit-profile-wrapper page-container">
+
+    <section class="edit-section">
+      <h2 class="edit-section-title">Profile Picture</h2>
+      <input type="file" #iconInput accept="image/*" class="file-input" (change)="onIconSelected($event)" aria-hidden="true" />
+      <div class="avatar-wrap" (click)="openIconPicker()" role="button" tabindex="0" aria-label="Change profile picture" (keydown.enter)="openIconPicker()" (keydown.space)="openIconPicker()">
+        <div class="edit-avatar" role="img" aria-label="Current profile picture">
+          @if (iconPreview(); as url) {
+            <img [src]="url" alt="Profile icon" />
+          } @else {
+            <span class="edit-avatar-initial">{{ displayName.charAt(0).toUpperCase() }}</span>
+          }
+        </div>
+        <button type="button" class="avatar-edit-btn" aria-label="Edit profile picture" (click)="openIconPicker(); $event.stopPropagation()">
+          @if (isUploadingIcon()) {
+            <span class="upload-spinner" aria-hidden="true"></span>
+          } @else {
+            <lucide-icon name="pencil" size="14" strokeWidth="2"></lucide-icon>
+          }
+        </button>
+      </div>
+      @if (uploadError()) {
+        <p class="edit-error" role="status" aria-live="polite"><span class="error-prefix">Error:</span> {{ uploadError() }}</p>
+      }
+    </section>
+
+    <section class="edit-section">
+      <h2 class="edit-section-title">Personal Information</h2>
+      <p class="edit-section-desc">Update your basic profile information.</p>
+      <form class="edit-form" [formGroup]="personalForm" (ngSubmit)="savePersonalInfo()">
+        <div class="edit-fields">
+          <div class="edit-field">
+            <label for="edit-username">Username</label>
+            <input id="edit-username" type="text" formControlName="username" [attr.aria-describedby]="controlError('personal', 'username') ? 'username-error' : null" [attr.aria-invalid]="!!controlError('personal', 'username')" />
+            @if (controlError('personal', 'username'); as err) {
+              <p id="username-error" class="edit-error" role="status" aria-live="polite"><span class="error-prefix">Error:</span> {{ err }}</p>
+            }
+          </div>
+          <div class="edit-field">
+            <label for="edit-email">Email</label>
+            <input id="edit-email" type="email" formControlName="email" [attr.aria-describedby]="controlError('personal', 'email') ? 'email-error' : null" [attr.aria-invalid]="!!controlError('personal', 'email')" />
+            @if (controlError('personal', 'email'); as err) {
+              <p id="email-error" class="edit-error" role="status" aria-live="polite"><span class="error-prefix">Error:</span> {{ err }}</p>
+            }
+          </div>
+        </div>
+        @if (personalError()) {
+          <p class="edit-error" role="status" aria-live="polite"><span class="error-prefix">Error:</span> {{ personalError() }}</p>
+        }
+        @if (personalSuccess()) {
+          <p class="edit-success" role="status" aria-live="polite">{{ personalSuccess() }}</p>
+        }
+        <div class="edit-actions">
+          <button type="button" class="btn-cancel" (click)="resetPersonalForm()">Reset</button>
+          <button type="submit" class="btn-primary btn-sm" [disabled]="isSavingPersonal()" [attr.aria-busy]="isSavingPersonal()">
+            @if (isSavingPersonal()) {
+              <span class="btn-loading-icon" aria-hidden="true"></span>
+            } @else {
+              Save
+            }
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="edit-section">
+      <h2 class="edit-section-title">Security</h2>
+      <p class="edit-section-desc">Update your password.</p>
+      <form class="edit-form" [formGroup]="passwordForm" (ngSubmit)="savePassword()">
+        <div class="edit-field">
+          <label for="edit-currentPassword">Current Password</label>
+          <div class="password-wrap">
+            <input id="edit-currentPassword" [type]="showCurrentPassword() ? 'text' : 'password'" formControlName="currentPassword" placeholder="Enter current password" />
+            <button type="button" class="password-toggle" (click)="toggleCurrentPasswordVisibility()" [attr.aria-label]="showCurrentPassword() ? 'Hide password' : 'Show password'">
+              @if (showCurrentPassword()) {
+                <lucide-icon name="eye" size="18" strokeWidth="2"></lucide-icon>
+              } @else {
+                <lucide-icon name="eye-off" size="18" strokeWidth="2"></lucide-icon>
+              }
+            </button>
+          </div>
+        </div>
+        <div class="edit-field">
+          <label for="edit-newPassword">New Password</label>
+          <div class="password-wrap">
+            <input id="edit-newPassword" [type]="showNewPassword() ? 'text' : 'password'" formControlName="newPassword" placeholder="Enter new password" [attr.aria-describedby]="controlError('password', 'newPassword') ? 'new-password-error' : null" [attr.aria-invalid]="!!controlError('password', 'newPassword')" />
+            <button type="button" class="password-toggle" (click)="toggleNewPasswordVisibility()" [attr.aria-label]="showNewPassword() ? 'Hide password' : 'Show password'">
+              @if (showNewPassword()) {
+                <lucide-icon name="eye" size="18" strokeWidth="2"></lucide-icon>
+              } @else {
+                <lucide-icon name="eye-off" size="18" strokeWidth="2"></lucide-icon>
+              }
+            </button>
+          </div>
+          @if (controlError('password', 'newPassword'); as err) {
+            <p id="new-password-error" class="edit-error" role="status" aria-live="polite"><span class="error-prefix">Error:</span> {{ err }}</p>
+          }
+        </div>
+        <div class="edit-field">
+          <label for="edit-confirmPassword">Confirm Password</label>
+          <div class="password-wrap">
+            <input id="edit-confirmPassword" [type]="showConfirmPassword() ? 'text' : 'password'" formControlName="confirmPassword" placeholder="Confirm new password" [attr.aria-describedby]="controlError('password', 'confirmPassword') ? 'confirm-password-error' : null" [attr.aria-invalid]="!!controlError('password', 'confirmPassword')" />
+            <button type="button" class="password-toggle" (click)="toggleConfirmPasswordVisibility()" [attr.aria-label]="showConfirmPassword() ? 'Hide confirm password' : 'Show confirm password'">
+              @if (showConfirmPassword()) {
+                <lucide-icon name="eye" size="18" strokeWidth="2"></lucide-icon>
+              } @else {
+                <lucide-icon name="eye-off" size="18" strokeWidth="2"></lucide-icon>
+              }
+            </button>
+          </div>
+          @if (controlError('password', 'confirmPassword'); as err) {
+            <p id="confirm-password-error" class="edit-error" role="status" aria-live="polite"><span class="error-prefix">Error:</span> {{ err }}</p>
+          }
+        </div>
+        @if (passwordError()) {
+          <p class="edit-error" role="status" aria-live="polite"><span class="error-prefix">Error:</span> {{ passwordError() }}</p>
+        }
+        @if (passwordSuccess()) {
+          <p class="edit-success" role="status" aria-live="polite">{{ passwordSuccess() }}</p>
+        }
+        <div class="edit-actions">
+          <button type="button" class="btn-cancel" (click)="resetPasswordForm()">Reset</button>
+          <button type="submit" class="btn-primary btn-sm" [disabled]="isSavingPassword()" [attr.aria-busy]="isSavingPassword()">
+            @if (isSavingPassword()) {
+              <span class="btn-loading-icon" aria-hidden="true"></span>
+            } @else {
+              Save password
+            }
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="edit-section edit-section-danger">
+      <h2 class="edit-section-title">Danger Zone</h2>
+      <p class="edit-section-desc">Actions here are permanent and cannot be undone.</p>
+      <section class="danger-card" aria-labelledby="danger-title">
+        <div>
+          <h3 id="danger-title" class="danger-title">Delete your Account</h3>
+          <p class="danger-desc">Permanently delete your profile and all data.</p>
+        </div>
+        <button type="button" class="btn-danger btn-sm" (click)="openDeleteModal()">
+          Delete Account
+        </button>
+      </section>
+    </section>
+  </div>
+</div>
+
+@if (showDeleteModal()) {
+  <app-confirm-delete-modal
+    [context]="deleteContext()"
+    (closeModal)="closeDeleteModal()"
+  />
+}
