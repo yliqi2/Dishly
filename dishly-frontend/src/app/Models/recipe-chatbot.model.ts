@@ -11,7 +11,8 @@ export interface ChatMessage {
 
 export interface RecetaResponse {
   status: string;
-  receta: RecetaData;
+  source?: string;
+  receta?: RecetaData | null;
   message?: string;
 }
 
@@ -26,9 +27,13 @@ export interface RecetaData {
   dificultad: 'easy' | 'medium' | 'hard';
   dificultad_texto: string;
   porciones: number;
+  price?: string | number | null;
   ingredientes: IngredienteResponse[];
+  pasos: string[];
   imagenes: string[];
   imagen_principal: string | null;
+  autor?: string;
+  fecha_creacion?: string;
   mensaje_chat: string;
 }
 

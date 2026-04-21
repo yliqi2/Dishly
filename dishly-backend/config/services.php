@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'n8n' => [
+        'chatbot_recipe_url' => env('N8N_CHATBOT_RECIPE_URL', 'http://n8n:5678/webhook/api/chatbot/receta/buscar'),
+    ],
+
 ];

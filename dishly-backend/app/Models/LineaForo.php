@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LineaForo extends Model
 {
@@ -10,5 +11,22 @@ class LineaForo extends Model
 
     protected $primaryKey = 'id_linea_foro';
 
-    public $timestamps = false;
+    protected $fillable = [
+        'mensaje',
+        'fecha',
+        'id_foro',
+        'id_usuario',
+    ];
+
+    public $timestamps = true;
+
+    public function foro(): BelongsTo
+    {
+        return $this->belongsTo(Foro::class, 'id_foro', 'id_foro');
+    }
+
+    public function autor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_usuario', 'id_usuario');
+    }
 }

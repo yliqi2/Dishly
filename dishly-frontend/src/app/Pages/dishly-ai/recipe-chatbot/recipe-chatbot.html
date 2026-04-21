@@ -3,16 +3,21 @@
   <!-- Header con acciones -->
   <div class="chat-header">
     <div class="header-info">
-      <span class="status-dot online"></span>
-      <span class="status-text">Conectado a Dishly AI</span>
+      <span class="assistant-brand-avatar" aria-hidden="true">
+        <img src="assets/icons/DishlyIcon.svg" alt="" />
+      </span>
+      <div>
+        <span class="status-text">Dishly AI online</span>
+        <p class="status-subtext">Talk about food and get recipe ideas directly inside the chat</p>
+      </div>
     </div>
     <div class="header-actions">
-      <button class="btn-clear" (click)="limpiarChat()" title="Limpiar chat">
-        🗑️
+      <button class="btn-clear" (click)="limpiarChat()" title="Clear chat">
+        Clear chat
       </button>
     </div>
   </div>
-  
+
   <!-- Área de mensajes -->
   <div class="messages-area" #messagesContainer>
     @for (message of messages; track message.id) {
@@ -20,60 +25,41 @@
         <!-- Mensaje de usuario -->
         @if (message.role === 'user') {
           <div class="message user-message">
-            <div class="message-avatar">👤</div>
+            <div class="message-avatar">
+              @if (currentUserAvatarUrl; as userAvatar) {
+                <img [src]="userAvatar" [alt]="currentUserName" />
+              } @else {
+                <span>{{ currentUserInitial }}</span>
+              }
+            </div>
             <div class="message-content">
               <div class="message-text">{{ message.content }}</div>
               <div class="message-time">{{ message.timestamp | date:'HH:mm' }}</div>
             </div>
           </div>
         }
-        
+
         <!-- Mensaje del asistente -->
         @if (message.role === 'assistant') {
           <div class="message assistant-message">
-            <div class="message-avatar">🤖</div>
+            <div class="message-avatar message-avatar--assistant">
+              <img src="assets/icons/DishlyIcon.svg" alt="Dishly AI" />
+            </div>
             <div class="message-content">
-              <!-- Removido pipe markdown para evitar errores si no está implementado -->
               <div class="message-text">{{ message.content }}</div>
               <div class="message-time">{{ message.timestamp | date:'HH:mm' }}</div>
-              
-              <!-- Tarjeta de receta si existe -->
+
               @if (message.receta) {
-                <div class="recipe-card">
-                  @if (message.receta.imagen_principal) {
-                    <img 
-                      [src]="message.receta.imagen_principal" 
+                <div class="message-recipe-media">
+                  @for (imageUrl of getVisibleImages(message.receta); track imageUrl) {
+                    <img
+                      [src]="imageUrl"
                       [alt]="message.receta.titulo"
-                      class="recipe-image"
+                      class="message-recipe-media__image"
+                      loading="lazy"
+                      (error)="$any($event.target).src='assets/placeholder.jpg'"
                     >
                   }
-                  <div class="recipe-info">
-                    <h4>{{ message.receta.titulo }}</h4>
-                    <div class="recipe-meta">
-                      <span class="badge" [class]="message.receta.dificultad">
-                        {{ message.receta.dificultad_texto }}
-                      </span>
-                      <span class="badge time">
-                        ⏱️ {{ message.receta.tiempo_texto }}
-                      </span>
-                      <span class="badge servings">
-                        🍽️ {{ message.receta.porciones }} porciones
-                      </span>
-                    </div>
-                    <div class="recipe-ingredients-preview">
-                      <strong>Ingredientes principales:</strong>
-                      <ul>
-                        @for (ing of message.receta.ingredientes.slice(0, 3); track $index) {
-                          <li>
-                            {{ ing.nombre }} {{ ing.cantidad }} {{ ing.unidad_texto }}
-                          </li>
-                        }
-                      </ul>
-                    </div>
-                    <button class="btn-view-recipe" (click)="verRecetaCompleta(message.receta.id_receta)">
-                      Ver receta completa →
-                    </button>
-                  </div>
                 </div>
               }
             </div>
@@ -81,7 +67,7 @@
         }
       </div>
     }
-    
+
     <!-- Indicador de escritura -->
     @if (isLoading()) {
       <div class="typing-indicator">
@@ -91,14 +77,14 @@
       </div>
     }
   </div>
-  
+
   <!-- Sugerencias -->
   @if (messages.length < 3) {
     <div class="suggestions-area">
-      <p class="suggestions-title">💡 Sugerencias para empezar:</p>
+      <p class="suggestions-title">Ideas to get started</p>
       <div class="suggestions-list">
         @for (sugerencia of sugerencias; track $index) {
-          <button 
+          <button
             class="suggestion-btn"
             (click)="usarSugerencia(sugerencia)"
           >
@@ -108,23 +94,23 @@
       </div>
     </div>
   }
-  
+
   <!-- Input area -->
   <div class="input-area">
     <textarea
       #messageInput
       [(ngModel)]="newMessage"
       (keydown)="handleKeyPress($event)"
-      placeholder="Escribe tu pregunta aquí... (ej: 'Busco una receta fácil con pollo')"
+      placeholder="Write as if you were talking to your chef: ingredients, cravings, time, or just a question..."
       [disabled]="isLoading()"
       rows="1"
     ></textarea>
-    <button 
-      class="btn-send" 
-      (click)="sendMessage()" 
+    <button
+      class="btn-send"
+      (click)="sendMessage()"
       [disabled]="!newMessage.trim() || isLoading()"
     >
       📤
     </button>
   </div>
-</div>
+</div>

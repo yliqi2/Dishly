@@ -57,6 +57,7 @@
 
 	--layout-max-width: 1400px;
 	--layout-gutter: 24px;
+	--border-radius: 10px;
 }
 
 /* Botones estilo Xuxemons: solo clases propias con nombres tipo Bootstrap, sin framework Bootstrap */

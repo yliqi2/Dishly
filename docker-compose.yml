@@ -53,10 +53,14 @@ services:
       - APP_URL=http://localhost:${BACKEND_PORT}
     command: >
       bash -c "
+      mkdir -p /var/www/html/storage/logs /var/www/html/storage/framework/cache/data /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/bootstrap/cache &&
+      touch /var/www/html/storage/logs/laravel.log &&
+      chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache &&
+      chmod -R ug+rwx /var/www/html/storage /var/www/html/bootstrap/cache &&
       composer install --no-interaction --optimize-autoloader &&
       [ ! -f /var/www/html/.env ] && cp /var/www/html/.env.example /var/www/html/.env || true &&
-      php artisan key:generate --no-interaction &&
-      php artisan migrate --force &&
+      (grep -q '^APP_KEY=base64:' /var/www/html/.env || php artisan key:generate --no-interaction) &&
+      php artisan migrate --force || true &&
       echo 'Server started' &&
       apache2-foreground
       "
@@ -109,9 +113,7 @@ services:
     ports:
       - "${N8N_PORT}:5678"
     environment:
-      - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE}
-      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+      - N8N_BASIC_AUTH_ACTIVE=false
       - N8N_HOST=localhost
       - N8N_PORT=5678
       - N8N_PROTOCOL=http

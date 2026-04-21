@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarritoController;
+use App\Http\Controllers\ForumController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\RecetaController;
 use App\Http\Controllers\UserController;
@@ -14,9 +15,12 @@ Route::get('/verify-email', [AuthController::class, 'verifyEmailApi']);
 Route::post('/send-email', [MailController::class, 'send']);
 Route::post('/reset-password', [MailController::class, 'resetPassword']);
 Route::get('/recipes', [RecetaController::class , 'getAllRecetas']);
+Route::get('/chatbot/recipes/catalog', [\App\Http\Controllers\ChatbotController::class, 'catalog']);
 Route::post('/chatbot/receta/buscar', [\App\Http\Controllers\ChatbotController::class, 'buscar']);
 Route::get('/recipes/{id}', [RecetaController::class , 'getRecetaById']);
 Route::get('/recipes/{id}/reviews', [RecetaController::class , 'getReviewsForRecipe']);
+Route::get('/forums', [ForumController::class, 'index']);
+Route::get('/forums/{forumId}', [ForumController::class, 'show']);
 
 
 Route::middleware('auth:api')->group(function () {
@@ -54,5 +58,10 @@ Route::middleware('auth:api')->group(function () {
 
         Route::get('/recipes/{id}/check-purchase', [RecetaController::class , 'checkPurchase']);
 
+        Route::post('/forums', [ForumController::class, 'store']);
+        Route::post('/forums/{forumId}/comments', [ForumController::class, 'storeComment']);
+        Route::put('/forums/{forumId}/comments/{commentId}', [ForumController::class, 'updateComment']);
+        Route::delete('/forums/{forumId}/comments/{commentId}', [ForumController::class, 'destroyComment']);
 
-    }); 
+
+    });

@@ -1,5 +1,5 @@
 {
-  "name": "Chatbot Recetas - Con Ingredientes",
+  "name": "Chatbot Recetas - Dishly AI",
   "nodes": [
     {
       "parameters": {
@@ -24,22 +24,14 @@
     },
     {
       "parameters": {
-        "operation": "executeQuery",
-        "query": "SELECT r.id_receta, r.titulo, r.descripcion, r.instrucciones, r.tiempo_preparacion, r.tiempo_preparacion_unidad, r.dificultad, r.porciones, r.price, r.imagen_1, r.imagen_2, r.imagen_3, r.imagen_4, r.imagen_5, r.fecha_creacion, u.name as autor_nombre, GROUP_CONCAT(CONCAT(i.nombre_ingrediente, ' (', ri.cantidad, ' ', ri.unidad, ')') SEPARATOR '|') as ingredientes_completos, GROUP_CONCAT(i.nombre_ingrediente SEPARATOR ', ') as solo_ingredientes FROM receta_original r LEFT JOIN users u ON r.id_autor = u.id_usuario LEFT JOIN receta_ingrediente ri ON r.id_receta = ri.id_receta LEFT JOIN ingrediente i ON ri.id_ingrediente = i.id_ingrediente WHERE r.active = 1 GROUP BY r.id_receta, r.titulo, r.descripcion, r.instrucciones, r.tiempo_preparacion, r.tiempo_preparacion_unidad, r.dificultad, r.porciones, r.price, r.imagen_1, r.imagen_2, r.imagen_3, r.imagen_4, r.imagen_5, r.fecha_creacion, u.name ORDER BY r.fecha_creacion DESC",
-        "options": {
-          "nodeVersion": 1
-        }
+        "method": "GET",
+        "url": "http://backend/api/chatbot/recipes/catalog",
+        "options": {}
       },
       "id": "mysql-node",
-      "name": "MySQL - receta_original con ingredientes",
-      "type": "n8n-nodes-base.mySql",
-      "position": [450, 300],
-      "credentials": {
-        "mySql": {
-          "id": "1",
-          "name": "MySQL Laravel"
-        }
-      }
+      "name": "Catalogo Laravel - recetas con ingredientes",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 300]
     },
     {
       "parameters": {
@@ -74,7 +66,7 @@
             },
             {
               "name": "prompt",
-              "value": "={{ 'MENSAJE DEL USUARIO: \"' + $json.userMessage + '\"\\n\\nRECETAS DISPONIBLES:\\n' + $json.recetas.map(r => '[' + r.id + '] ' + r.titulo + ' - Ingredientes: ' + r.ingredientes).join('\\n') + '\\n\\nRespuesta (solo el número ID):' }}"
+              "value": "={{ 'MENSAJE DEL USUARIO: \"' + $json.userMessage + '\"\\n\\nRECETAS DISPONIBLES EN DISHLY:\\n' + $json.recetas.map(r => '[' + r.id + '] ' + r.titulo + ' - Ingredientes: ' + r.ingredientes + ' - Dificultad: ' + r.dificultad).join('\\n') + '\\n\\nDevuelve solo el ID numérico de la receta que mejor responde a la petición.' }}"
             },
             {
               "name": "system",
@@ -131,11 +123,11 @@
             },
             {
               "name": "prompt",
-              "value": "={{ 'Presenta esta receta de forma atractiva:\\n\\nNombre: ' + $json.recetaSeleccionada.titulo + '\\nDificultad: ' + $json.recetaSeleccionada.dificultad + '\\nTiempo: ' + $json.recetaSeleccionada.tiempo_preparacion + ' ' + $json.recetaSeleccionada.tiempo_preparacion_unidad + '\\nPorciones: ' + $json.recetaSeleccionada.porciones + '\\nIngredientes: ' + $json.ingredientes.map(i => i.nombre + (i.cantidad ? ' ' + i.cantidad + ' ' + i.unidad : '')).join(', ') + '\\nInstrucciones: ' + $json.recetaSeleccionada.instrucciones }}"
+              "value": "={{ 'Redacta una recomendación breve y útil para esta receta de Dishly.\\n\\nNombre: ' + $json.recetaSeleccionada.titulo + '\\nDescripción: ' + $json.recetaSeleccionada.descripcion + '\\nDificultad: ' + $json.recetaSeleccionada.dificultad + '\\nTiempo: ' + $json.recetaSeleccionada.tiempo_preparacion + ' ' + $json.recetaSeleccionada.tiempo_preparacion_unidad + '\\nPorciones: ' + $json.recetaSeleccionada.porciones + '\\nIngredientes: ' + $json.ingredientes.map(i => i.nombre + (i.cantidad ? ' ' + i.cantidad + ' ' + i.unidad : '')).join(', ') + '\\nInstrucciones: ' + $json.recetaSeleccionada.instrucciones }}"
             },
             {
               "name": "system",
-              "value": "Eres un chef entusiasta. Presenta la receta de forma clara usando emojis. Máximo 200 palabras."
+              "value": "Eres Dishly AI. Responde en español claro, en máximo 140 palabras, mencionando por qué la receta encaja con la petición del usuario. No inventes ingredientes ni pasos."
             },
             {
               "name": "stream",
@@ -152,7 +144,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const receta = $('Filtrar Receta por ID').first().json.recetaSeleccionada;\nconst ingredientes = $('Filtrar Receta por ID').first().json.ingredientes;\nconst aiMsg = $input.first().json.response || $input.first().json.message?.content || '';\n\nreturn [{\n  json: {\n    status: 'success',\n    receta: {\n      id_receta: receta.id_receta,\n      titulo: receta.titulo,\n      descripcion: receta.descripcion,\n      instrucciones: receta.instrucciones,\n      tiempo_preparacion: receta.tiempo_preparacion,\n      tiempo_preparacion_unidad: receta.tiempo_preparacion_unidad,\n      dificultad: receta.dificultad,\n      porciones: receta.porciones,\n      ingredientes: ingredientes.map(i => ({ nombre: i.nombre, cantidad: i.cantidad, unidad: i.unidad })),\n      imagen_principal: receta.imagen_1,\n      imagenes: [receta.imagen_1, receta.imagen_2, receta.imagen_3, receta.imagen_4, receta.imagen_5].filter(Boolean),\n      mensaje_chat: aiMsg\n    }\n  }\n}];"
+        "jsCode": "const receta = $('Filtrar Receta por ID').first().json.recetaSeleccionada;\nconst ingredientes = $('Filtrar Receta por ID').first().json.ingredientes;\nconst aiMsg = $input.first().json.response || $input.first().json.message?.content || '';\n\nconst dificultadMap = { easy: 'Fácil', medium: 'Media', hard: 'Difícil' };\nconst tiempoMap = { minutes: 'minutos', hours: 'horas' };\nconst unidadMap = { g: 'g', kg: 'kg', mg: 'mg', l: 'l', ml: 'ml', unit: 'unidades' };\n\nconst pasos = (receta.instrucciones || '')\n  .split(/\\r?\\n/)\n  .map(step => step.replace(/^\\d+[.)-]?\\s*/, '').trim())\n  .filter(Boolean);\n\nreturn [{\n  json: {\n    status: 'success',\n    receta: {\n      id_receta: receta.id_receta,\n      titulo: receta.titulo,\n      descripcion: receta.descripcion,\n      instrucciones: receta.instrucciones,\n      pasos,\n      tiempo_preparacion: receta.tiempo_preparacion,\n      tiempo_preparacion_unidad: receta.tiempo_preparacion_unidad,\n      tiempo_texto: receta.tiempo_preparacion + ' ' + (tiempoMap[receta.tiempo_preparacion_unidad] || receta.tiempo_preparacion_unidad),\n      dificultad: receta.dificultad,\n      dificultad_texto: dificultadMap[receta.dificultad] || receta.dificultad,\n      porciones: receta.porciones,\n      ingredientes: ingredientes.map(i => ({ nombre: i.nombre, cantidad: i.cantidad, unidad: i.unidad, unidad_texto: unidadMap[i.unidad] || i.unidad })),\n      imagen_principal: receta.imagen_1,\n      imagenes: [receta.imagen_1, receta.imagen_2, receta.imagen_3, receta.imagen_4, receta.imagen_5].filter(Boolean),\n      autor: receta.autor_nombre,\n      fecha_creacion: receta.fecha_creacion,\n      mensaje_chat: aiMsg\n    }\n  }\n}];"
       },
       "id": "code-final",
       "name": "Formato Respuesta Laravel",
@@ -189,9 +181,9 @@
   ],
   "connections": {
     "Webhook Laravel": {
-      "main": [[{ "node": "MySQL - receta_original con ingredientes", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Catalogo Laravel - recetas con ingredientes", "type": "main", "index": 0 }]]
     },
-    "MySQL - receta_original con ingredientes": {
+    "Catalogo Laravel - recetas con ingredientes": {
       "main": [[{ "node": "Agregar Todas las Recetas", "type": "main", "index": 0 }]]
     },
     "Agregar Todas las Recetas": {
