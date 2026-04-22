@@ -427,3 +427,54 @@
 		align-items: flex-start;
 	}
 }
+
+/* Delete confirmation modal */
+.delete-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	background: rgba(0, 0, 0, 0.55);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	backdrop-filter: blur(2px);
+}
+
+.delete-modal {
+	background: var(--background);
+	border: 1px solid var(--gray-800);
+	border-radius: var(--border-radius);
+	box-shadow: 0 8px 40px rgba(0, 0, 0, 0.22);
+	padding: 36px 32px 28px;
+	max-width: 420px;
+	width: 100%;
+	display: grid;
+	gap: 12px;
+	text-align: center;
+}
+
+.delete-modal__icon {
+	font-size: 40px;
+	line-height: 1;
+}
+
+.delete-modal h3 {
+	margin: 0;
+	font-size: 20px;
+	color: var(--PrimaryText);
+}
+
+.delete-modal p {
+	margin: 0;
+	color: var(--gray-500);
+	font-size: 15px;
+	line-height: 1.5;
+}
+
+.delete-modal__actions {
+	display: flex;
+	justify-content: center;
+	gap: 12px;
+	margin-top: 8px;
+}

@@ -283,3 +283,17 @@
     }
   </div>
 </section>
+
+@if (deleteModalOpen) {
+  <div class="delete-modal-backdrop" (click)="cancelDeleteModal()" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+    <div class="delete-modal" (click)="$event.stopPropagation()">
+      <div class="delete-modal__icon" aria-hidden="true">🗑️</div>
+      <h3 id="delete-modal-title">Delete comment</h3>
+      <p>Are you sure you want to delete this comment? This action cannot be undone.</p>
+      <div class="delete-modal__actions">
+        <button class="btn-secondary btn-sm" type="button" (click)="cancelDeleteModal()">Cancel</button>
+        <button class="btn-danger btn-sm" type="button" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+}
