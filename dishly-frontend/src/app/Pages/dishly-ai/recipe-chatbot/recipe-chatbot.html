@@ -7,8 +7,8 @@
         <img src="assets/icons/DishlyIcon.svg" alt="" />
       </span>
       <div>
-        <span class="status-text">Dishly AI online</span>
-        <p class="status-subtext">Talk about food and get recipe ideas directly inside the chat</p>
+        <span class="status-text">Dishly AI Recipe Generator online</span>
+        <p class="status-subtext">Describe ingredients or cravings and get a generated recipe in this chat</p>
       </div>
     </div>
     <div class="header-actions">
@@ -81,7 +81,7 @@
   <!-- Sugerencias -->
   @if (messages.length < 3) {
     <div class="suggestions-area">
-      <p class="suggestions-title">Ideas to get started</p>
+      <p class="suggestions-title">Recipe prompts to generate ideas</p>
       <div class="suggestions-list">
         @for (sugerencia of sugerencias; track $index) {
           <button
@@ -101,7 +101,7 @@
       #messageInput
       [(ngModel)]="newMessage"
       (keydown)="handleKeyPress($event)"
-      placeholder="Write as if you were talking to your chef: ingredients, cravings, time, or just a question..."
+      placeholder="Ask Dishly AI to generate a recipe: ingredients, style, time, servings, or difficulty..."
       [disabled]="isLoading()"
       rows="1"
     ></textarea>

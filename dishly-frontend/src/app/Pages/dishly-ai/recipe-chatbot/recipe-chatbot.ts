@@ -30,12 +30,12 @@ export class RecipeChatbot implements OnInit {
   isLoading = signal<boolean>(false);
 
   sugerencias: string[] = [
-    'Hi Dishly, what can you do?',
-    'I want a smash burger recipe',
-    'I need something quick and easy for dinner',
-    'I have tomato and cheese, what can I make?',
-    'I want a chocolate dessert',
-    'Recommend something in under 30 minutes'
+    'Generate a smash burger recipe with crispy onions',
+    'Create a quick 20-minute dinner recipe with chicken and rice',
+    'I have tomato and cheese, generate a recipe I can cook now',
+    'Generate an easy chocolate dessert recipe for 4 people',
+    'Create a high-protein breakfast recipe with eggs and oats',
+    'Generate a vegetarian pasta recipe under 30 minutes'
   ];
 
   protected get currentUserName(): string {
@@ -86,7 +86,7 @@ export class RecipeChatbot implements OnInit {
     this.messages.push({
       id: Date.now(),
       role: 'assistant',
-      content: 'Hello. I am Dishly AI. I can chat with you about cooking and suggest recipe ideas based on your ingredients, the time you have, or the kind of dish you want. What would you like to make today?',
+      content: 'Hello. I am Dishly AI Recipe Generator. Tell me your ingredients, preferred style, available time, or difficulty level, and I will generate a full recipe for you.',
       timestamp: new Date(),
       receta: null
     });
@@ -114,7 +114,7 @@ export class RecipeChatbot implements OnInit {
     const typingIndicator: ChatMessage = {
       id: Date.now() + 1,
       role: 'assistant',
-      content: 'Thinking about the best answer for you...',
+      content: 'Generating your recipe idea...',
       timestamp: new Date(),
       receta: null,
       isTyping: true
@@ -132,7 +132,7 @@ export class RecipeChatbot implements OnInit {
         const assistantMessage: ChatMessage = {
           id: Date.now(),
           role: 'assistant',
-          content: response.receta?.mensaje_chat || response.message || 'I have an idea for you. If you want, give me a bit more detail and I will refine it.',
+          content: response.receta?.mensaje_chat || response.message || 'I generated a recipe idea for you. If you want, give me more detail and I will refine it.',
           timestamp: new Date(),
           receta: response.receta ?? null
         };
@@ -141,7 +141,7 @@ export class RecipeChatbot implements OnInit {
         this.messages.push({
           id: Date.now(),
           role: 'assistant',
-          content: response?.message || 'Sorry, I could not find a recipe that matches your request. Could you try different keywords?',
+          content: response?.message || 'Sorry, I could not generate a recipe that matches your request. Could you try different ingredients or keywords?',
           timestamp: new Date(),
           receta: null
         });

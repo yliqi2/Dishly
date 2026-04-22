@@ -55,6 +55,9 @@ export class Forum implements OnInit {
   protected savingEditedComment = false;
   protected deletingCommentId: number | null = null;
 
+  protected deleteModalOpen = false;
+  private pendingDeleteComment: ForumComment | null = null;
+
   private temporaryForumId = -1;
   private temporaryCommentId = -1;
 
@@ -70,6 +73,7 @@ export class Forum implements OnInit {
       next: (forums) => {
         this.forums = forums;
         this.loadingForums = false;
+        this.sidebarError = null;
 
         const targetForumId = selectedForumId
           ?? this.selectedForum?.id_foro
@@ -85,7 +89,10 @@ export class Forum implements OnInit {
       error: (error) => {
         this.loadingForums = false;
         this.sidebarError = error?.error?.message ?? 'Could not load forums.';
-        this.selectedForum = null;
+
+        if (this.forums.length === 0) {
+          this.selectedForum = null;
+        }
       }
     });
   }
@@ -127,6 +134,11 @@ export class Forum implements OnInit {
       return;
     }
 
+    if (this.isDuplicatedForumTitle(titulo)) {
+      this.createForumError = 'A forum with this title already exists. Please choose a different title.';
+      return;
+    }
+
     this.creatingForum = true;
     this.createForumError = null;
 
@@ -142,8 +154,10 @@ export class Forum implements OnInit {
         this.creatingForum = false;
         this.newForumTitle = '';
         this.newForumDescription = '';
+        this.sidebarError = null;
         this.selectedForum = forum;
         this.upsertForumSummary(forum, true);
+        this.loadForums(forum.id_foro);
       },
       error: (error) => {
         this.creatingForum = false;
@@ -259,11 +273,24 @@ export class Forum implements OnInit {
       return;
     }
 
-    const confirmed = window.confirm('Delete this comment?');
-    if (!confirmed) {
+    this.pendingDeleteComment = comment;
+    this.deleteModalOpen = true;
+  }
+
+  protected cancelDeleteModal(): void {
+    this.deleteModalOpen = false;
+    this.pendingDeleteComment = null;
+  }
+
+  protected confirmDelete(): void {
+    const comment = this.pendingDeleteComment;
+    if (!comment || !this.selectedForum) {
+      this.cancelDeleteModal();
       return;
     }
 
+    this.deleteModalOpen = false;
+    this.pendingDeleteComment = null;
     this.deletingCommentId = comment.id_linea_foro;
     this.commentError = null;
 
@@ -388,6 +415,25 @@ export class Forum implements OnInit {
     return String(validationMessage ?? error?.error?.message ?? fallback);
   }
 
+  private isDuplicatedForumTitle(candidateTitle: string): boolean {
+    const normalizedCandidate = this.normalizeForumTitle(candidateTitle);
+
+    if (!normalizedCandidate) {
+      return false;
+    }
+
+    return this.forums.some((forum) => this.normalizeForumTitle(forum.titulo) === normalizedCandidate);
+  }
+
+  private normalizeForumTitle(value: string): string {
+    return value
+      .trim()
+      .replace(/\s+/g, ' ')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+  }
+
   private buildOptimisticForum(titulo: string, descripcion: string): ForumDetail {
     const now = new Date().toISOString();
     const currentUser = this.user();
@@ -431,4 +477,5 @@ export class Forum implements OnInit {
       can_delete: true,
     };
   }
+
 }

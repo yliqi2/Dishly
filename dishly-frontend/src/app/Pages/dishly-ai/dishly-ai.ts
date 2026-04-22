@@ -16,13 +16,13 @@ import { RouterOutlet } from '@angular/router';
       <div class="dishly-ai-shell page-container">
         <section class="ai-hero-card">
           <div class="ai-hero-card__copy">
-            <p class="ai-eyebrow">Smart Recipe Assistant</p>
-            <h2>Your Dishly kitchen copilot, with the same look and feel as the rest of the app.</h2>
-            <p class="subtitle">Ask for recipes by ingredient, time, difficulty or mood, and jump straight into the full recipe when you find one you like.</p>
+            <p class="ai-eyebrow">AI Recipe Generation</p>
+            <h2>Generate custom recipes in seconds based on your ingredients, time, and cravings.</h2>
+            <p class="subtitle">Tell Dishly AI what you have at home and it will generate a complete recipe with steps, timing, and serving ideas.</p>
           </div>
           <div class="ai-hero-card__badge">
             <span class="ai-icon" aria-hidden="true">AI</span>
-            <span>Live assistant</span>
+            <span>Recipe generator online</span>
           </div>
         </section>
 

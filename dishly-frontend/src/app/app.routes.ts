@@ -72,7 +72,7 @@ export const routes: Routes = [
     title: 'Dishly AI',
     children: [
       { path: '', redirectTo: 'chatbot', pathMatch: 'full' },
-      { path: 'chatbot', component: RecipeChatbot, title: 'Recipe Chatbot' },
+      { path: 'chatbot', component: RecipeChatbot, title: 'Dishly AI' },
     ],
   },
   {

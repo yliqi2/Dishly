@@ -66,11 +66,13 @@ class ForumController extends Controller
                 'descripcion' => ['required', 'string', 'max:4000'],
             ]);
 
-            $normalizedTitle = preg_replace('/\s+/', ' ', trim((string) $data['titulo'])) ?? '';
+            $cleanTitle = preg_replace('/\s+/', ' ', trim((string) $data['titulo'])) ?? '';
+            $normalizedTitle = $this->normalizeForumTitle($cleanTitle);
 
             $duplicateTitleExists = Foro::query()
-                ->whereRaw('LOWER(TRIM(titulo)) = ?', [strtolower($normalizedTitle)])
-                ->exists();
+                ->select('titulo')
+                ->get()
+                ->contains(fn (Foro $forum) => $this->normalizeForumTitle((string) $forum->titulo) === $normalizedTitle);
 
             if ($duplicateTitleExists) {
                 throw ValidationException::withMessages([
@@ -79,7 +81,7 @@ class ForumController extends Controller
             }
 
             $forum = Foro::create([
-                'titulo' => $normalizedTitle,
+                'titulo' => $cleanTitle,
                 'descripcion' => trim((string) $data['descripcion']),
                 'fecha_creacion' => now()->toDateString(),
                 'id_usuario' => $user->id_usuario,
@@ -284,5 +286,14 @@ class ForumController extends Controller
             'can_edit' => $isOwner || $isAdmin,
             'can_delete' => $isOwner || $isAdmin,
         ];
+    }
+
+    private function normalizeForumTitle(string $title): string
+    {
+        $collapsed = preg_replace('/\s+/', ' ', trim($title)) ?? '';
+        $lowered = mb_strtolower($collapsed, 'UTF-8');
+        $transliterated = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $lowered);
+
+        return $transliterated === false ? $lowered : mb_strtolower($transliterated, 'UTF-8');
     }
 }

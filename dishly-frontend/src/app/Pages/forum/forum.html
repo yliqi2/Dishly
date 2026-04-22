@@ -84,7 +84,7 @@
 
       @if (loadingForums) {
         <p class="forum-empty">Loading discussions...</p>
-      } @else if (sidebarError) {
+      } @else if (sidebarError && forums.length === 0) {
         <p class="forum-message forum-message--error">{{ sidebarError }}</p>
       } @else if (forums.length === 0) {
         <p class="forum-empty">No forums yet. Be the first to start one.</p>
