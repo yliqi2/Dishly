@@ -36,13 +36,3 @@ import { RouterOutlet } from '@angular/router';
 })
 export class DishlyAi {}
 
-  stripHtml(html: string): string {
-    if (!html) return '';
-    return html.replace(/<[^>]*>/g, '');
-  }
-
-  onKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter') this.onSearch();
-  }
-}
-
