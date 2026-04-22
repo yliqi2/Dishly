@@ -35,6 +35,15 @@ export interface ForumSummary {
 
 export interface ForumDetail extends ForumSummary {
   comments: ForumComment[];
+  comments_meta?: ForumCommentsMeta;
+}
+
+export interface ForumCommentsMeta {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+  has_more: boolean;
 }
 
 export interface ForumCommentResponse {

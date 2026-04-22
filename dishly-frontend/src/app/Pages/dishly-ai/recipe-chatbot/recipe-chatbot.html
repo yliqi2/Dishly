@@ -13,7 +13,8 @@
     </div>
     <div class="header-actions">
       <button class="btn-clear" (click)="limpiarChat()" title="Clear chat">
-        Clear chat
+        <lucide-icon name="trash-2" [size]="16" aria-hidden="true"></lucide-icon>
+        <span>Clear chat</span>
       </button>
     </div>
   </div>
@@ -88,6 +89,7 @@
             class="suggestion-btn"
             (click)="usarSugerencia(sugerencia)"
           >
+            <lucide-icon name="chef-hat" [size]="14" aria-hidden="true"></lucide-icon>
             {{ sugerencia }}
           </button>
         }
@@ -110,7 +112,38 @@
       (click)="sendMessage()"
       [disabled]="!newMessage.trim() || isLoading()"
     >
-      📤
+      <lucide-icon name="send" [size]="18" aria-hidden="true"></lucide-icon>
+      <span>Send</span>
     </button>
   </div>
 </div>
+
+@if (showClearModal) {
+  <div class="clear-modal-backdrop" (click)="cancelClearChat()">
+    <div
+      class="clear-modal-shell animate-pop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="clear-chat-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="clear-modal-content">
+        <div class="clear-modal-header">
+          <h3 class="clear-modal-title" id="clear-chat-modal-title">
+            <lucide-icon name="triangle-alert" [size]="20" aria-hidden="true"></lucide-icon>
+            Clear conversation
+          </h3>
+        </div>
+
+        <div class="clear-modal-body">
+          <p>This will remove all current messages from Dishly AI. Do you want to continue?</p>
+        </div>
+
+        <div class="clear-modal__actions">
+          <button class="btn-secondary" type="button" (click)="cancelClearChat()">Cancel</button>
+          <button class="btn-danger" type="button" (click)="confirmClearChat()">Clear chat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

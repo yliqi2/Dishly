@@ -31,13 +31,7 @@ class ForumController extends Controller
     {
         $user = $request->user('api');
         $forum = Foro::query()
-            ->with([
-                'propietario:id_usuario,nombre,icon_path,updated_at',
-                'comentarios' => fn ($query) => $query
-                    ->with(['autor:id_usuario,nombre,icon_path,updated_at'])
-                    ->orderBy('created_at')
-                    ->orderBy('id_linea_foro'),
-            ])
+            ->with(['propietario:id_usuario,nombre,icon_path,updated_at'])
             ->withCount('comentarios')
             ->withMax('comentarios as last_activity_at', 'created_at')
             ->find($forumId);
@@ -48,12 +42,29 @@ class ForumController extends Controller
             ], 404);
         }
 
-        $comments = $forum->comentarios
+        $perPage = (int) $request->integer('per_page', 30);
+        $perPage = max(1, min($perPage, 100));
+        $page = max(1, (int) $request->integer('page', 1));
+
+        $commentsPaginator = LineaForo::query()
+            ->where('id_foro', $forum->id_foro)
+            ->with(['autor:id_usuario,nombre,icon_path,updated_at'])
+            ->orderBy('created_at')
+            ->orderBy('id_linea_foro')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        $comments = collect($commentsPaginator->items())
             ->map(fn ($comment) => $this->mapComment($comment, $user));
 
         return response()->json([
-            ...$this->mapForumSummary($forum, $user),
-            'comments' => $comments,
+            ...$this->mapForumDetail($forum, $user, $comments),
+            'comments_meta' => [
+                'current_page' => $commentsPaginator->currentPage(),
+                'per_page' => $commentsPaginator->perPage(),
+                'total' => $commentsPaginator->total(),
+                'last_page' => $commentsPaginator->lastPage(),
+                'has_more' => $commentsPaginator->hasMorePages(),
+            ],
         ]);
     }
 
@@ -147,6 +158,94 @@ class ForumController extends Controller
         }
     }
 
+    public function update(Request $request, int $forumId): JsonResponse
+    {
+        try {
+            $forum = Foro::query()->find($forumId);
+            if (!$forum) {
+                return response()->json([
+                    'message' => 'Forum not found.',
+                ], 404);
+            }
+
+            if (!$this->canManageForum($request->user('api'), $forum)) {
+                return response()->json([
+                    'message' => 'Only the forum owner can edit this post.',
+                ], 403);
+            }
+
+            $data = $request->validate([
+                'titulo' => ['required', 'string', 'max:160'],
+                'descripcion' => ['required', 'string', 'max:4000'],
+            ]);
+
+            $cleanTitle = preg_replace('/\s+/', ' ', trim((string) $data['titulo'])) ?? '';
+            $normalizedTitle = $this->normalizeForumTitle($cleanTitle);
+
+            $duplicateTitleExists = Foro::query()
+                ->where('id_foro', '!=', $forum->id_foro)
+                ->select('titulo')
+                ->get()
+                ->contains(fn (Foro $item) => $this->normalizeForumTitle((string) $item->titulo) === $normalizedTitle);
+
+            if ($duplicateTitleExists) {
+                throw ValidationException::withMessages([
+                    'titulo' => ['A forum with this title already exists. Please choose a different title.'],
+                ]);
+            }
+
+            $forum->titulo = $cleanTitle;
+            $forum->descripcion = trim((string) $data['descripcion']);
+            $forum->save();
+
+            $forum->load(['propietario:id_usuario,nombre,icon_path,updated_at']);
+            $forum->loadCount('comentarios');
+            $forum->loadMax('comentarios as last_activity_at', 'created_at');
+
+            return response()->json($this->mapForumDetail($forum, $request->user('api'), []));
+        } catch (ValidationException $exception) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $exception->errors(),
+            ], 422);
+        } catch (Throwable $throwable) {
+            return response()->json([
+                'message' => 'Forum could not be updated.',
+                'errors' => ['server' => [$throwable->getMessage()]],
+            ], 500);
+        }
+    }
+
+    public function destroy(Request $request, int $forumId): JsonResponse
+    {
+        try {
+            $forum = Foro::query()->find($forumId);
+            if (!$forum) {
+                return response()->json([
+                    'message' => 'Forum not found.',
+                ], 404);
+            }
+
+            if (!$this->canManageForum($request->user('api'), $forum)) {
+                return response()->json([
+                    'message' => 'Only the forum owner can delete this post.',
+                ], 403);
+            }
+
+            LineaForo::query()->where('id_foro', $forum->id_foro)->delete();
+            $forum->delete();
+
+            return response()->json([
+                'message' => 'Forum deleted successfully.',
+            ]);
+        } catch (Throwable $throwable) {
+            return response()->json([
+                'message' => 'Forum could not be deleted.',
+                'errors' => ['server' => [$throwable->getMessage()]],
+            ], 500);
+        }
+    }
+
     public function updateComment(Request $request, int $forumId, int $commentId): JsonResponse
     {
         try {
@@ -233,6 +332,15 @@ class ForumController extends Controller
         }
 
         return (int) $user->id_usuario === (int) $comment->id_usuario || ($user->rol ?? null) === 'admin';
+    }
+
+    private function canManageForum(?object $user, Foro $forum): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        return (int) $user->id_usuario === (int) $forum->id_usuario;
     }
 
     private function mapForumSummary(object $forum, ?object $user): array

@@ -7,13 +7,14 @@
         <img src="assets/icons/DishlyIcon.svg" alt="" />
       </span>
       <div>
-        <span class="status-text">Dishly AI online</span>
-        <p class="status-subtext">Talk about food and get recipe ideas directly inside the chat</p>
+        <span class="status-text">Dishly AI Recipe Generator online</span>
+        <p class="status-subtext">Describe ingredients or cravings and get a generated recipe in this chat</p>
       </div>
     </div>
     <div class="header-actions">
       <button class="btn-clear" (click)="limpiarChat()" title="Clear chat">
-        Clear chat
+        <lucide-icon name="trash-2" [size]="16" aria-hidden="true"></lucide-icon>
+        <span>Clear chat</span>
       </button>
     </div>
   </div>
@@ -81,13 +82,14 @@
   <!-- Sugerencias -->
   @if (messages.length < 3) {
     <div class="suggestions-area">
-      <p class="suggestions-title">Ideas to get started</p>
+      <p class="suggestions-title">Recipe prompts to generate ideas</p>
       <div class="suggestions-list">
         @for (sugerencia of sugerencias; track $index) {
           <button
             class="suggestion-btn"
             (click)="usarSugerencia(sugerencia)"
           >
+            <lucide-icon name="chef-hat" [size]="14" aria-hidden="true"></lucide-icon>
             {{ sugerencia }}
           </button>
         }
@@ -101,7 +103,7 @@
       #messageInput
       [(ngModel)]="newMessage"
       (keydown)="handleKeyPress($event)"
-      placeholder="Write as if you were talking to your chef: ingredients, cravings, time, or just a question..."
+      placeholder="Ask Dishly AI to generate a recipe: ingredients, style, time, servings, or difficulty..."
       [disabled]="isLoading()"
       rows="1"
     ></textarea>
@@ -110,7 +112,38 @@
       (click)="sendMessage()"
       [disabled]="!newMessage.trim() || isLoading()"
     >
-      📤
+      <lucide-icon name="send" [size]="18" aria-hidden="true"></lucide-icon>
+      <span>Send</span>
     </button>
   </div>
 </div>
+
+@if (showClearModal) {
+  <div class="clear-modal-backdrop" (click)="cancelClearChat()">
+    <div
+      class="clear-modal-shell animate-pop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="clear-chat-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="clear-modal-content">
+        <div class="clear-modal-header">
+          <h3 class="clear-modal-title" id="clear-chat-modal-title">
+            <lucide-icon name="triangle-alert" [size]="20" aria-hidden="true"></lucide-icon>
+            Clear conversation
+          </h3>
+        </div>
+
+        <div class="clear-modal-body">
+          <p>This will remove all current messages from Dishly AI. Do you want to continue?</p>
+        </div>
+
+        <div class="clear-modal__actions">
+          <button class="btn-secondary" type="button" (click)="cancelClearChat()">Cancel</button>
+          <button class="btn-danger" type="button" (click)="confirmClearChat()">Clear chat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

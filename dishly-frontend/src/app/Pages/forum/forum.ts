@@ -17,6 +17,7 @@ import { ForumComment, ForumDetail, ForumOwner, ForumSummary } from '../../Core/
 export class Forum implements OnInit {
   private readonly forumService = inject(ForumService);
   private readonly authService = inject(AuthServices);
+  private readonly commentsPerPage = 30;
 
   protected readonly user = toSignal<Record<string, unknown> | null>(this.authService.user$, { initialValue: null });
   protected readonly isAuthenticated = computed(() => !!this.user());
@@ -40,11 +41,18 @@ export class Forum implements OnInit {
   protected loadingForum = false;
   protected sidebarError: string | null = null;
   protected detailError: string | null = null;
+  protected forumActionError: string | null = null;
 
   protected creatingForum = false;
   protected newForumTitle = '';
   protected newForumDescription = '';
   protected createForumError: string | null = null;
+
+  protected editingForum = false;
+  protected updatingForum = false;
+  protected deletingForum = false;
+  protected editingForumTitle = '';
+  protected editingForumDescription = '';
 
   protected postingComment = false;
   protected newComment = '';
@@ -54,6 +62,9 @@ export class Forum implements OnInit {
   protected editingCommentMessage = '';
   protected savingEditedComment = false;
   protected deletingCommentId: number | null = null;
+  protected loadingMoreComments = false;
+  protected hasMoreComments = false;
+  private nextCommentsPage = 2;
 
   protected deleteModalOpen = false;
   private pendingDeleteComment: ForumComment | null = null;
@@ -104,14 +115,17 @@ export class Forum implements OnInit {
 
     this.loadingForum = true;
     this.detailError = null;
+    this.forumActionError = null;
     this.editingCommentId = null;
     this.commentError = null;
+    this.editingForum = false;
 
-    this.forumService.getForum(forumId).subscribe({
+    this.forumService.getForum(forumId, 1, this.commentsPerPage).subscribe({
       next: (forum) => {
         this.selectedForum = forum;
         this.loadingForum = false;
         this.upsertForumSummary(forum);
+        this.syncCommentsPagination(forum);
       },
       error: (error) => {
         this.loadingForum = false;
@@ -208,6 +222,7 @@ export class Forum implements OnInit {
           comments_count: this.selectedForum!.comments.length,
           last_activity_at: comment.created_at ?? comment.fecha,
         };
+        this.updateCommentsMeta(1);
         this.syncForumSummary(this.selectedForum);
       },
       error: (error) => {
@@ -217,6 +232,7 @@ export class Forum implements OnInit {
           comments: this.selectedForum!.comments.filter((item) => item.id_linea_foro !== optimisticComment.id_linea_foro),
           comments_count: Math.max(0, (this.selectedForum!.comments_count ?? this.selectedForum!.comments.length) - 1),
         };
+        this.updateCommentsMeta(-1);
         this.bumpSummaryCommentCount(this.selectedForum.id_foro, -1, this.selectedForum.last_activity_at ?? null);
         this.newComment = mensaje;
         this.commentError = this.extractErrorMessage(error, 'Could not publish the comment.');
@@ -300,6 +316,7 @@ export class Forum implements OnInit {
           ...this.selectedForum!,
           comments: this.selectedForum!.comments.filter((item) => item.id_linea_foro !== comment.id_linea_foro),
         };
+        this.updateCommentsMeta(-1);
         this.bumpSummaryCommentCount(this.selectedForum.id_foro, -1, this.selectedForum.last_activity_at ?? null);
         this.deletingCommentId = null;
       },
@@ -312,6 +329,132 @@ export class Forum implements OnInit {
 
   protected isSelected(forumId: number): boolean {
     return this.selectedForum?.id_foro === forumId;
+  }
+
+  protected loadMoreComments(): void {
+    if (!this.selectedForum || this.loadingMoreComments || !this.hasMoreComments) {
+      return;
+    }
+
+    this.loadingMoreComments = true;
+    this.forumActionError = null;
+
+    this.forumService.getForum(this.selectedForum.id_foro, this.nextCommentsPage, this.commentsPerPage).subscribe({
+      next: (forumPage) => {
+        if (!this.selectedForum || this.selectedForum.id_foro !== forumPage.id_foro) {
+          this.loadingMoreComments = false;
+          return;
+        }
+
+        this.selectedForum = {
+          ...this.selectedForum,
+          comments: this.mergeComments(this.selectedForum.comments, forumPage.comments),
+          comments_meta: forumPage.comments_meta,
+          comments_count: forumPage.comments_count,
+          last_activity_at: forumPage.last_activity_at,
+        };
+
+        this.loadingMoreComments = false;
+        this.syncCommentsPagination(this.selectedForum);
+      },
+      error: (error) => {
+        this.loadingMoreComments = false;
+        this.forumActionError = this.extractErrorMessage(error, 'Could not load more comments.');
+      }
+    });
+  }
+
+  protected startEditingForum(): void {
+    if (!this.selectedForum?.is_owner) {
+      return;
+    }
+
+    this.editingForum = true;
+    this.forumActionError = null;
+    this.editingForumTitle = this.selectedForum.titulo;
+    this.editingForumDescription = this.selectedForum.descripcion;
+  }
+
+  protected cancelEditingForum(): void {
+    this.editingForum = false;
+    this.updatingForum = false;
+    this.editingForumTitle = '';
+    this.editingForumDescription = '';
+  }
+
+  protected saveForumChanges(): void {
+    if (!this.selectedForum || !this.selectedForum.is_owner) {
+      return;
+    }
+
+    const titulo = this.editingForumTitle.trim();
+    const descripcion = this.editingForumDescription.trim();
+
+    if (!titulo || !descripcion) {
+      this.forumActionError = 'Title and description are required.';
+      return;
+    }
+
+    if (this.isDuplicatedForumTitle(titulo, this.selectedForum.id_foro)) {
+      this.forumActionError = 'A forum with this title already exists. Please choose a different title.';
+      return;
+    }
+
+    this.updatingForum = true;
+    this.forumActionError = null;
+
+    this.forumService.updateForum(this.selectedForum.id_foro, { titulo, descripcion }).subscribe({
+      next: (forum) => {
+        this.updatingForum = false;
+        this.selectedForum = {
+          ...forum,
+          comments: this.selectedForum?.comments ?? forum.comments,
+          comments_meta: this.selectedForum?.comments_meta ?? forum.comments_meta,
+        };
+        this.upsertForumSummary(this.selectedForum, true);
+        this.cancelEditingForum();
+      },
+      error: (error) => {
+        this.updatingForum = false;
+        this.forumActionError = this.extractErrorMessage(error, 'Could not update this forum.');
+      }
+    });
+  }
+
+  protected deleteForum(): void {
+    if (!this.selectedForum || !this.selectedForum.is_owner || this.deletingForum) {
+      return;
+    }
+
+    const shouldDelete = window.confirm('Are you sure you want to delete this forum? All comments will be removed.');
+    if (!shouldDelete) {
+      return;
+    }
+
+    this.deletingForum = true;
+    this.forumActionError = null;
+
+    const forumId = this.selectedForum.id_foro;
+
+    this.forumService.deleteForum(forumId).subscribe({
+      next: () => {
+        this.deletingForum = false;
+        this.cancelEditingForum();
+        this.forums = this.forums.filter((forum) => forum.id_foro !== forumId);
+
+        const nextForumId = this.forums[0]?.id_foro;
+        if (nextForumId) {
+          this.selectForum(nextForumId, true);
+          return;
+        }
+
+        this.selectedForum = null;
+      },
+      error: (error) => {
+        this.deletingForum = false;
+        this.forumActionError = this.extractErrorMessage(error, 'Could not delete this forum.');
+      }
+    });
   }
 
   protected getOwnerAvatar(owner: ForumOwner): string | null {
@@ -415,14 +558,51 @@ export class Forum implements OnInit {
     return String(validationMessage ?? error?.error?.message ?? fallback);
   }
 
-  private isDuplicatedForumTitle(candidateTitle: string): boolean {
+  private isDuplicatedForumTitle(candidateTitle: string, ignoreForumId?: number): boolean {
     const normalizedCandidate = this.normalizeForumTitle(candidateTitle);
 
     if (!normalizedCandidate) {
       return false;
     }
 
-    return this.forums.some((forum) => this.normalizeForumTitle(forum.titulo) === normalizedCandidate);
+    return this.forums
+      .filter((forum) => forum.id_foro !== ignoreForumId)
+      .some((forum) => this.normalizeForumTitle(forum.titulo) === normalizedCandidate);
+  }
+
+  private syncCommentsPagination(forum: ForumDetail): void {
+    const currentPage = Number(forum.comments_meta?.current_page ?? 1);
+    this.hasMoreComments = Boolean(forum.comments_meta?.has_more);
+    this.nextCommentsPage = currentPage + 1;
+  }
+
+  private mergeComments(existing: ForumComment[], incoming: ForumComment[]): ForumComment[] {
+    const byId = new Map<number, ForumComment>();
+
+    for (const comment of existing) {
+      byId.set(comment.id_linea_foro, comment);
+    }
+
+    for (const comment of incoming) {
+      byId.set(comment.id_linea_foro, comment);
+    }
+
+    return [...byId.values()].sort((left, right) => left.id_linea_foro - right.id_linea_foro);
+  }
+
+  private updateCommentsMeta(delta: number): void {
+    if (!this.selectedForum?.comments_meta) {
+      return;
+    }
+
+    const total = Math.max(0, Number(this.selectedForum.comments_meta.total ?? 0) + delta);
+    this.selectedForum = {
+      ...this.selectedForum,
+      comments_meta: {
+        ...this.selectedForum.comments_meta,
+        total,
+      },
+    };
   }
 
   private normalizeForumTitle(value: string): string {

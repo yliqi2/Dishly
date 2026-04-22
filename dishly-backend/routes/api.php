@@ -78,6 +78,8 @@ Route::middleware('auth:api')->group(function () {
 
     // Foro (autenticado - escritura)
     Route::post('/forums', [ForumController::class, 'store']);
+    Route::put('/forums/{forumId}', [ForumController::class, 'update']);
+    Route::delete('/forums/{forumId}', [ForumController::class, 'destroy']);
     Route::post('/forums/{forumId}/comments', [ForumController::class, 'storeComment']);
     Route::put('/forums/{forumId}/comments/{commentId}', [ForumController::class, 'updateComment']);
     Route::delete('/forums/{forumId}/comments/{commentId}', [ForumController::class, 'destroyComment']);

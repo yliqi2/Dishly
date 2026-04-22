@@ -11,12 +11,25 @@ export class ForumService extends ApiBaseService {
     return this.http.get<ForumSummary[]>(`${this.apiUrl}/forums`);
   }
 
-  getForum(forumId: number): Observable<ForumDetail> {
-    return this.http.get<ForumDetail>(`${this.apiUrl}/forums/${forumId}`);
+  getForum(forumId: number, page: number = 1, perPage: number = 30): Observable<ForumDetail> {
+    return this.http.get<ForumDetail>(`${this.apiUrl}/forums/${forumId}`, {
+      params: {
+        page: String(page),
+        per_page: String(perPage),
+      },
+    });
   }
 
   createForum(payload: { titulo: string; descripcion: string }): Observable<ForumDetail> {
     return this.http.post<ForumDetail>(`${this.apiUrl}/forums`, payload);
+  }
+
+  updateForum(forumId: number, payload: { titulo: string; descripcion: string }): Observable<ForumDetail> {
+    return this.http.put<ForumDetail>(`${this.apiUrl}/forums/${forumId}`, payload);
+  }
+
+  deleteForum(forumId: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/forums/${forumId}`);
   }
 
   createComment(forumId: number, mensaje: string): Observable<ForumCommentResponse> {

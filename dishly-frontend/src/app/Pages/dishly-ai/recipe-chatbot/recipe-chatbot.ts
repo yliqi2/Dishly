@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
+import { LucideAngularModule } from 'lucide-angular';
 import { RecipeChatbotService } from '../../../Services/recipe-chatbot.service';
 import { AuthServices } from '../../../Core/Services/Auth/auth-services';
 import { ChatMessage, RecetaData } from '../../../Models/recipe-chatbot.model';
@@ -11,7 +12,7 @@ import { ChatMessage, RecetaData } from '../../../Models/recipe-chatbot.model';
 @Component({
   selector: 'app-recipe-chatbot',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './recipe-chatbot.html',
   styleUrls: ['./recipe-chatbot.scss']
 })
@@ -27,6 +28,7 @@ export class RecipeChatbot implements OnInit {
   // Estado con signals
   messages: ChatMessage[] = [];
   newMessage: string = '';
+  showClearModal = false;
   isLoading = signal<boolean>(false);
 
   sugerencias: string[] = [
@@ -171,10 +173,17 @@ export class RecipeChatbot implements OnInit {
   }
 
   limpiarChat() {
-    if (confirm('Do you want to clear this conversation?')) {
-      this.messages = [];
-      this.addWelcomeMessage();
-    }
+    this.showClearModal = true;
+  }
+
+  cancelClearChat() {
+    this.showClearModal = false;
+  }
+
+  confirmClearChat() {
+    this.messages = [];
+    this.addWelcomeMessage();
+    this.showClearModal = false;
   }
 
   private scrollToBottom(): void {

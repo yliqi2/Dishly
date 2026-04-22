@@ -84,7 +84,7 @@
 
       @if (loadingForums) {
         <p class="forum-empty">Loading discussions...</p>
-      } @else if (sidebarError) {
+      } @else if (sidebarError && forums.length === 0) {
         <p class="forum-message forum-message--error">{{ sidebarError }}</p>
       } @else if (forums.length === 0) {
         <p class="forum-empty">No forums yet. Be the first to start one.</p>
@@ -147,7 +147,60 @@
             </div>
           </div>
 
-          <p class="forum-detail__description">{{ selectedForum.descripcion }}</p>
+          @if (isAuthenticated() && selectedForum.is_owner) {
+            <div class="forum-detail__actions">
+              @if (!editingForum) {
+                <button class="btn-secondary btn-sm" type="button" (click)="startEditingForum()">Edit post</button>
+                <button
+                  class="btn-danger btn-sm"
+                  type="button"
+                  [disabled]="deletingForum"
+                  (click)="deleteForum()"
+                >
+                  Delete post
+                </button>
+              }
+            </div>
+          }
+
+          @if (editingForum) {
+            <div class="forum-editor">
+              <label class="forum-field">
+                <span>Title</span>
+                <input
+                  type="text"
+                  name="editingForumTitle"
+                  [(ngModel)]="editingForumTitle"
+                  maxlength="160"
+                />
+              </label>
+
+              <label class="forum-field">
+                <span>Description</span>
+                <textarea
+                  name="editingForumDescription"
+                  [(ngModel)]="editingForumDescription"
+                  rows="4"
+                  maxlength="4000"
+                ></textarea>
+              </label>
+
+              <div class="comment-editor__actions">
+                <button class="btn-primary btn-sm" type="button" [disabled]="updatingForum" (click)="saveForumChanges()">
+                  Save post
+                </button>
+                <button class="btn-secondary btn-sm" type="button" (click)="cancelEditingForum()">Cancel</button>
+              </div>
+            </div>
+          }
+
+          @if (forumActionError) {
+            <p class="forum-message forum-message--error">{{ forumActionError }}</p>
+          }
+
+          @if (!editingForum) {
+            <p class="forum-detail__description">{{ selectedForum.descripcion }}</p>
+          }
         </header>
 
         <section class="forum-comments">
@@ -180,12 +233,12 @@
                       @if (comment.can_edit || comment.can_delete) {
                         <div class="comment-card__actions">
                           @if (comment.can_edit) {
-                            <button class="comment-action" type="button" (click)="startEditing(comment)">Edit</button>
+                            <button class="btn-secondary btn-sm" type="button" (click)="startEditing(comment)">Edit</button>
                           }
 
                           @if (comment.can_delete) {
                             <button
-                              class="comment-action comment-action--danger"
+                              class="btn-danger btn-sm"
                               type="button"
                               [disabled]="deletingCommentId === comment.id_linea_foro"
                               (click)="deleteComment(comment)"
@@ -215,7 +268,7 @@
                           >
                             Save
                           </button>
-                          <button class="comment-action" type="button" (click)="cancelEditing()">Cancel</button>
+                          <button class="btn-secondary btn-sm" type="button" (click)="cancelEditing()">Cancel</button>
                         </div>
                       </div>
                     } @else {
@@ -225,6 +278,16 @@
                 </article>
               }
             </div>
+
+            @if (hasMoreComments) {
+              <button class="btn-secondary btn-sm forum-comments__load-more" type="button" [disabled]="loadingMoreComments" (click)="loadMoreComments()">
+                @if (loadingMoreComments) {
+                  <span class="btn-loading-icon" aria-hidden="true"></span>
+                } @else {
+                  <span>Load more comments</span>
+                }
+              </button>
+            }
           }
         </section>
 
@@ -283,3 +346,40 @@
     }
   </div>
 </section>
+
+@if (deleteModalOpen) {
+  <div
+    class="delete-modal-backdrop"
+    (click)="cancelDeleteModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="delete-modal-title"
+    (keydown.escape)="cancelDeleteModal()"
+  >
+    <div class="delete-modal-shell" tabindex="-1">
+      <div class="delete-modal-content animate-pop" (click)="$event.stopPropagation()">
+        <div class="delete-modal-header">
+          <h3 class="delete-modal-title" id="delete-modal-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19 6l-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Delete comment
+          </h3>
+        </div>
+
+        <div class="delete-modal-body">
+          <p>Are you sure you want to delete this comment? This action cannot be undone.</p>
+        </div>
+
+        <div class="delete-modal__actions">
+          <button class="btn-secondary" type="button" (click)="cancelDeleteModal()">Cancel</button>
+          <button class="btn-danger" type="button" (click)="confirmDelete()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

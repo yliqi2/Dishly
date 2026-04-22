@@ -714,7 +714,7 @@
 
 .btn-review-action.edit {
   background: var(--blue-700);
-  color: #ffffff;
+  color: var(--on-highlight);
 }
 
 .btn-review-action.edit:hover {
@@ -729,7 +729,7 @@
 
 .btn-review-action.delete {
   background: var(--danger);
-  color: #ffffff;
+  color: var(--on-highlight);
 }
 
 .btn-review-action.delete:hover {
