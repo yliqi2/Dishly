@@ -1,0 +1,285 @@
+<section class="page-header page-container">
+  <div class="page-header__inner">
+    <h1 class="page-title">Community Forum</h1>
+    <div class="page-underline" aria-hidden="true"></div>
+  </div>
+</section>
+
+<section class="page-container forum-page">
+  <aside class="forum-sidebar">
+    <div class="forum-panel forum-panel--accent">
+      <div class="forum-panel__hero">
+        <p class="forum-eyebrow">Open conversations</p>
+        <h2>Share ideas, ask questions and help other cooks.</h2>
+        <p class="forum-copy">
+          Anyone can read the discussions. Only registered users can open a new thread or post a comment.
+        </p>
+
+        @if (isAuthenticated()) {
+          <div class="forum-user-chip">
+            <span class="forum-user-chip__avatar" aria-hidden="true">
+              @if (currentUserIconUrl(); as currentUserAvatar) {
+                <img [src]="currentUserAvatar" [alt]="currentUserName()" />
+              } @else {
+                <span>{{ ownerInitial(currentUserName()) }}</span>
+              }
+            </span>
+            <span class="forum-user-chip__meta">
+              <strong>{{ currentUserName() }}</strong>
+              <span>Ready to start a discussion</span>
+            </span>
+          </div>
+        }
+      </div>
+
+      @if (isAuthenticated()) {
+        <form class="forum-create" (ngSubmit)="createForum()">
+          <label class="forum-field">
+            <span>Title</span>
+            <input
+              type="text"
+              name="forumTitle"
+              [(ngModel)]="newForumTitle"
+              maxlength="160"
+              placeholder="Example: Best tricks to improve homemade pasta"
+            />
+          </label>
+
+          <label class="forum-field">
+            <span>Description</span>
+            <textarea
+              name="forumDescription"
+              [(ngModel)]="newForumDescription"
+              rows="4"
+              maxlength="4000"
+              placeholder="Describe the topic so other users know what the conversation is about."
+            ></textarea>
+          </label>
+
+          @if (createForumError) {
+            <p class="forum-message forum-message--error">{{ createForumError }}</p>
+          }
+
+          <button class="btn-primary btn-sm forum-create__button" type="submit" [disabled]="creatingForum">
+            @if (creatingForum) {
+              <span class="btn-loading-icon" aria-hidden="true"></span>
+            } @else {
+              <span>Create forum</span>
+            }
+          </button>
+        </form>
+      } @else {
+        <div class="forum-guest-card">
+          <p>Create your account to open a new discussion and join the comments.</p>
+          <a class="btn-primary btn-sm" routerLink="/login">Log in</a>
+        </div>
+      }
+    </div>
+
+    <div class="forum-panel forum-list-panel">
+      <div class="forum-list-panel__header">
+        <h2>All forums</h2>
+        <span>{{ forums.length }}</span>
+      </div>
+
+      @if (loadingForums) {
+        <p class="forum-empty">Loading discussions...</p>
+      } @else if (sidebarError) {
+        <p class="forum-message forum-message--error">{{ sidebarError }}</p>
+      } @else if (forums.length === 0) {
+        <p class="forum-empty">No forums yet. Be the first to start one.</p>
+      } @else {
+        <div class="forum-list">
+          @for (forum of forums; track forum.id_foro) {
+            <button
+              class="forum-list__item"
+              type="button"
+              [class.forum-list__item--active]="isSelected(forum.id_foro)"
+              (click)="selectForum(forum.id_foro)"
+            >
+              <div class="forum-list__topline">
+                <strong>{{ forum.titulo }}</strong>
+                <span>{{ forum.comments_count ?? 0 }} comments</span>
+              </div>
+              <p>{{ forum.descripcion }}</p>
+              <div class="forum-list__meta">
+                <span>By {{ forum.owner.nombre || 'Dishly user' }}</span>
+                <span>{{ formatDate(forum.last_activity_at ?? forum.created_at ?? forum.fecha_creacion) }}</span>
+              </div>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </aside>
+
+  <div class="forum-content">
+    @if (loadingForum && !selectedForum) {
+      <div class="forum-panel forum-state-panel">
+        <p class="forum-empty">Loading discussion...</p>
+      </div>
+    } @else if (detailError) {
+      <div class="forum-panel forum-state-panel">
+        <p class="forum-message forum-message--error">{{ detailError }}</p>
+      </div>
+    } @else if (!selectedForum) {
+      <div class="forum-panel forum-state-panel">
+        <p class="forum-empty">Select a discussion from the list to read the conversation.</p>
+      </div>
+    } @else {
+      <article class="forum-panel forum-detail">
+        <header class="forum-detail__header">
+          <div class="forum-owner">
+            @if (getOwnerAvatar(selectedForum.owner); as ownerAvatar) {
+              <img [src]="ownerAvatar" [alt]="selectedForum.owner.nombre" class="forum-owner__avatar" />
+            } @else {
+              <div class="forum-owner__fallback">{{ ownerInitial(selectedForum.owner.nombre) }}</div>
+            }
+
+            <div>
+              <p class="forum-eyebrow">Started by {{ selectedForum.owner.nombre || 'Dishly user' }}</p>
+              <h2>{{ selectedForum.titulo }}</h2>
+              <p class="forum-detail__meta">
+                {{ formatDate(selectedForum.created_at ?? selectedForum.fecha_creacion) }}
+                <span class="forum-detail__separator">·</span>
+                {{ selectedForum.comments.length }} comments
+              </p>
+            </div>
+          </div>
+
+          <p class="forum-detail__description">{{ selectedForum.descripcion }}</p>
+        </header>
+
+        <section class="forum-comments">
+          <div class="forum-comments__header">
+            <h3>Conversation</h3>
+            <span>{{ selectedForum.comments.length }} messages</span>
+          </div>
+
+          @if (selectedForum.comments.length === 0) {
+            <p class="forum-empty">This forum has no comments yet.</p>
+          } @else {
+            <div class="forum-comments__list">
+              @for (comment of selectedForum.comments; track comment.id_linea_foro) {
+                <article class="comment-card">
+                  <div class="comment-card__avatar">
+                    @if (getCommentAvatar(comment); as commentAvatar) {
+                      <img [src]="commentAvatar" [alt]="comment.autor_nombre" />
+                    } @else {
+                      <div class="forum-owner__fallback">{{ ownerInitial(comment.autor_nombre) }}</div>
+                    }
+                  </div>
+
+                  <div class="comment-card__body">
+                    <div class="comment-card__header">
+                      <div>
+                        <strong>{{ comment.autor_nombre }}</strong>
+                        <p>{{ formatDate(comment.created_at ?? comment.fecha) }}</p>
+                      </div>
+
+                      @if (comment.can_edit || comment.can_delete) {
+                        <div class="comment-card__actions">
+                          @if (comment.can_edit) {
+                            <button class="comment-action" type="button" (click)="startEditing(comment)">Edit</button>
+                          }
+
+                          @if (comment.can_delete) {
+                            <button
+                              class="comment-action comment-action--danger"
+                              type="button"
+                              [disabled]="deletingCommentId === comment.id_linea_foro"
+                              (click)="deleteComment(comment)"
+                            >
+                              Delete
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+
+                    @if (editingCommentId === comment.id_linea_foro) {
+                      <div class="comment-editor">
+                        <textarea
+                          name="editingCommentMessage"
+                          [(ngModel)]="editingCommentMessage"
+                          rows="4"
+                          maxlength="4000"
+                        ></textarea>
+
+                        <div class="comment-editor__actions">
+                          <button
+                            class="btn-primary btn-sm"
+                            type="button"
+                            [disabled]="savingEditedComment"
+                            (click)="saveEditedComment(comment)"
+                          >
+                            Save
+                          </button>
+                          <button class="comment-action" type="button" (click)="cancelEditing()">Cancel</button>
+                        </div>
+                      </div>
+                    } @else {
+                      <p class="comment-card__message">{{ comment.mensaje }}</p>
+                    }
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        </section>
+
+        <section class="forum-panel forum-panel--subtle forum-comment-form">
+          <div class="forum-comments__header">
+            <h3>Leave a comment</h3>
+            @if (!isAuthenticated()) {
+              <span>Read-only mode</span>
+            }
+          </div>
+
+          @if (!isAuthenticated()) {
+            <p class="forum-copy">
+              You can read all discussions, but you need an account to comment.
+              <a routerLink="/login">Log in here</a>.
+            </p>
+          } @else {
+            <label class="forum-field">
+              <span>Your message</span>
+              <div class="forum-comment-form__identity">
+                <span class="forum-user-chip__avatar forum-user-chip__avatar--small" aria-hidden="true">
+                  @if (currentUserIconUrl(); as commentUserAvatar) {
+                    <img [src]="commentUserAvatar" [alt]="currentUserName()" />
+                  } @else {
+                    <span>{{ ownerInitial(currentUserName()) }}</span>
+                  }
+                </span>
+                <div>
+                  <strong>{{ currentUserName() }}</strong>
+                  <span>Your profile photo will appear with the comment</span>
+                </div>
+              </div>
+              <textarea
+                name="newComment"
+                [(ngModel)]="newComment"
+                rows="5"
+                maxlength="4000"
+                placeholder="Write your answer, recommendation or question."
+              ></textarea>
+            </label>
+
+            @if (commentError) {
+              <p class="forum-message forum-message--error">{{ commentError }}</p>
+            }
+
+            <button class="btn-primary btn-sm" type="button" [disabled]="postingComment" (click)="submitComment()">
+              @if (postingComment) {
+                <span class="btn-loading-icon" aria-hidden="true"></span>
+              } @else {
+                <span>Publish comment</span>
+              }
+            </button>
+          }
+        </section>
+      </article>
+    }
+  </div>
+</section>

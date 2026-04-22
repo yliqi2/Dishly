@@ -10,6 +10,7 @@ import { BoughtRecipes } from './Pages/recipes/bought-recipes/bought-recipes';
 import { Upload } from './Pages/upload/upload';
 import { DishlyAi } from './Pages/dishly-ai/dishly-ai';
 import { Forum } from './Pages/forum/forum';
+import { RecipeChatbot } from './Pages/dishly-ai/recipe-chatbot/recipe-chatbot';
 import { Cart } from './Pages/shopping/cart/cart';
 import { PaymentMethod } from './Pages/shopping/payment-method/payment-method';
 import { AuthGuard } from './Guards/auth.guard';
@@ -69,6 +70,10 @@ export const routes: Routes = [
     path: 'dishly-ai',
     component: DishlyAi,
     title: 'Dishly AI',
+    children: [
+      { path: '', redirectTo: 'chatbot', pathMatch: 'full' },
+      { path: 'chatbot', component: RecipeChatbot, title: 'Recipe Chatbot' },
+    ],
   },
   {
     path: 'forum',

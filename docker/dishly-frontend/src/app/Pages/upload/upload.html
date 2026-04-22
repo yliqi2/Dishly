@@ -1,0 +1,438 @@
+<section class="page-header page-container gradient-bg">
+  <div class="page-header__inner">
+    <h1 class="page-title">Upload</h1>
+    <div class="page-underline" aria-hidden="true"></div>
+  </div>
+</section>
+
+<section class="page-container">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="d-flex flex-column gap-4">
+    <article class="upload-card p-4 p-md-5">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="upload-title m-0"><i class="bi bi-image me-2"></i>Recipe Photos</h2>
+        <span class="badge rounded-pill count-badge">{{ photoCount }}/{{ maxPhotos }}</span>
+      </div>
+
+      <input id="uploadPhotos" #uploadPhotosInput class="d-none" type="file" multiple accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+        (change)="onPhotosSelected($event)" />
+
+      <p class="text-secondary mb-0 mt-1">Click any slot to upload photos. Choose which one will be the cover.</p>
+      @if (photosError$ | async) {
+      <p class="text-danger small mb-0 mt-1" role="alert" aria-live="polite">
+        <i class="bi bi-exclamation-circle me-1"></i>You must upload at least one photo.
+      </p>
+      }
+
+      @if (vm$ | async; as vm) {
+      <div class="row g-2 mt-3">
+        <div class="col-12 col-md-7">
+          @if (vm.photos.length > 0) {
+          <div class="preview-item bento-cover">
+            <img [src]="vm.photos[vm.coverIndex].url" alt="Cover" class="w-100 h-100 object-fit-cover" />
+            <button type="button" class="btn btn-sm btn-danger preview-remove" (click)="removePhoto(vm.coverIndex)"
+              aria-label="Eliminar imagen subida">
+              <i class="bi bi-trash"></i>
+            </button>
+            <span class="cover-label badge rounded-pill">Cover</span>
+          </div>
+          } @else {
+          <button type="button" class="btn bento-cover bento-placeholder bento-placeholder--cover"
+            (click)="uploadPhotosInput.click()" [disabled]="!canUploadMorePhotos" aria-label="Upload cover photo">
+            <i class="bi bi-upload"></i>
+            <span class="mt-2 small fw-semibold">Cover</span>
+          </button>
+          }
+        </div>
+
+        <div class="col-12 col-md-5">
+          <div class="bento-thumbs">
+            @for (item of vm.nonCoverItems; track item.photo.url) {
+            <div class="preview-item">
+              <img [src]="item.photo.url" alt="Recipe photo" class="w-100 h-100 object-fit-cover" />
+              <button type="button" class="btn btn-sm btn-danger preview-remove"
+                (click)="removePhoto(item.originalIndex)" aria-label="Eliminar imagen subida">
+                <i class="bi bi-trash"></i>
+              </button>
+              <button type="button" class="btn btn-sm cover-btn" (click)="selectCover(item.originalIndex)">
+                Set as cover
+              </button>
+            </div>
+            }
+            @for (p of vm.placeholders; track $index) {
+            <button type="button" class="btn bento-placeholder" (click)="uploadPhotosInput.click()"
+              [disabled]="!canUploadMorePhotos" aria-label="Upload recipe photo">
+              <i class="bi bi-upload"></i>
+            </button>
+            }
+          </div>
+        </div>
+      </div>
+      }
+    </article>
+
+    <article class="upload-card p-4 p-md-5">
+      <h2 class="upload-title mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+          class="bi bi-fork-knife" viewBox="0 0 16 16">
+          <path
+            d="M13 .5c0-.276-.226-.506-.498-.465-1.703.257-2.94 2.012-3 8.462a.5.5 0 0 0 .498.5c.56.01 1 .13 1 1.003v5.5a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5zM4.25 0a.25.25 0 0 1 .25.25v5.122a.128.128 0 0 0 .256.006l.233-5.14A.25.25 0 0 1 5.24 0h.522a.25.25 0 0 1 .25.238l.233 5.14a.128.128 0 0 0 .256-.006V.25A.25.25 0 0 1 6.75 0h.29a.5.5 0 0 1 .498.458l.423 5.07a1.69 1.69 0 0 1-1.059 1.711l-.053.022a.92.92 0 0 0-.58.884L6.47 15a.971.971 0 1 1-1.942 0l.202-6.855a.92.92 0 0 0-.58-.884l-.053-.022a1.69 1.69 0 0 1-1.059-1.712L3.462.458A.5.5 0 0 1 3.96 0z" />
+        </svg>Basic Information</h2>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold" for="titulo">Recipe Title</label>
+        <div class="input-with-icon">
+          <span class="input-prefix"><i class="bi bi-card-heading"></i></span>
+          <input id="titulo" class="form-control input-soft" formControlName="titulo"
+            placeholder="E.g.: Traditional Carbonara Pasta" [attr.aria-invalid]="isFieldInvalid('titulo')"
+            [attr.aria-describedby]="getError('titulo') ? 'upload-titulo-error' : null" />
+        </div>
+        @if (getError('titulo')) {
+        <div id="upload-titulo-error" class="invalid-feedback d-block mt-1" role="status" aria-live="polite">
+          {{ getError('titulo') }}
+        </div>
+        }
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-semibold" for="descripcion">Description</label>
+        <textarea id="descripcion" class="form-control input-soft" rows="4" formControlName="descripcion"
+          placeholder="Describe your recipe... What makes it special?"
+          [attr.aria-invalid]="isFieldInvalid('descripcion')"
+          [attr.aria-describedby]="getError('descripcion') ? 'upload-descripcion-error' : null"></textarea>
+        @if (getError('descripcion')) {
+        <div id="upload-descripcion-error" class="invalid-feedback d-block mt-1" role="status" aria-live="polite">
+          {{ getError('descripcion') }}
+        </div>
+        }
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold" for="tiempoPreparacion">Prep Time</label>
+          <div class="input-with-icon">
+            <span class="input-prefix"><i class="bi bi-clock"></i></span>
+            <input id="tiempoPreparacion" type="number" class="form-control input-soft"
+              formControlName="tiempo_preparacion" min="1" [attr.aria-invalid]="isFieldInvalid('tiempo_preparacion')"
+              [attr.aria-describedby]="getError('tiempo_preparacion') ? 'upload-tiempo-preparacion-error' : null" />
+          </div>
+          @if (getError('tiempo_preparacion')) {
+          <div id="upload-tiempo-preparacion-error" class="invalid-feedback d-block mt-1" role="status"
+            aria-live="polite">
+            {{ getError('tiempo_preparacion') }}
+          </div>
+          }
+        </div>
+
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold" for="unidadTiempo-trigger">Unidad de tiempo</label>
+          <div class="custom-select-wrapper" (focusout)="onTimeUnitFocusOut($event)">
+            <button type="button" id="unidadTiempo-trigger" class="btn custom-select-trigger"
+              [class.is-open]="timeUnitOpen" [class.input-error]="isFieldInvalid('tiempo_preparacion_unidad')"
+              [attr.aria-expanded]="timeUnitOpen" [attr.aria-haspopup]="'listbox'"
+              [attr.aria-describedby]="getError('tiempo_preparacion_unidad') ? 'upload-tiempo-unidad-error' : null"
+              [attr.aria-invalid]="isFieldInvalid('tiempo_preparacion_unidad')" (click)="toggleTimeUnitDropdown()">
+              <span class="custom-select-trigger-label">
+                @if (form.get('tiempo_preparacion_unidad')?.value === 'minutes') {
+                <i class="bi bi-clock me-2 time-unit-icon" aria-hidden="true"></i>
+                Minutes
+                } @else {
+                <i class="bi bi-hourglass-split me-2 time-unit-icon" aria-hidden="true"></i>
+                Hours
+                }
+              </span>
+              <i class="bi bi-chevron-down" aria-hidden="true"></i>
+            </button>
+
+            @if (timeUnitOpen) {
+            <div class="custom-select-backdrop" (click)="closeTimeUnitDropdown()" aria-hidden="true"></div>
+            <div class="custom-select-dropdown">
+              <ul class="category-list" role="listbox" aria-labelledby="unidadTiempo-trigger">
+                <li role="option" tabindex="0"
+                  [attr.aria-selected]="form.get('tiempo_preparacion_unidad')?.value === 'minutes'"
+                  class="category-list__item"
+                  [class.is-selected]="form.get('tiempo_preparacion_unidad')?.value === 'minutes'"
+                  (click)="setTimeUnit('minutes')" (keydown.enter)="setTimeUnit('minutes'); $event.preventDefault()"
+                  (keydown.space)="setTimeUnit('minutes'); $event.preventDefault()">
+                  <i class="bi bi-clock me-2 time-unit-icon" aria-hidden="true"></i>
+                  Minutes
+                </li>
+                <li role="option" tabindex="0"
+                  [attr.aria-selected]="form.get('tiempo_preparacion_unidad')?.value === 'hours'"
+                  class="category-list__item"
+                  [class.is-selected]="form.get('tiempo_preparacion_unidad')?.value === 'hours'"
+                  (click)="setTimeUnit('hours')" (keydown.enter)="setTimeUnit('hours'); $event.preventDefault()"
+                  (keydown.space)="setTimeUnit('hours'); $event.preventDefault()">
+                  <i class="bi bi-hourglass-split me-2 time-unit-icon" aria-hidden="true"></i>
+                  Hours
+                </li>
+              </ul>
+            </div>
+            }
+          </div>
+          @if (getError('tiempo_preparacion_unidad')) {
+          <div id="upload-tiempo-unidad-error" class="invalid-feedback d-block mt-1" role="status" aria-live="polite">
+            {{ getError('tiempo_preparacion_unidad') }}
+          </div>
+          }
+        </div>
+
+        <div class="col-12 col-md-4">
+          <label class="form-label fw-semibold" for="porciones">Servings</label>
+          <div class="input-with-icon">
+            <span class="input-prefix"><i class="bi bi-people"></i></span>
+            <input id="porciones" type="number" class="form-control input-soft" formControlName="porciones" min="1"
+              [attr.aria-invalid]="isFieldInvalid('porciones')"
+              [attr.aria-describedby]="getError('porciones') ? 'upload-porciones-error' : null" />
+          </div>
+          @if (getError('porciones')) {
+          <div id="upload-porciones-error" class="invalid-feedback d-block mt-1" role="status" aria-live="polite">
+            {{ getError('porciones') }}
+          </div>
+          }
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-semibold" for="price">Price</label>
+        <div class="input-with-icon">
+          <span class="input-prefix"><i class="bi bi-cash-coin"></i></span>
+          <input id="price" type="number" inputmode="decimal" step="0.01" min="0" class="form-control input-soft"
+            formControlName="price" placeholder="0.00" [attr.aria-invalid]="isFieldInvalid('price')"
+            [attr.aria-describedby]="getError('price') ? 'upload-price-error' : null" />
+        </div>
+        @if (getError('price')) {
+        <div id="upload-price-error" class="invalid-feedback d-block mt-1" role="status" aria-live="polite">
+          {{ getError('price') }}
+        </div>
+        }
+      </div>
+
+      <div>
+        <label class="form-label fw-semibold">Difficulty Level</label>
+        <div class="row g-3 difficulty-options">
+          <div class="col-12 col-md-4">
+            <button type="button" class="btn btn-difficulty btn-difficulty--easy w-100"
+              [class.is-active]="(selectedDifficulty$ | async) === 'easy'" (click)="setDifficulty('easy')"
+              [attr.aria-describedby]="getError('dificultad') ? 'upload-dificultad-error' : null">
+              <div class="difficulty-hats" aria-hidden="true">
+                <span class="chef-hat-badge" aria-hidden="true">
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon Chef" />
+                </span>
+              </div>
+              <span class="difficulty-pill">Easy</span>
+            </button>
+          </div>
+          <div class="col-12 col-md-4">
+            <button type="button" class="btn btn-difficulty btn-difficulty--medium w-100"
+              [class.is-active]="(selectedDifficulty$ | async) === 'medium'" (click)="setDifficulty('medium')"
+              [attr.aria-describedby]="getError('dificultad') ? 'upload-dificultad-error' : null">
+              <div class="difficulty-hats" aria-hidden="true">
+                <span class="chef-hat-badge" aria-hidden="true">
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon chef x2" />
+                </span>
+                <span class="chef-hat-badge" aria-hidden="true">
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                </span>
+              </div>
+              <span class="difficulty-pill">Medium</span>
+            </button>
+          </div>
+          <div class="col-12 col-md-4">
+            <button type="button" class="btn btn-difficulty btn-difficulty--hard w-100"
+              [class.is-active]="(selectedDifficulty$ | async) === 'hard'" (click)="setDifficulty('hard')"
+              [attr.aria-describedby]="getError('dificultad') ? 'upload-dificultad-error' : null">
+              <div class="difficulty-hats" aria-hidden="true">
+                <span class="chef-hat-badge" aria-hidden="true">
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon chef x3" />
+                </span>
+                <span class="chef-hat-badge" aria-hidden="true">
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                </span>
+                <span class="chef-hat-badge" aria-hidden="true">
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                </span>
+              </div>
+              <span class="difficulty-pill">Hard</span>
+            </button>
+          </div>
+        </div>
+        @if (getError('dificultad')) {
+        <div id="upload-dificultad-error" class="invalid-feedback d-block mt-2" role="status" aria-live="polite">
+          {{ getError('dificultad') }}
+        </div>
+        }
+      </div>
+    </article>
+
+    <article class="upload-card p-4 p-md-5">
+      <h2 class="upload-title mb-4">
+        <i class="bi bi-tags me-2"></i>Categories
+      </h2>
+
+      <div class="mb-1">
+        <label class="form-label fw-semibold" for="upload-category-trigger">Recipe Category</label>
+        <div class="custom-select-wrapper" (focusout)="onCategoryFocusOut($event)">
+          <button type="button" id="upload-category-trigger" class="btn custom-select-trigger"
+            [class.is-open]="categoryOpen" [class.input-error]="isFieldInvalid('categoria')"
+            [attr.aria-expanded]="categoryOpen" [attr.aria-haspopup]="'listbox'"
+            [attr.aria-describedby]="getError('categoria') ? 'upload-category-error' : null"
+            [attr.aria-invalid]="isFieldInvalid('categoria')" (click)="toggleCategoryDropdown()">
+            <span class="custom-select-trigger-label">
+              @if (selectedCategories.length > 0) {
+              <span>{{ selectedCategories.length }} {{ selectedCategories.length === 1 ? 'category selected' :
+                'categories selected' }}</span>
+              } @else {
+              <span class="custom-select-placeholder">Select categories...</span>
+              }
+            </span>
+            <i class="bi bi-chevron-down" aria-hidden="true"></i>
+          </button>
+
+          @if (categoryOpen) {
+          <div class="custom-select-backdrop" (click)="closeCategoryDropdown()" aria-hidden="true"></div>
+          <div class="custom-select-dropdown">
+            <div class="category-search-wrap">
+              <i class="bi bi-search category-search-icon"></i>
+              <label for="upload-category-search" class="visually-hidden">Search categories</label>
+              <input id="upload-category-search" class="category-search-input" type="text"
+                placeholder="Search category..." [value]="categorySearch" (input)="onCategorySearch($event)"
+                (click)="$event.stopPropagation()" autofocus />
+            </div>
+            <ul class="category-list" role="listbox" aria-labelledby="upload-category-trigger">
+              @for (cat of filteredCategorias; track cat.id_categoria) {
+              <li role="option" tabindex="0" [attr.aria-selected]="isCategorySelected(cat)" class="category-list__item"
+                [class.is-selected]="isCategorySelected(cat)" (click)="selectCategory(cat)"
+                (keydown.enter)="selectCategory(cat); $event.preventDefault()"
+                (keydown.space)="selectCategory(cat); $event.preventDefault()">
+                <i class="bi bi-check2 me-2 category-check"></i>
+                {{ cat.nombre }}
+              </li>
+              } @empty {
+              <li class="category-list__empty">No categories found.</li>
+              }
+            </ul>
+          </div>
+          }
+        </div>
+
+        @if (selectedCategories.length > 0) {
+        <div class="category-tags mt-2">
+          @for (cat of selectedCategories; track cat.id_categoria) {
+          <span class="category-tag">
+            <span class="category-tag__text">{{ cat.nombre }}</span>
+            <button type="button" class="btn category-tag__remove" (click)="removeCategory(cat)">
+              <i class="bi bi-x"></i>
+            </button>
+          </span>
+          }
+        </div>
+        }
+
+        @if (getError('categoria')) {
+        <div id="upload-category-error" class="invalid-feedback d-block mt-1" role="status" aria-live="polite">
+          {{ getError('categoria') }}
+        </div>
+        }
+      </div>
+    </article>
+
+    <article class="upload-card p-4 p-md-5">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="upload-title m-0"><i class="bi bi-basket me-2"></i>Ingredients</h2>
+        <button type="button" class="btn btn-primary btn-sm ingredients-add-btn" (click)="addIngredient()">
+          Add
+        </button>
+      </div>
+
+      <div formArrayName="ingredientes" class="ingredients-list">
+        @for (ingredient of ingredientes.controls; track ingredient; let i = $index) {
+        <div class="ingredients-row" [formGroupName]="i">
+          <div class="ingredients-index">
+            <span class="ingredient-badge">{{ i + 1 }}</span>
+          </div>
+          <div class="ingredients-fields">
+            <div class="ingredient-field ingredient-field--amount">
+              <label for="upload-ingrediente-cantidad-{{ i }}" class="visually-hidden">Ingredient amount</label>
+              <div class="input-with-icon">
+                <span class="input-prefix"><i class="bi bi-hash"></i></span>
+                <input id="upload-ingrediente-cantidad-{{ i }}" type="number" step="any" min="0"
+                  class="form-control input-soft" formControlName="cantidad" placeholder="Amount"
+                  [attr.aria-invalid]="isFieldInvalid('cantidad', ingredient)" />
+              </div>
+            </div>
+            <div class="ingredient-field ingredient-field--name">
+              <label for="upload-ingrediente-nombre-{{ i }}" class="visually-hidden">Ingredient name</label>
+              <div class="input-with-icon">
+                <span class="input-prefix"><i class="bi bi-egg-fried"></i></span>
+                <input id="upload-ingrediente-nombre-{{ i }}" class="form-control input-soft" formControlName="nombre"
+                  placeholder="Ingredient name" [attr.aria-invalid]="isFieldInvalid('nombre', ingredient)" />
+              </div>
+            </div>
+            <div class="ingredient-field ingredient-field--unit">
+              <label for="upload-ingrediente-unidad-{{ i }}" class="visually-hidden">Ingredient unit</label>
+              <div class="select-wrap">
+                <select id="upload-ingrediente-unidad-{{ i }}" class="form-control input-soft input-soft-select"
+                  formControlName="unidad" [attr.aria-invalid]="isFieldInvalid('unidad', ingredient)">
+                  @for (unit of ingredientUnits; track unit) {
+                  <option [value]="unit">{{ unit }}</option>
+                  }
+                </select>
+                <span class="select-caret"><i class="bi bi-chevron-down"></i></span>
+              </div>
+            </div>
+          </div>
+          <div class="ingredients-remove-wrap">
+            <button type="button" class="btn btn-danger btn-sm ingredients-remove-btn" (click)="removeIngredient(i)"
+              aria-label="Remove ingredient">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+
+      @if (getIngredientsErrorMessage()) {
+      <div id="upload-ingredients-error" class="invalid-feedback d-block mt-3 ingredient-errors" role="status"
+        aria-live="polite">
+        {{ getIngredientsErrorMessage() }}
+      </div>
+      }
+    </article>
+
+    <article class="upload-card p-4 p-md-5">
+      <h2 class="upload-title mb-3"><i class="bi bi-clipboard-check me-2"></i>Preparation Instructions</h2>
+      <label for="instrucciones" class="visually-hidden">Preparation Instructions</label>
+      <textarea id="instrucciones" class="form-control input-soft" rows="7" formControlName="instrucciones"
+        placeholder="Describe step by step how to prepare your recipe..."
+        [attr.aria-invalid]="isFieldInvalid('instrucciones')"
+        [attr.aria-describedby]="getError('instrucciones') ? 'upload-instrucciones-error' : null"></textarea>
+      @if (getError('instrucciones')) {
+      <div id="upload-instrucciones-error" class="invalid-feedback d-block mt-2" role="status" aria-live="polite">
+        {{ getError('instrucciones') }}
+      </div>
+      }
+    </article>
+
+    @if (submitError$ | async; as submitError) {
+    <div class="alert alert-danger mb-0" role="alert">
+      <i class="bi bi-exclamation-triangle me-2"></i>{{ submitError }}
+    </div>
+    }
+    @if (submitSuccess$ | async; as submitSuccess) {
+    <div class="alert alert-success mb-0" role="status" aria-live="polite">
+      <i class="bi bi-check-circle me-2"></i>{{ submitSuccess }}
+    </div>
+    }
+
+    <div class="d-flex justify-content-end gap-2 pb-3">
+      <button type="button" class="btn btn-outline-secondary px-4 ingredients-action-btn ingredients-cancel-btn"
+        (click)="onCancel()">Cancel</button>
+      <button type="submit" class="btn btn-publish px-4 ingredients-action-btn" [disabled]="submitting$ | async">
+        @if (submitting$ | async) {
+        Publishing...
+        } @else {
+        Publish Recipe
+        }
+      </button>
+    </div>
+  </form>
+</section>

@@ -1,54 +1,40 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { LucideAngularModule } from 'lucide-angular';
-import { SpoonacularService, SpoonacularRecipe } from '../../Core/Services/Spoonacular/spoonacular.service';
-import { catchError, of, finalize } from 'rxjs';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-dishly-ai',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
-  templateUrl: './dishly-ai.html',
-  styleUrl: './dishly-ai.css',
+  imports: [CommonModule, RouterOutlet],
+  template: `
+    <section class="page-header page-container">
+      <div class="page-header__inner">
+        <h1 class="page-title">Dishly AI</h1>
+        <div class="page-underline" aria-hidden="true"></div>
+      </div>
+
+      <div class="dishly-ai-shell page-container">
+        <section class="ai-hero-card">
+          <div class="ai-hero-card__copy">
+            <p class="ai-eyebrow">Smart Recipe Assistant</p>
+            <h2>Your Dishly kitchen copilot, with the same look and feel as the rest of the app.</h2>
+            <p class="subtitle">Ask for recipes by ingredient, time, difficulty or mood, and jump straight into the full recipe when you find one you like.</p>
+          </div>
+          <div class="ai-hero-card__badge">
+            <span class="ai-icon" aria-hidden="true">AI</span>
+            <span>Live assistant</span>
+          </div>
+        </section>
+
+        <div class="ai-content">
+        <router-outlet></router-outlet>
+        </div>
+      </div>
+    </section>
+  `,
+  styleUrls: ['./dishly-ai.scss']
 })
-export class DishlyAi {
-  private spoonacular = inject(SpoonacularService);
-
-  searchQuery = '';
-  recipes = signal<SpoonacularRecipe[]>([]);
-  selectedRecipe = signal<SpoonacularRecipe | null>(null);
-  loading = signal(false);
-  error = signal<string | null>(null);
-  hasSearched = signal(false);
-
-  onSearch(): void {
-    const query = this.searchQuery.trim();
-    if (!query) return;
-
-    this.loading.set(true);
-    this.error.set(null);
-    this.hasSearched.set(true);
-
-    this.spoonacular.searchRecipes(query).pipe(
-      catchError(() => {
-        this.error.set('Failed to fetch recipes. Please check your API key or try again later.');
-        return of({ results: [], offset: 0, number: 0, totalResults: 0 });
-      }),
-      finalize(() => this.loading.set(false))
-    ).subscribe(res => {
-      this.recipes.set(res.results);
-      this.selectedRecipe.set(res.results[0] ?? null);
-    });
-  }
-
-  clearSearch(): void {
-    this.searchQuery = '';
-    this.recipes.set([]);
-    this.selectedRecipe.set(null);
-    this.hasSearched.set(false);
-    this.error.set(null);
-  }
+export class DishlyAi {}
 
   stripHtml(html: string): string {
     if (!html) return '';

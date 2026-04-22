@@ -1,0 +1,84 @@
+<main class="profile-main">
+  <section class="page-header page-container">
+    <div class="page-header__inner">
+      <h1 class="page-title">My Profile</h1>
+      <div class="page-underline" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <div class="profile-wrapper page-container page-container--no-gutter">
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-header-main">
+          <div class="profile-avatar" aria-hidden="true">
+            @if (iconUrl(); as url) {
+            <img [src]="url" alt="Profile icon" />
+            } @else {
+            <span class="profile-avatar-initial">{{ displayName.charAt(0).toUpperCase() }}</span>
+            }
+          </div>
+          <div class="profile-info">
+            <h1 id="profile-title" class="profile-name">
+              {{ displayName }}
+              @if (user()?.chef) {
+              <lucide-icon name="chef-hat" class="profile-chef-hat" size="18" strokeWidth="2"></lucide-icon>
+              }
+            </h1>
+            <p class="profile-meta">{{ memberSince }}</p>
+            <p class="profile-email">{{ user()?.email ?? '—' }}</p>
+          </div>
+        </div>
+        <a routerLink="/profile/edit" class="btn-primary btn-sm profile-edit-link">Edit Profile</a>
+      </div>
+
+      <section class="profile-stats" aria-label="Profile statistics">
+        <article class="profile-stat">
+          <header class="profile-stat-header">
+            <h2 class="profile-stat-label">My Recipes</h2>
+            <lucide-icon name="chef-hat" class="profile-stat-icon" size="24" strokeWidth="2"></lucide-icon>
+          </header>
+          <h3 class="profile-stat-value">{{ myRecipesCount() }}</h3>
+        </article>
+        <article class="profile-stat">
+          <header class="profile-stat-header">
+            <h2 class="profile-stat-label">Bought Recipes</h2>
+            <lucide-icon name="shopping-cart" class="profile-stat-icon" size="24" strokeWidth="2"></lucide-icon>
+          </header>
+          <h3 class="profile-stat-value">{{ boughtRecipesCount() }}</h3>
+        </article>
+      </section>
+
+      <button type="button" class="btn-danger profile-logout-btn" [disabled]="isLoggingOut()"
+        (click)="logout()" [attr.aria-busy]="isLoggingOut()">
+        @if (isLoggingOut()) {
+        <span class="btn-loading-icon" aria-hidden="true"></span>
+        } @else {
+        <span class="profile-logout-text">Log out</span>
+        }
+      </button>
+    </div>
+  </div>
+
+  <section class="page-header page-container">
+    <div class="page-header__inner">
+      <h1 class="page-title">My Recipes</h1>
+      <div class="page-underline" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <div class="profile-wrapper page-container page-container--no-gutter">
+    <div class="profile-card">
+      <div class="profile-recipes-section">
+        @if (visibleRecipes().length > 0) {
+        <div class="recipes-grid">
+          @for (recipe of visibleRecipes(); track recipe.id_receta) {
+          <app-recipe-card [receta]="recipe" (recipeDeactivated)="onRecipeDeactivated($event)"></app-recipe-card>
+          }
+        </div>
+        } @else {
+        <p class="no-recipes-message">You haven't published any recipes yet.</p>
+        }
+      </div>
+    </div>
+  </div>
+</main>

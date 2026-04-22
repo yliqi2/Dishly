@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarritoController;
+use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\ForumController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\OwnedRecipes;
 use App\Http\Controllers\RecetaController;
@@ -22,6 +24,14 @@ Route::get('/recipes/{id}/reviews', [RecetaController::class, 'getReviewsForReci
 Route::get('/profile/{id}', [UserController::class, 'showPublicProfile'])->whereNumber('id');
 Route::get('/recetas/categorias', [RecetaController::class, 'getCategorias']);
 Route::get('/recetas/ingredientes', [RecetaController::class, 'getIngredientes']);
+
+// Chatbot (público)
+Route::get('/chatbot/recipes/catalog', [ChatbotController::class, 'catalog']);
+Route::post('/chatbot/receta/buscar', [ChatbotController::class, 'buscar']);
+
+// Foro (público - lectura)
+Route::get('/forums', [ForumController::class, 'index']);
+Route::get('/forums/{forumId}', [ForumController::class, 'show']);
 
 // Autenticado
 Route::middleware('auth:api')->group(function () {
@@ -65,4 +75,10 @@ Route::middleware('auth:api')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin/recipes', [RecetaController::class, 'getAllRecetasAdmin']);
     });
+
+    // Foro (autenticado - escritura)
+    Route::post('/forums', [ForumController::class, 'store']);
+    Route::post('/forums/{forumId}/comments', [ForumController::class, 'storeComment']);
+    Route::put('/forums/{forumId}/comments/{commentId}', [ForumController::class, 'updateComment']);
+    Route::delete('/forums/{forumId}/comments/{commentId}', [ForumController::class, 'destroyComment']);
 });
