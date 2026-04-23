@@ -9,7 +9,7 @@ import { RouterOutlet } from '@angular/router';
   template: `
     <section class="page-header page-container mb-4">
       <div class="page-header__inner">
-        <h1 class="page-title">Dishly AI</h1>
+        <h1 class="page-title"><span class="notranslate" translate="no">Dishly AI</span></h1>
         <div class="page-underline" aria-hidden="true"></div>
       </div>
     </section>
@@ -19,7 +19,7 @@ import { RouterOutlet } from '@angular/router';
         <div class="ai-hero-card__copy">
           <p class="ai-eyebrow">AI Recipe Generation</p>
           <h2>Generate custom recipes in seconds based on your ingredients, time, and cravings.</h2>
-          <p class="subtitle">Tell Dishly AI what you have at home and it will generate a complete recipe with steps, timing, and serving ideas.</p>
+          <p class="subtitle">Tell <span class="notranslate" translate="no">Dishly AI</span> what you have at home and it will generate a complete recipe with steps, timing, and serving ideas.</p>
         </div>
         <div class="ai-hero-card__badge">
           <span class="ai-icon" aria-hidden="true">AI</span>

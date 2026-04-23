@@ -24,7 +24,7 @@
           </div>
           <div class="profile-info">
             <h1 id="profile-title" class="profile-name">
-              {{ displayName }}
+              <span class="notranslate" translate="no">{{ displayName }}</span>
               @if (user()?.chef) {
               <lucide-icon name="chef-hat" class="profile-chef-hat" size="18" strokeWidth="2"></lucide-icon>
               }
@@ -39,7 +39,7 @@
 
   <section class="page-header page-container">
     <div class="page-header__inner">
-      <h1 class="page-title">{{ displayName }}'s Recipes</h1>
+      <h1 class="page-title"><span class="notranslate" translate="no">{{ displayName }}</span>'s Recipes</h1>
       <div class="page-underline" aria-hidden="true"></div>
     </div>
   </section>

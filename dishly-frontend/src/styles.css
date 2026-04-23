@@ -1,4 +1,4 @@
-﻿/* You can add global styles to this file, and also import other style files */
+/* You can add global styles to this file, and also import other style files */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Poppins:wght@100..900&display=swap");
 
 :root {
@@ -59,6 +59,24 @@ body {
 	margin: 0;
 	padding: 0;
 	overflow-x: hidden;
+	top: 0 !important;
+}
+
+#google_translate_element {
+	position: fixed;
+	top: 0;
+	right: 0;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	opacity: 0;
+	pointer-events: none;
+	z-index: 1;
+}
+
+iframe.VIpgJd-ZVi9od-ORHb-OEVmcd,
+.goog-te-banner-frame.skiptranslate {
+	display: none !important;
 }
 
 /* Elemento <small> y utilidad .small (Bootstrap); misma talla, dos selectores distintos */

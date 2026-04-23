@@ -25,7 +25,7 @@
               }
             </span>
             <span class="forum-user-chip__meta">
-              <strong>{{ currentUserName() }}</strong>
+              <strong class="notranslate" translate="no">{{ currentUserName() }}</strong>
               <span>Ready to start a discussion</span>
             </span>
           </div>
@@ -116,7 +116,7 @@
                 </div>
                 <p>{{ forum.descripcion }}</p>
                 <div class="forum-list__meta">
-                  <span>By {{ forum.owner.nombre || 'Dishly user' }}</span>
+                  <span>By <span class="notranslate" translate="no">{{ forum.owner.nombre || 'Dishly user' }}</span></span>
                   <span>{{ formatDate(forum.last_activity_at ?? forum.created_at ?? forum.fecha_creacion) }}</span>
                 </div>
               </button>
@@ -233,7 +233,7 @@
                   <div class="comment-card__body">
                     <div class="comment-card__header">
                       <div>
-                        <strong>{{ comment.autor_nombre }}</strong>
+                        <strong class="notranslate" translate="no">{{ comment.autor_nombre }}</strong>
                         <p>{{ formatDate(comment.created_at ?? comment.fecha) }}</p>
                       </div>
 

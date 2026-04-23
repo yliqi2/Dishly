@@ -7,7 +7,7 @@
         <img src="assets/icons/DishlyIcon.webp" alt="" />
       </span>
       <div>
-        <span class="status-text">Dishly AI Recipe Generator online</span>
+        <span class="status-text"><span class="notranslate" translate="no">Dishly AI</span> Recipe Generator online</span>
         <p class="status-subtext">Describe ingredients or cravings and get a generated recipe in this chat</p>
       </div>
     </div>
@@ -44,7 +44,7 @@
         @if (message.role === 'assistant') {
           <div class="message assistant-message">
             <div class="message-avatar message-avatar--assistant">
-              <img src="assets/icons/DishlyIcon.webp" alt="Dishly AI" />
+              <img src="assets/icons/DishlyIcon.webp" alt="Dishly AI" translate="no" />
             </div>
             <div class="message-content">
               <div class="message-text">{{ message.content }}</div>
@@ -104,6 +104,7 @@
       [(ngModel)]="newMessage"
       (keydown)="handleKeyPress($event)"
       placeholder="Ask Dishly AI to generate a recipe: ingredients, style, time, servings, or difficulty..."
+      translate="no"
       [disabled]="isLoading()"
       rows="1"
     ></textarea>
@@ -142,7 +143,7 @@
         </div>
 
         <div class="clear-modal-body">
-          <p>This will remove all current messages from Dishly AI. Do you want to continue?</p>
+          <p>This will remove all current messages from <span class="notranslate" translate="no">Dishly AI</span>. Do you want to continue?</p>
         </div>
 
         <div class="clear-modal__actions">

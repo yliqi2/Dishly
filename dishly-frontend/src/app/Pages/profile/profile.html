@@ -19,13 +19,13 @@
           </div>
           <div class="profile-info">
             <h1 id="profile-title" class="profile-name">
-              {{ displayName }}
+              <span class="notranslate" translate="no">{{ displayName }}</span>
               @if (user()?.chef) {
               <lucide-icon name="chef-hat" class="profile-chef-hat" size="18" strokeWidth="2"></lucide-icon>
               }
             </h1>
             <p class="profile-meta">{{ memberSince }}</p>
-            <p class="profile-email">{{ user()?.email ?? '—' }}</p>
+            <p class="profile-email"><span class="notranslate" translate="no">{{ user()?.email ?? '—' }}</span></p>
           </div>
         </div>
         <a routerLink="/profile/edit" class="btn-primary btn-sm profile-edit-link">Edit Profile</a>
