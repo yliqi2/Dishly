@@ -17,6 +17,7 @@ import { RecetaOriginal } from '../../Core/Interfaces/RecetaOriginal';
 import { AuthServices } from '../../Core/Services/Auth/auth-services';
 import { Categoria } from '../../Core/Services/Categoria/categoria';
 import { RecetaDetailsService } from '../../Core/Services/Core/receta-details-service';
+import { Breadcrumbs } from '../../Core/Components/breadcrumbs/breadcrumbs';
 
 type DifficultyLevel = 'easy' | 'medium' | 'hard';
 type TimeUnit = 'minutes' | 'hours';
@@ -29,7 +30,7 @@ type EditablePhoto = {
 
 @Component({
   selector: 'app-edit-recipe',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, Breadcrumbs],
   templateUrl: './upload.html',
   styleUrl: './upload.css',
 })

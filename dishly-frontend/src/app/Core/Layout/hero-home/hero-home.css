@@ -52,6 +52,7 @@
 	font-weight: 800;
 	line-height: 1.2;
 	margin: 0;
+	max-width: 50%;
 	text-shadow: 2px 2px 4px var(--color-shadow);
 }
 
@@ -70,6 +71,7 @@
 	.hero__title {
 		font-size: 48px;
 		text-align: center;
+		max-width: 100%;
 	}
 }
 
@@ -86,7 +88,7 @@
 	}
 
 	.hero__title {
-		font-size: 38px;
+		font-size: clamp(30px, 9vw, 38px);
 		text-align: center;
 	}
 }
@@ -104,7 +106,7 @@
 	}
 
 	.hero__title {
-		font-size: 32px;
+		font-size: clamp(28px, 9vw, 32px);
 		text-align: center;
 	}
 }
@@ -122,7 +124,7 @@
 	}
 
 	.hero__title {
-		font-size: 28px;
+		font-size: 26px;
 		text-align: center;
 	}
 }

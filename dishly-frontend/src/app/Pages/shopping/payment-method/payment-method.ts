@@ -5,11 +5,12 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractContro
 import { CartService } from '../../../Core/Services/Cart/cart.service';
 import { PurchasedItemSummary } from '../../../Core/Interfaces/PayCartResponse';
 import { ChefAnimation } from '../../../Core/Components/chef-animation/chef-animation';
+import { Breadcrumbs } from '../../../Core/Components/breadcrumbs/breadcrumbs';
 
 @Component({
   selector: 'app-payment-method',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, ChefAnimation],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule, ChefAnimation, Breadcrumbs],
   templateUrl: './payment-method.html',
   styleUrl: './payment-method.css',
 })

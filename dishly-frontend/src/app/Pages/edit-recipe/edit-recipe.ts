@@ -18,6 +18,7 @@ import { AuthServices } from '../../Core/Services/Auth/auth-services';
 import { Categoria } from '../../Core/Services/Categoria/categoria';
 import { RecetaDetailsService } from '../../Core/Services/Core/receta-details-service';
 import { DishlySelectComponent, SelectOption } from '../../Core/Components/dishly-select/dishly-select';
+import { Breadcrumbs } from '../../Core/Components/breadcrumbs/breadcrumbs';
 
 type DifficultyLevel = 'easy' | 'medium' | 'hard';
 type EditablePhoto = {
@@ -30,7 +31,7 @@ type EditablePhoto = {
 @Component({
   selector: 'app-edit-recipe',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DishlySelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, DishlySelectComponent, Breadcrumbs],
   templateUrl: './edit-recipe.html',
   styleUrls: ['./edit-recipe.css'],
 })

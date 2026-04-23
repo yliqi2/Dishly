@@ -7,11 +7,12 @@ import { RecetaOriginal } from '../../../Core/Interfaces/RecetaOriginal';
 import { RecipeService } from '../../../Core/Services/Recipes/recipe.service';
 import { DishlySelectComponent, SelectOption } from '../../../Core/Components/dishly-select/dishly-select';
 import { AuthServices } from '../../../Core/Services/Auth/auth-services';
+import { Breadcrumbs } from '../../../Core/Components/breadcrumbs/breadcrumbs';
 
 @Component({
   selector: 'app-bought-recipes',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule, RecipeCardComponent, DishlySelectComponent],
+  imports: [CommonModule, RouterLink, LucideAngularModule, RecipeCardComponent, DishlySelectComponent, Breadcrumbs],
   templateUrl: './bought-recipes.html',
   styleUrl: './bought-recipes.css',
 })

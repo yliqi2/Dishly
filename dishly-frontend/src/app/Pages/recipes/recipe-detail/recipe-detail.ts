@@ -11,13 +11,14 @@ import { RecetaOriginal } from '../../../Core/Interfaces/RecetaOriginal';
 import { Review } from '../../../Core/Interfaces/Review';
 import { DeleteReviewModal } from '../../../Core/Components/modals/delete-review-modal/delete-review-modal';
 import { DishlySelectComponent, SelectOption } from '../../../Core/Components/dishly-select/dishly-select';
+import { Breadcrumbs } from '../../../Core/Components/breadcrumbs/breadcrumbs';
 
 type ReviewSortOption = 'latest' | 'highest' | 'lowest';
 
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, FormsModule, RouterLink, DeleteReviewModal, DishlySelectComponent],
+  imports: [CommonModule, LucideAngularModule, FormsModule, RouterLink, DeleteReviewModal, DishlySelectComponent, Breadcrumbs],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.css',
 })
@@ -112,6 +113,7 @@ export class RecipeDetail implements OnInit {
         }
 
         this.recipe = data;
+        sessionStorage.setItem(`dishly.recipeTitle.${data.id_receta}`, data.titulo);
         this.hasPurchased = Boolean(data.purchased);
         this.thumbnails = this.computeThumbnails(data);
         this.selectedThumbnailIndex = 0;

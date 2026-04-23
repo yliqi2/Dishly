@@ -244,7 +244,6 @@
 .carousel-btn:hover {
   transform: translateY(calc(-50% - 1px));
   border-color: var(--highlight);
-  color: var(--highlight);
   box-shadow: 0 14px 28px var(--color-shadow);
 }
 
@@ -255,7 +254,15 @@
 
 .carousel-btn:hover:active {
   border-color: var(--highlight);
-  color: var(--highlight);
+}
+
+.carousel-btn:focus-visible {
+  outline: 3px solid var(--highlight);
+  outline-offset: 3px;
+  border-color: var(--highlight);
+  transform: translateY(calc(-50% - 1px));
+  box-shadow: 0 14px 28px var(--color-shadow);
+  border-radius: var(--border-radius);
 }
 
 .carousel-btn.prev { left: 14px; }
@@ -566,8 +573,9 @@
 }
 
 .btn-buy-custom:focus-visible {
-  outline: 3px solid var(--color-highlight-overlay);
+  outline: 3px solid var(--highlight);
   outline-offset: 4px;
+  border-radius: var(--border-radius);
 }
 
 .btn-buy-custom:active:not(:disabled) {

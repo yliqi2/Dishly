@@ -1,1 +1,16 @@
-<p>breadcrumbs works!</p>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol class="breadcrumbs__list">
+    @for (item of items; track item.path; let i = $index) {
+      <li class="breadcrumbs__item">
+        @if (isLast(i)) {
+          <span class="breadcrumbs__current">{{ item.label }}</span>
+        } @else {
+          <a [routerLink]="item.path" class="breadcrumbs__link">{{ item.label }}</a>
+        }
+        @if (!isLast(i)) {
+          <span class="breadcrumbs__sep" aria-hidden="true">/</span>
+        }
+      </li>
+    }
+  </ol>
+</nav>

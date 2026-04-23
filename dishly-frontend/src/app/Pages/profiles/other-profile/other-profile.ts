@@ -6,10 +6,11 @@ import { LucideAngularModule } from 'lucide-angular';
 import { Profile as ProfileService, PublicProfileResponse } from '../../../Core/Services/Profile/profile-services';
 import { RecipeCardComponent } from '../../../Core/Components/recipe-card/recipe-card';
 import { RecetaOriginal } from '../../../Core/Interfaces/RecetaOriginal';
+import { Breadcrumbs } from '../../../Core/Components/breadcrumbs/breadcrumbs';
 
 @Component({
   selector: 'app-other-profile',
-  imports: [CommonModule, LucideAngularModule, RecipeCardComponent],
+  imports: [CommonModule, LucideAngularModule, RecipeCardComponent, Breadcrumbs],
   templateUrl: './other-profile.html',
   styleUrl: './other-profile.css',
   changeDetection: ChangeDetectionStrategy.OnPush

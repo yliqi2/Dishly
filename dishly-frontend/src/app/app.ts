@@ -1,4 +1,5 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Header } from './Core/Layout/header/header';
 import { filter } from 'rxjs';
@@ -19,6 +20,7 @@ export class App {
   private readonly titleService = inject(Title);
   private readonly metaService = inject(Meta);
   private readonly loadingService = inject(LoadingService);
+  private readonly platformId = inject(PLATFORM_ID);
   protected readonly title = signal('Dishly');
   protected readonly showHeader = signal(true);
   protected readonly isGlobalLoading = this.loadingService.isLoading;
@@ -30,7 +32,7 @@ export class App {
         const authRoutes = ['/login', '/register', '/forgot-password'];
         this.showHeader.set(!authRoutes.some(route => event.url.startsWith(route)));
         this.updateRouteMeta(event.urlAfterRedirects || event.url);
-        if (this.showHeader()) {
+        if (this.showHeader() && isPlatformBrowser(this.platformId)) {
           setTimeout(() => {
             const b = document.body;
             b.setAttribute('tabindex', '-1');
@@ -53,7 +55,8 @@ export class App {
     this.metaService.updateTag({ property: 'og:title', content: fullTitle });
     this.metaService.updateTag({ property: 'og:description', content: description });
     this.metaService.updateTag({ property: 'og:type', content: 'website' });
-    this.metaService.updateTag({ property: 'og:url', content: window.location.origin + currentUrl });
+    const origin = isPlatformBrowser(this.platformId) ? window.location.origin : '';
+    this.metaService.updateTag({ property: 'og:url', content: `${origin}${currentUrl}` });
   }
 
   private getDeepestRoute(route: ActivatedRoute): ActivatedRoute {

@@ -1,16 +1,18 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { Breadcrumbs } from '../../Core/Components/breadcrumbs/breadcrumbs';
 
 @Component({
   selector: 'app-dishly-ai',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, Breadcrumbs],
   template: `
     <section class="page-header page-container mb-4">
       <div class="page-header__inner">
         <h1 class="page-title"><span class="notranslate" translate="no">Dishly AI</span></h1>
         <div class="page-underline" aria-hidden="true"></div>
+        <app-breadcrumbs></app-breadcrumbs>
       </div>
     </section>
 

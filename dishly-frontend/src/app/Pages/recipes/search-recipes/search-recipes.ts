@@ -7,11 +7,12 @@ import { RecipeCardComponent } from '../../../Core/Components/recipe-card/recipe
 import { RecipeService } from '../../../Core/Services/Recipes/recipe.service';
 import { RecetaCard } from '../../../Core/Interfaces/RecetaCard';
 import { DishlySelectComponent, SelectOption } from '../../../Core/Components/dishly-select/dishly-select';
+import { Breadcrumbs } from '../../../Core/Components/breadcrumbs/breadcrumbs';
 
 @Component({
   selector: 'app-search-recipes',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, FormsModule, RecipeCardComponent, DishlySelectComponent],
+  imports: [CommonModule, LucideAngularModule, FormsModule, RecipeCardComponent, DishlySelectComponent, Breadcrumbs],
   templateUrl: './search-recipes.html',
   styleUrl: './search-recipes.css',
 })

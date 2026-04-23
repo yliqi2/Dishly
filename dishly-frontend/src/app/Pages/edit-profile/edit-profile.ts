@@ -14,6 +14,7 @@ import { AuthServices } from '../../Core/Services/Auth/auth-services';
 import { LucideAngularModule } from 'lucide-angular';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ConfirmDeleteModal } from '../../Core/Components/modals/confirm-delete-modal/confirm-delete-modal';
+import { Breadcrumbs } from '../../Core/Components/breadcrumbs/breadcrumbs';
 
 type User = {
   nombre?: string;
@@ -27,7 +28,7 @@ type User = {
 
 @Component({
   selector: 'app-edit-profile',
-  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, ConfirmDeleteModal],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, ConfirmDeleteModal, Breadcrumbs],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.css',
   changeDetection: ChangeDetectionStrategy.OnPush

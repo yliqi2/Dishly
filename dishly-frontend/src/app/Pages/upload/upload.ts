@@ -16,13 +16,14 @@ import { Categoria } from '../../Core/Services/Categoria/categoria';
 import { CategoriaItem } from '../../Core/Interfaces/CategoriaItem';
 import { Router } from '@angular/router';
 import { DishlySelectComponent, SelectOption } from '../../Core/Components/dishly-select/dishly-select';
+import { Breadcrumbs } from '../../Core/Components/breadcrumbs/breadcrumbs';
 
 type DifficultyLevel = 'easy' | 'medium' | 'hard';
 
 
 @Component({
   selector: 'app-upload',
-  imports: [CommonModule, ReactiveFormsModule, DishlySelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, DishlySelectComponent, Breadcrumbs],
   templateUrl: './upload.html',
   styleUrl: './upload.css',
 })

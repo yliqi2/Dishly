@@ -7,11 +7,12 @@ import { AuthServices } from '../../Core/Services/Auth/auth-services';
 import { ForumService } from '../../Core/Services/Forum/forum.service';
 import { ForumComment, ForumDetail, ForumOwner, ForumSummary } from '../../Core/Interfaces/Forum';
 import { DeletePostModal } from '../../Core/Components/modals/delete-post-modal/delete-post-modal';
+import { Breadcrumbs } from '../../Core/Components/breadcrumbs/breadcrumbs';
 
 @Component({
   selector: 'app-forum',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, DeletePostModal],
+  imports: [CommonModule, FormsModule, RouterLink, DeletePostModal, Breadcrumbs],
   templateUrl: './forum.html',
   styleUrl: './forum.css',
 })
