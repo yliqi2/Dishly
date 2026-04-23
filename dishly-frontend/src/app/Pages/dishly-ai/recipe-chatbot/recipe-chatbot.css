@@ -38,7 +38,7 @@
 .status-subtext {
   margin: 0.15rem 0 0;
   color: var(--color-gray-medium);
-  font-size: 0.88rem;
+  font-size: 1rem;
 }
 
 .assistant-brand-avatar {
@@ -61,7 +61,9 @@
 
 .btn-clear {
   background: var(--color-red-base);
-  border: 1px solid var(--neutral-black);
+  border: none;
+  box-shadow: none;
+  appearance: none;
   color: var(--neutral-white);
   cursor: pointer;
   padding: 0.625rem 1rem;
@@ -127,9 +129,14 @@
 }
 
 .message.user-message .message-content {
-  background: var(--highlight);
-  color: var(--neutral-white);
+  background: var(--secondaryWhite);
+  border: 2px solid var(--highlight);
+  color: var(--neutral-black);
   box-shadow: 0 2px 10px var(--color-shadow);
+}
+
+.message.user-message .message-time {
+  color: var(--neutral-black);
 }
 
 .message.assistant-message .message-content {
@@ -175,8 +182,22 @@
   word-break: break-word;
 }
 
+.message-text--internet p {
+  margin: 0;
+}
+
+.message-text--internet p + p {
+  margin-top: 0.2rem;
+}
+
+.message-text--internet a {
+  color: var(--highlight-hover);
+  text-decoration: underline;
+  word-break: break-all;
+}
+
 .message-time {
-  font-size: 0.7rem;
+  font-size: 1rem;
   opacity: 0.7;
   margin-top: 0.25rem;
 }
@@ -234,7 +255,7 @@
 
 .suggestions-title {
   margin: 0 0 0.75rem;
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--highlight-hover);
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -253,7 +274,7 @@
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--neutral-black);
   min-height: 40px;
   display: inline-flex;
@@ -261,10 +282,26 @@
   gap: 8px;
 }
 
+.suggestion-btn lucide-icon,
+.btn-send lucide-icon,
+.btn-clear lucide-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .suggestion-btn:hover {
   border-color: var(--highlight);
   box-shadow: 0 6px 16px var(--color-shadow);
   transform: translateY(-1px);
+}
+
+.suggestion-btn:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px var(--color-shadow);
+  border-color: var(--highlight-hover);
 }
 
 .suggestion-btn:focus-visible {
@@ -287,7 +324,7 @@
   border-radius: var(--border-radius);
   resize: none;
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 1rem;
   max-height: 100px;
   background: var(--neutral-white);
   color: var(--neutral-black);
@@ -301,7 +338,10 @@
 
 .btn-send {
   background: var(--highlight);
-  border: 1px solid var(--neutral-black);
+  border: none;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
   color: var(--neutral-white);
   min-width: 140px;
   height: 48px;

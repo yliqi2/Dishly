@@ -6,7 +6,16 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   receta?: RecetaData | null;
+  internetResult?: InternetSearchResult | null;
   isTyping?: boolean;
+}
+
+export interface InternetSearchResult {
+  title: string;
+  timeText: string;
+  servingsText: string;
+  summary?: string;
+  sourceUrl: string;
 }
 
 export interface RecetaResponse {

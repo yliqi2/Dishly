@@ -731,14 +731,6 @@ export class Forum implements OnInit, AfterViewChecked, OnDestroy {
 
     this.conversationPanelEl.style.height = '';
     this.commentPanelEl.style.height = '';
-
-    const targetHeight = Math.max(
-      this.conversationPanelEl.offsetHeight,
-      this.commentPanelEl.offsetHeight
-    );
-
-    this.conversationPanelEl.style.height = `${targetHeight}px`;
-    this.commentPanelEl.style.height = `${targetHeight}px`;
   }
 
 }

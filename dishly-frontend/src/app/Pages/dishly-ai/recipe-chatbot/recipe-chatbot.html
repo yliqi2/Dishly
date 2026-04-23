@@ -47,7 +47,24 @@
               <img src="assets/icons/DishlyIcon.webp" alt="Dishly AI" translate="no" />
             </div>
             <div class="message-content">
-              <div class="message-text">{{ message.content }}</div>
+              @if (message.internetResult; as internetResult) {
+                <div class="message-text message-text--internet">
+                  <p>{{ internetResult.title }}</p>
+                  <p><strong>Time:</strong> {{ internetResult.timeText }}</p>
+                  <p><strong>Servings:</strong> {{ internetResult.servingsText }}</p>
+                  @if (internetResult.summary) {
+                    <p><strong>Summary:</strong> {{ internetResult.summary }}</p>
+                  }
+                  <p>
+                    <strong>Source:</strong>
+                    <a [href]="internetResult.sourceUrl" target="_blank" rel="noopener noreferrer">
+                      {{ internetResult.sourceUrl }}
+                    </a>
+                  </p>
+                </div>
+              } @else {
+                <div class="message-text">{{ message.content }}</div>
+              }
               <div class="message-time">{{ message.timestamp | date:'HH:mm' }}</div>
 
               @if (message.receta) {

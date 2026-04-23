@@ -137,24 +137,15 @@
         <header class="forum-detail__header">
           <div class="forum-owner-row">
             <div class="forum-owner">
-            @if (getOwnerAvatar(selectedForum.owner); as ownerAvatar) {
-              <img [src]="ownerAvatar" [alt]="selectedForum.owner.nombre" class="forum-owner__avatar" />
-            } @else {
-              <div class="forum-owner__fallback">{{ ownerInitial(selectedForum.owner.nombre) }}</div>
-            }
-
-            <div>
+              <div>
               <h2>{{ selectedForum.titulo }}</h2>
               <p class="forum-detail__meta">
                 {{ formatDate(selectedForum.created_at ?? selectedForum.fecha_creacion) }}
-                @if (selectedForum.comments.length > 0) {
-                  {{ selectedForum.comments.length }} comments
-                }
               </p>
               @if (!editingForum) {
                 <p class="forum-detail__description">{{ selectedForum.descripcion }}</p>
               }
-            </div>
+              </div>
             </div>
             @if (isAuthenticated() && selectedForum.is_owner && !editingForum) {
               <div class="forum-detail__actions">
@@ -193,7 +184,7 @@
                 ></textarea>
               </label>
 
-              <div class="comment-editor__actions">
+              <div class="forum-editor__actions">
                 <button class="btn-primary btn-sm" type="button" [disabled]="updatingForum" (click)="saveForumChanges()">
                   Save post
                 </button>
