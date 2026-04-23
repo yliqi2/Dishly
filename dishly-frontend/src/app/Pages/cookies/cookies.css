@@ -8,7 +8,7 @@
 
 .legal-page__header {
   padding-top: var(--layout-gutter);
-  padding-bottom: 20px;
+  padding-bottom: 0;
 }
 
 .legal-meta {

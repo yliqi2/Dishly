@@ -2,36 +2,13 @@
   <div class="page-header__inner">
     <h1 class="page-title">Shopping cart</h1>
     <div class="page-underline" aria-hidden="true"></div>
-    <p class="page-subtitle">Almost there—review your items and check out when ready.</p>
   </div>
 </section>
 
 <section class="page-container cart-page pb-4">
   @if (items().length === 0) {
   <div class="cart-empty shadow-sm">
-    <div class="cart-empty__chef" aria-hidden="true">
-      <div class="chef-hat">
-        <div class="hat-top"></div>
-        <div class="hat-brim"></div>
-      </div>
-      <div class="chef-face">
-        <div class="chef-eyes">
-          <span class="eye"></span>
-          <span class="eye"></span>
-        </div>
-        <div class="chef-mouth"></div>
-      </div>
-      <div class="chef-body">
-        <div class="chef-buttons">
-          <span></span><span></span><span></span>
-        </div>
-      </div>
-      <div class="steam">
-        <span class="swirl s1">~</span>
-        <span class="swirl s2">~</span>
-        <span class="swirl s3">~</span>
-      </div>
-    </div>
+    <app-chef-animation class="cart-empty__chef" aria-hidden="true"></app-chef-animation>
     <h2>Your cart is empty</h2>
     <p>Add a premium recipe from the details page to see it here.</p>
     <a routerLink="/recipes" class="btn-primary">Browse recipes</a>

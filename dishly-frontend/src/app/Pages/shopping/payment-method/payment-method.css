@@ -1,7 +1,8 @@
 /* ── Page shell ─────────────────────────────────────── */
 
 .pm-header {
-  padding: var(--layout-gutter) 0;
+  padding-top: var(--layout-gutter);
+  padding-bottom: 0;
 }
 
 .page-header__inner {

@@ -8,6 +8,7 @@
 
 	--layout-max-width: 1400px;
 	--layout-gutter: 24px;
+	--page-header-spacing: 24px;
 	--border-radius: 10px;
 
 	--neutral-black: #111827;
@@ -217,7 +218,12 @@ textarea:focus-visible,
 }
 
 .page-header {
-	padding: var(--layout-gutter) 0;
+	padding: var(--layout-gutter) 0 0;
+	margin-bottom: var(--page-header-spacing);
+}
+
+.page-header.mb-4 {
+	margin-bottom: var(--page-header-spacing) !important;
 }
 
 .page-header__inner {

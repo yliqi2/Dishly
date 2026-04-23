@@ -99,7 +99,7 @@
   height: 60px;
   background: var(--secondaryWhite);
   border-radius: var(--border-radius);
-  border: 3px solid var(--secondaryWhite);
+  border: 3px solid var(--neutral-black);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -116,7 +116,7 @@
 .eye {
   width: 9px;
   height: 9px;
-  background: var(--color-slate-deep);
+  background: var(--neutral-black);
   border-radius: var(--border-radius);
   animation: cartBlink 4s ease-in-out infinite;
 }

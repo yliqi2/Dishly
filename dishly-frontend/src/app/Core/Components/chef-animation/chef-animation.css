@@ -1,0 +1,158 @@
+:host {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chef-hat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hat-top {
+  width: 64px;
+  height: 56px;
+  background: var(--neutral-white);
+  border: 3px solid var(--neutral-black);
+  border-radius: var(--border-radius);
+  position: relative;
+}
+
+.hat-top::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 6px;
+  background: var(--highlight);
+  border-radius: var(--border-radius);
+}
+
+.hat-brim {
+  width: 76px;
+  height: 14px;
+  background: var(--neutral-white);
+  border: 3px solid var(--neutral-black);
+  border-radius: var(--border-radius);
+  margin-top: -2px;
+}
+
+.chef-face {
+  width: 70px;
+  height: 60px;
+  background: var(--neutral-white);
+  border-radius: var(--border-radius);
+  border: 3px solid var(--neutral-black);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.chef-eyes {
+  display: flex;
+  gap: 14px;
+}
+
+.eye {
+  width: 9px;
+  height: 9px;
+  background: var(--neutral-black);
+  border-radius: 50%;
+  animation: chef-blink 4s ease-in-out infinite;
+}
+
+.chef-mouth {
+  width: 22px;
+  height: 10px;
+  border: 3px solid var(--highlight-hover);
+  border-top: none;
+  border-radius: var(--border-radius);
+}
+
+.chef-mouth--happy {
+  width: 28px;
+  height: 14px;
+}
+
+.chef-body {
+  width: 70px;
+  height: 44px;
+  background: var(--neutral-white);
+  border: 3px solid var(--neutral-black);
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.chef-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.chef-buttons span {
+  width: 8px;
+  height: 8px;
+  background: var(--highlight);
+  border-radius: var(--border-radius);
+  display: block;
+}
+
+.steam {
+  position: absolute;
+  top: -20px;
+  right: -28px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.swirl {
+  font-size: 18px;
+  color: var(--highlight);
+  opacity: 0;
+  animation: chef-steam-up 2.4s ease-in-out infinite;
+  display: block;
+}
+
+.s1 { animation-delay: 0s; }
+.s2 { animation-delay: 0.4s; }
+.s3 { animation-delay: 0.8s; }
+
+@keyframes chef-blink {
+  0%,
+  96%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  98% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes chef-steam-up {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg);
+  }
+
+  40% {
+    opacity: 0.8;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-28px) rotate(15deg);
+  }
+}

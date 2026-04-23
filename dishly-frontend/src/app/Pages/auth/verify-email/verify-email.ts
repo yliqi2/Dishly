@@ -1,10 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthServices } from '../../../Core/Services/Auth/auth-services';
+import { ChefAnimation } from '../../../Core/Components/chef-animation/chef-animation';
 
 @Component({
   selector: 'app-verify-email',
-  imports: [RouterLink],
+  imports: [RouterLink, ChefAnimation],
   templateUrl: './verify-email.html',
   styleUrls: ['./verify-email.css'],
 })
