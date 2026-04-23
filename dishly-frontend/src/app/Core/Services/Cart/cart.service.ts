@@ -112,7 +112,7 @@ export class CartService extends ApiBaseService {
         ...response,
         purchased_items: (response.purchased_items ?? []).map((item) => ({
           ...item,
-          imagen_1: item.imagen_1 ? this.authService.getAssetUrl(item.imagen_1) : null,
+          imagen_1: item.imagen_1 ? this.authService.getAssetUrl(item.imagen_1, item.updated_at ?? undefined) : null,
         })),
       })),
       tap(() => this.itemsSubject.next([]))
@@ -129,7 +129,7 @@ export class CartService extends ApiBaseService {
       author: item.autor_nombre ?? 'Dishly Chef',
       description: item.descripcion ?? 'A premium recipe ready to complete your next meal.',
       price: Number.isFinite(price) ? price : 0,
-      imageUrl: this.authService.getAssetUrl(imagePath),
+      imageUrl: this.authService.getAssetUrl(imagePath, item.updated_at ?? undefined),
     };
   }
 
@@ -143,7 +143,7 @@ export class CartService extends ApiBaseService {
       author: recipe.autor_nombre,
       description: recipe.descripcion ?? 'A premium recipe ready to complete your next meal.',
       price: Number.isFinite(price) ? price : 0,
-      imageUrl: this.authService.getAssetUrl(imagePath),
+      imageUrl: this.authService.getAssetUrl(imagePath, recipe.updated_at ?? undefined),
     };
   }
 }

@@ -1,20 +1,20 @@
 .bought-recipes-container {
-  background-color: var(--background);
+  background-color: var(--neutral-white);
   min-height: 100vh;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
 }
 
 .filter-card {
-  border: 1px solid var(--neutral-900) !important;
-  background-color: var(--background) !important;
-  box-shadow: 0 4px 20px var(--black-alpha-05) !important;
-  border-radius: var(--border-radius) !important;
+  border: 1px solid var(--neutral-black) !important;
+  background-color: var(--neutral-white) !important;
+  box-shadow: 0 4px 20px var(--color-shadow) !important;
+  border-radius: var(--border-radius);
   padding: 24px !important;
 }
 
 .btn-clear-all {
   background-color: var(--highlight);
-  color: var(--on-highlight);
+  color: var(--neutral-white);
   border: none;
   padding: 10px 20px;
   border-radius: var(--border-radius);
@@ -25,15 +25,15 @@
 }
 
 .btn-clear-all:hover:not(:disabled) {
-  background-color: var(--highlight-press);
-  color: var(--on-highlight);
+  background-color: var(--highlight-hover);
+  color: var(--neutral-white);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--highlight-alpha-30);
+  box-shadow: 0 4px 12px var(--color-shadow);
 }
 
 .btn-clear-all:active:not(:disabled) {
-  background-color: var(--orange-600);
-  color: var(--on-highlight);
+  background-color: var(--highlight-hover);
+  color: var(--neutral-white);
   transform: translateY(0) scale(0.97);
   box-shadow: none;
 }
@@ -44,7 +44,7 @@
 }
 
 .filter-section {
-  border-bottom: 1px solid var(--neutral-900);
+  border-bottom: 1px solid var(--neutral-black);
   padding-bottom: 24px;
   margin-bottom: 24px;
 }
@@ -66,12 +66,12 @@
 .filter-label {
   font-weight: 700;
   font-size: 1rem;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   margin: 0;
 }
 
 .form-select-custom {
-  border-radius: var(--border-radius) !important;
+  border-radius: var(--border-radius);
   padding: 10px 20px !important;
   font-size: 1rem !important;
   min-height: 44px;
@@ -83,17 +83,17 @@
 
 .form-select-custom:focus {
   border-color: var(--highlight) !important;
-  box-shadow: 0 0 0 4px var(--highlight-focus) !important;
+  box-shadow: 0 0 0 4px var(--color-shadow) !important;
 }
 
 .dropdown-input-custom {
-  background-color: var(--background) !important;
-  border: 1px solid var(--neutral-900) !important;
+  background-color: var(--neutral-white) !important;
+  border: 1px solid var(--neutral-black) !important;
   font-size: 1rem;
   font-weight: 500;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   min-height: 44px;
-  border-radius: var(--border-radius) !important;
+  border-radius: var(--border-radius);
   transition: all 0.2s ease;
   box-shadow: none !important;
   appearance: none;
@@ -119,7 +119,7 @@
 
 .dropdown-input-custom:focus-within {
   border-color: var(--highlight) !important;
-  box-shadow: 0 0 0 4px var(--highlight-focus) !important;
+  box-shadow: 0 0 0 4px var(--color-shadow) !important;
 }
 
 .dropdown-input-custom input:focus {
@@ -128,18 +128,18 @@
 }
 
 .filter-tag {
-  background-color: var(--background) !important;
+  background-color: var(--neutral-white) !important;
   border: 1.5px solid var(--highlight) !important;
   color: var(--highlight);
   font-weight: 700;
   font-size: 1rem;
   padding: 6px 14px !important;
-  border-radius: var(--border-radius) !important;
+  border-radius: var(--border-radius);
   transition: all 0.2s ease;
 }
 
 .filter-tag:hover {
-  background-color: var(--highlight-alpha-05) !important;
+  background-color: var(--color-highlight-overlay) !important;
 }
 
 .filter-tag .btn-close {
@@ -168,26 +168,25 @@
 }
 
 .dropdown-item-custom:hover {
-  background-color: var(--highlight-alpha-05) !important;
+  background-color: var(--color-highlight-overlay) !important;
   color: var(--highlight);
 }
 
 .dropdown-item-custom:active {
-  background-color: var(--highlight-alpha-15) !important;
+  background-color: var(--color-highlight-overlay-soft) !important;
   color: var(--highlight);
 }
-
 
 .recipes-search-bar {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--background);
+  background: var(--neutral-white);
   border-radius: var(--border-radius);
   padding: 10px 10px 10px 24px;
-  box-shadow: 0 4px 12px var(--black-alpha-08);
+  box-shadow: 0 4px 12px var(--color-shadow);
   width: 100%;
-  border: 1px solid var(--neutral-900);
+  border: 1px solid var(--neutral-black);
 }
 
 .recipes-search-bar lucide-icon {
@@ -198,7 +197,7 @@
   width: 20px;
   height: 20px;
   line-height: 0;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
 }
 
 .recipes-search-bar lucide-icon svg {
@@ -214,16 +213,12 @@
   font-size: 1rem;
   line-height: 1.25;
   padding-block: 0;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   background: transparent;
 }
 
-.recipes-search-bar__input::placeholder {
-  color: var(--neutral-900);
-}
-
 .recipes-search-bar:focus-within {
-  outline: 3px solid var(--highlight-glow);
+  outline: 3px solid var(--color-highlight-overlay);
   border-color: var(--highlight);
 }
 
@@ -233,7 +228,7 @@
 
 .empty-state {
   min-height: 320px;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
 }
 
 .empty-icon {
@@ -244,19 +239,19 @@
 .empty-title {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   margin: 0;
 }
 
 .empty-subtitle {
   font-size: 1rem;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   margin-top: 6px;
 }
 
 .btn-primary-orange {
   background-color: var(--highlight);
-  color: var(--on-highlight);
+  color: var(--neutral-white);
   border: none;
   border-radius: var(--border-radius);
   padding: 10px 28px;
@@ -267,15 +262,15 @@
 }
 
 .btn-primary-orange:hover {
-  background-color: var(--highlight-press);
-  color: var(--on-highlight);
+  background-color: var(--highlight-hover);
+  color: var(--neutral-white);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--highlight-alpha-30);
+  box-shadow: 0 4px 12px var(--color-shadow);
 }
 
 .btn-primary-orange:active {
-  background-color: var(--orange-600);
-  color: var(--on-highlight);
+  background-color: var(--highlight-hover);
+  color: var(--neutral-white);
   transform: translateY(0) scale(0.97);
   box-shadow: none;
 }
@@ -288,3 +283,10 @@
   width: 20px;
   height: 20px;
 }
+
+.bought-recipes-container .review-avatar,
+.bought-recipes-container .author-avatar {
+  border-radius: 50%;
+  overflow: hidden;
+}
+

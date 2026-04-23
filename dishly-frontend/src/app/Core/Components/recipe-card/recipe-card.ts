@@ -108,7 +108,7 @@ export class RecipeCardComponent {
   });
 
   protected readonly mainImage = computed(() => {
-    return this.authService.getAssetUrl(this.receta().imagen_1 ?? '');
+    return this.authService.getAssetUrl(this.receta().imagen_1 ?? '', this.receta().updated_at ?? undefined);
   });
 
   protected readonly chefName = computed(() => {

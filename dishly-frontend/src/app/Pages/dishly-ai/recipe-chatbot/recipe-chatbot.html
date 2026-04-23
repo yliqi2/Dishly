@@ -4,7 +4,7 @@
   <div class="chat-header">
     <div class="header-info">
       <span class="assistant-brand-avatar" aria-hidden="true">
-        <img src="assets/icons/DishlyIcon.svg" alt="" />
+        <img src="assets/icons/DishlyIcon.webp" alt="" />
       </span>
       <div>
         <span class="status-text">Dishly AI Recipe Generator online</span>
@@ -44,7 +44,7 @@
         @if (message.role === 'assistant') {
           <div class="message assistant-message">
             <div class="message-avatar message-avatar--assistant">
-              <img src="assets/icons/DishlyIcon.svg" alt="Dishly AI" />
+              <img src="assets/icons/DishlyIcon.webp" alt="Dishly AI" />
             </div>
             <div class="message-content">
               <div class="message-text">{{ message.content }}</div>
@@ -58,7 +58,7 @@
                       [alt]="message.receta.titulo"
                       class="message-recipe-media__image"
                       loading="lazy"
-                      (error)="$any($event.target).src='assets/placeholder.jpg'"
+                      (error)="$any($event.target).src='assets/icons/DishlyIcon.webp'"
                     >
                   }
                 </div>
@@ -130,8 +130,14 @@
       <div class="clear-modal-content">
         <div class="clear-modal-header">
           <h3 class="clear-modal-title" id="clear-chat-modal-title">
-            <lucide-icon name="triangle-alert" [size]="20" aria-hidden="true"></lucide-icon>
-            Clear conversation
+            <svg class="clear-modal-title__icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19 6l-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Clear Chat
           </h3>
         </div>
 

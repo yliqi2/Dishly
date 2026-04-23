@@ -10,6 +10,7 @@ export interface CartApiItem {
   imagen_3?: string | null;
   imagen_4?: string | null;
   imagen_5?: string | null;
+  updated_at?: string | null;
 }
 
 export interface CartResponse {

@@ -9,7 +9,6 @@ import { CartService } from '../../../Core/Services/Cart/cart.service';
 import { RecetaDetailsService } from '../../../Core/Services/Core/receta-details-service';
 import { RecetaOriginal } from '../../../Core/Interfaces/RecetaOriginal';
 import { Review } from '../../../Core/Interfaces/Review';
-import { LoadingPage } from '../../loading-page/loading-page';
 import { DeleteReviewModal } from '../../../Core/Components/modals/delete-review-modal/delete-review-modal';
 import { DishlySelectComponent, SelectOption } from '../../../Core/Components/dishly-select/dishly-select';
 
@@ -18,13 +17,12 @@ type ReviewSortOption = 'latest' | 'highest' | 'lowest';
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, FormsModule, RouterLink, LoadingPage, DeleteReviewModal, DishlySelectComponent],
+  imports: [CommonModule, LucideAngularModule, FormsModule, RouterLink, DeleteReviewModal, DishlySelectComponent],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.css',
 })
 export class RecipeDetail implements OnInit {
   recipe: RecetaOriginal | null = null;
-  loading = true;
   error: string | null = null;
 
   thumbnails: string[] = [];
@@ -102,7 +100,6 @@ export class RecipeDetail implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
       this.error = 'ID de receta no encontrado.';
-      this.loading = false;
       return;
     }
 
@@ -110,7 +107,6 @@ export class RecipeDetail implements OnInit {
       next: (data) => {
         if (data.active === false && !data.purchased) {
           this.error = 'This recipe is no longer available.';
-          this.loading = false;
           this.cdr.detectChanges();
           return;
         }
@@ -122,7 +118,6 @@ export class RecipeDetail implements OnInit {
         this.syncMainImageSlideUrls();
         this.instructions = this.computeInstructions(data.instrucciones);
         this.isInCart = this.cartService.hasRecipe(data.id_receta);
-        this.loading = false;
         this.cdr.detectChanges();
 
         if (this.authService.isAuthenticated()) {
@@ -140,7 +135,6 @@ export class RecipeDetail implements OnInit {
       error: (err) => {
         console.error('Error al cargar la receta:', err);
         this.error = 'The recipe failed to load.';
-        this.loading = false;
         this.cdr.detectChanges();
       }
     });
@@ -151,7 +145,7 @@ export class RecipeDetail implements OnInit {
 
     const addImage = (path: string | null) => {
       if (!path) return;
-      thumbs.push(this.authService.getAssetUrl(path));
+      thumbs.push(this.authService.getAssetUrl(path, r.updated_at ?? undefined));
     };
 
     addImage(r.imagen_1);
@@ -160,7 +154,7 @@ export class RecipeDetail implements OnInit {
     addImage(r.imagen_4);
     addImage(r.imagen_5);
 
-    if (thumbs.length === 0) thumbs.push('assets/placeholder.jpg');
+    if (thumbs.length === 0) thumbs.push('assets/icons/DishlyIcon.webp');
     return thumbs;
   }
 
@@ -372,7 +366,7 @@ export class RecipeDetail implements OnInit {
   }
 
   private syncMainImageSlideUrls(): void {
-    const src = this.thumbnails[this.selectedThumbnailIndex] ?? 'assets/placeholder.jpg';
+    const src = this.thumbnails[this.selectedThumbnailIndex] ?? 'assets/icons/DishlyIcon.webp';
     this.mainImageSlideLeftSrc = src;
     this.mainImageSlideRightSrc = src;
     this.mainImageSlideTransform = 'translateX(0)';
@@ -421,7 +415,7 @@ export class RecipeDetail implements OnInit {
 
   private finishMainImageSlide(to: number): void {
     this.selectedThumbnailIndex = to;
-    const src = this.thumbnails[to] ?? 'assets/placeholder.jpg';
+    const src = this.thumbnails[to] ?? 'assets/icons/DishlyIcon.webp';
     this.mainImageSlideNoTransition = true;
     this.mainImageSlideLeftSrc = src;
     this.mainImageSlideRightSrc = src;

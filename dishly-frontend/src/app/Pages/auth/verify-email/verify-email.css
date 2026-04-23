@@ -19,7 +19,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   text-decoration: none;
   font-size: 16px;
   font-weight: 500;
@@ -29,10 +29,10 @@
 .ve-card {
   position: relative;
   z-index: 1;
-  background: var(--background);
-  border: 1px solid var(--orange-500-alpha-15);
-  border-radius: 28px;
-  box-shadow: 0 24px 60px var(--shadow-lg);
+  background: var(--neutral-white);
+  border: 1px solid var(--neutral-black);
+  border-radius: var(--border-radius);
+  box-shadow: 0 24px 60px var(--color-shadow);
   padding: 56px 40px 40px;
   text-align: center;
   max-width: 560px;
@@ -57,9 +57,9 @@
 .hat-top {
   width: 64px;
   height: 56px;
-  background: var(--background);
-  border: 3px solid var(--neutral-900);
-  border-radius: 50% 50% 0 0 / 60% 60% 0 0;
+  background: var(--neutral-white);
+  border: 3px solid var(--neutral-black);
+  border-radius: var(--border-radius);
   position: relative;
 }
 
@@ -71,25 +71,25 @@
   transform: translateX(-50%);
   width: 80%;
   height: 6px;
-  background: var(--orange-500);
-  border-radius: 4px;
+  background: var(--highlight);
+  border-radius: var(--border-radius);
 }
 
 .hat-brim {
   width: 76px;
   height: 14px;
-  background: var(--background);
-  border: 3px solid var(--neutral-900);
-  border-radius: 8px;
+  background: var(--neutral-white);
+  border: 3px solid var(--neutral-black);
+  border-radius: var(--border-radius);
   margin-top: -2px;
 }
 
 .chef-face {
   width: 70px;
   height: 60px;
-  background: var(--amber-skin);
-  border-radius: 40%;
-  border: 3px solid var(--amber-skin-border);
+  background: var(--secondaryWhite);
+  border-radius: var(--border-radius);
+  border: 3px solid var(--neutral-black);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -104,20 +104,21 @@
 }
 
 .eye {
-  width: 9px;
-  height: 9px;
-  background: var(--slate-800);
+  width: 10px;
+  height: 10px;
+  background: var(--neutral-black);
   border-radius: 50%;
+  display: block;
   animation: blink 4s ease-in-out infinite;
 }
 
 .chef-mouth {
   width: 22px;
   height: 10px;
-  border: 3px solid var(--terracotta);
+  border: 3px solid var(--highlight-hover);
   border-top: none;
-  border-radius: 0 0 20px 20px;
-  background: var(--terracotta);
+  border-radius: var(--border-radius);
+  background: transparent;
 }
 
 .chef-mouth::after {
@@ -125,17 +126,17 @@
   display: block;
   width: 10px;
   height: 4px;
-  background: var(--coral-accent);
-  border-radius: 0 0 10px 10px;
+  background: transparent;
+  border-radius: var(--border-radius);
   margin: 2px auto 0;
 }
 
 .chef-body {
   width: 70px;
   height: 44px;
-  background: var(--background);
-  border: 3px solid var(--neutral-900);
-  border-radius: 0 0 16px 16px;
+  background: var(--neutral-white);
+  border: 3px solid var(--neutral-black);
+  border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -152,8 +153,8 @@
 .chef-buttons span {
   width: 8px;
   height: 8px;
-  background: var(--orange-500);
-  border-radius: 50%;
+  background: var(--highlight);
+  border-radius: var(--border-radius);
   display: block;
 }
 
@@ -168,7 +169,7 @@
 
 .swirl {
   font-size: 18px;
-  color: var(--orange-500);
+  color: var(--highlight);
   opacity: 0;
   animation: steamUp 2.4s ease-in-out infinite;
   display: block;
@@ -192,28 +193,28 @@
   bottom: 10px;
   width: 46px;
   height: 46px;
-  border-radius: 999px;
-  background: var(--emerald-50);
-  color: var(--emerald-700);
-  border: 2px solid var(--emerald-200);
+  border-radius: var(--border-radius);
+  background: var(--secondaryWhite);
+  color: var(--color-green-deep);
+  border: 2px solid var(--secondaryWhite);
   display: grid;
   place-items: center;
   font-size: 22px;
   font-weight: 700;
-  box-shadow: 0 12px 24px var(--black-alpha-12);
+  box-shadow: 0 12px 24px var(--color-shadow);
 }
 
 .ve-status-badge--error {
-  background: var(--red-50);
-  color: var(--red-700);
-  border-color: var(--red-200);
+  background: var(--color-red-soft);
+  color: var(--color-red-deep);
+  border-color: var(--color-red-soft);
 }
 
 .spinner {
   width: 20px;
   height: 20px;
-  border-radius: 999px;
-  border: 3px solid var(--emerald-border-alpha-20);
+  border-radius: var(--border-radius);
+  border: 3px solid var(--color-highlight-overlay);
   border-top-color: currentColor;
   animation: spin 0.8s linear infinite;
 }
@@ -223,7 +224,7 @@
   font-family: var(--font-display, 'Poppins', sans-serif);
   font-size: clamp(1.8rem, 4vw, 2.4rem);
   line-height: 1.2;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
 }
 
 .ve-subtitle {
@@ -231,7 +232,7 @@
   max-width: 420px;
   font-size: 1rem;
   line-height: 1.7;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
 }
 
 .ve-divider {
@@ -240,7 +241,7 @@
   justify-content: center;
   gap: 12px;
   margin: 22px 0 16px;
-  color: var(--orange-500);
+  color: var(--highlight);
   font-size: 1.25rem;
 }
 
@@ -254,13 +255,13 @@
   content: '';
   width: 70px;
   height: 1px;
-  background: var(--orange-500-alpha-28);
+  background: var(--color-highlight-overlay);
 }
 
 .ve-helper {
   margin: 0 auto 24px;
   max-width: 400px;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   line-height: 1.6;
 }
 
@@ -336,3 +337,4 @@
     width: 44px;
   }
 }
+

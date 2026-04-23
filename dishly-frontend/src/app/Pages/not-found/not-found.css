@@ -24,10 +24,10 @@
 .nf-card {
   position: relative;
   z-index: 1;
-  background: var(--background);
-  border: 1px solid var(--orange-500-alpha-15);
-  border-radius: 28px;
-  box-shadow: 0 24px 60px var(--shadow-lg);
+  background: var(--neutral-white);
+  border: 1px solid var(--neutral-black);
+  border-radius: var(--border-radius);
+  box-shadow: 0 24px 60px var(--color-shadow);
   padding: 56px 48px 48px;
   text-align: center;
   max-width: 560px;
@@ -55,9 +55,9 @@
 .hat-top {
   width: 64px;
   height: 56px;
-  background: var(--background);
-  border: 3px solid var(--neutral-900);
-  border-radius: 50% 50% 0 0 / 60% 60% 0 0;
+  background: var(--neutral-white);
+  border: 3px solid var(--neutral-black);
+  border-radius: var(--border-radius);
   position: relative;
 }
 
@@ -69,16 +69,16 @@
   transform: translateX(-50%);
   width: 80%;
   height: 6px;
-  background: var(--orange-500);
-  border-radius: 4px;
+  background: var(--highlight);
+  border-radius: var(--border-radius);
 }
 
 .hat-brim {
   width: 76px;
   height: 14px;
-  background: var(--background);
-  border: 3px solid var(--neutral-900);
-  border-radius: 8px;
+  background: var(--neutral-white);
+  border: 3px solid var(--neutral-black);
+  border-radius: var(--border-radius);
   margin-top: -2px;
 }
 
@@ -86,9 +86,9 @@
 .chef-face {
   width: 70px;
   height: 60px;
-  background: var(--amber-skin);
-  border-radius: 40%;
-  border: 3px solid var(--amber-skin-border);
+  background: var(--neutral-white);
+  border-radius: var(--border-radius);
+  border: 3px solid var(--neutral-black);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -105,7 +105,7 @@
 .eye {
   width: 9px;
   height: 9px;
-  background: var(--slate-800);
+  background: var(--neutral-black);
   border-radius: 50%;
   animation: blink 4s ease-in-out infinite;
 }
@@ -126,18 +126,18 @@
 .chef-mouth {
   width: 22px;
   height: 10px;
-  border: 3px solid var(--terracotta);
+  border: 3px solid var(--highlight-hover);
   border-top: none;
-  border-radius: 0 0 20px 20px;
+  border-radius: var(--border-radius);
 }
 
 /* Body */
 .chef-body {
   width: 70px;
   height: 44px;
-  background: var(--background);
-  border: 3px solid var(--neutral-900);
-  border-radius: 0 0 16px 16px;
+  background: var(--neutral-white);
+  border: 3px solid var(--neutral-black);
+  border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,8 +154,8 @@
 .chef-buttons span {
   width: 8px;
   height: 8px;
-  background: var(--orange-500);
-  border-radius: 50%;
+  background: var(--highlight);
+  border-radius: var(--border-radius);
   display: block;
 }
 
@@ -171,7 +171,7 @@
 
 .swirl {
   font-size: 18px;
-  color: var(--orange-500);
+  color: var(--highlight);
   opacity: 0;
   animation: steamUp 2.4s ease-in-out infinite;
   display: block;
@@ -212,7 +212,7 @@
   font-weight: 900;
   line-height: 1;
   margin: 12px 0 0;
-  background: var(--gradient-hero-orange);
+  background: var(--gradient-cta-orange);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -224,7 +224,7 @@
   font-family: var(--font-display, 'Poppins', sans-serif);
   font-size: 22px;
   font-weight: 700;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   margin: 16px 0 12px;
   line-height: 1.35;
 }
@@ -232,7 +232,7 @@
 /* ── Subtitle ─────────────────────────────────────── */
 .nf-subtitle {
   font-size: 1rem;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   line-height: 1.65;
   margin: 0;
   max-width: 420px;
@@ -253,7 +253,7 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: var(--neutral-900);
+  background: var(--neutral-black);
 }
 
 .nf-divider span {
@@ -266,19 +266,19 @@
   align-items: center;
   gap: 8px;
   background: var(--highlight);
-  color: var(--on-highlight);
+  color: var(--neutral-white);
   padding: 14px 36px;
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   font-size: 16px;
   font-weight: 700;
   text-decoration: none;
   transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 12px var(--orange-500-alpha-30);
+  box-shadow: 0 4px 12px var(--color-shadow);
 }
 
 .btn-home:hover {
-  background: var(--orange-600);
-  box-shadow: 0 8px 20px var(--orange-500-alpha-40);
+  background: var(--highlight-hover);
+  box-shadow: 0 8px 20px var(--color-shadow);
   transform: translateY(-2px);
 }
 

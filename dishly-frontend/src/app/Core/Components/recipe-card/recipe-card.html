@@ -6,16 +6,22 @@
     [routerLink]="['/recipes', receta().id_receta]"
     tabindex="-1"
     aria-hidden="true">
-    <img [src]="mainImage()" alt="Recipe image" class="recipe-image w-100" loading="lazy" (error)="$any($event.target).src='assets/placeholder.jpg'">
+    <img [src]="mainImage()" alt="Recipe image" class="recipe-image w-100" loading="lazy" (error)="$any($event.target).src='assets/icons/DishlyIcon.webp'">
 
     <!-- Top tags -->
     <div class="position-absolute top-0 start-0 end-0 d-flex justify-content-between align-items-start p-3">
-      <div class="d-flex flex-wrap gap-2 recipe-tag-category-list">
-        @for (cat of displayedCategories(); track cat.id_categoria) {
-        <span class="badge recipe-tag-category text-truncate recipe-tag-category-item">{{ cat.nombre }}</span>
-        }
+      <div class="recipe-tag-category-list">
+        <div class="recipe-tag-category-row">
+          @for (cat of displayedCategories(); track cat.id_categoria) {
+          <span class="badge recipe-tag-category recipe-tag-category-item">
+            <span class="recipe-tag-category-item__text">{{ cat.nombre }}</span>
+          </span>
+          }
+        </div>
         @if (extraCategoriesCount() > 0) {
-        <span class="badge recipe-tag-category">+{{ extraCategoriesCount() }}</span>
+        <div class="recipe-tag-category-extra-row">
+          <span class="badge recipe-tag-category recipe-tag-category--extra">+{{ extraCategoriesCount() }}</span>
+        </div>
         }
       </div>
       <span class="badge recipe-tag-rating d-flex align-items-center gap-1 flex-shrink-0">

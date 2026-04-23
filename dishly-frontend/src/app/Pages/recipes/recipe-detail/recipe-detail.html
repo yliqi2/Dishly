@@ -1,9 +1,7 @@
 <article class="recipe-page bg-white min-vh-100 pb-3">
   <div class="page-layout-container">
 
-    @if (loading) {
-      <app-loading-page></app-loading-page>
-    } @else if (error) {
+    @if (error) {
       <div class="alert alert-danger rounded-4">{{ error }}</div>
     } @else if (recipe) {
 
@@ -26,7 +24,7 @@
         <div class="author-avatar d-flex align-items-center justify-content-center fw-bold shadow-sm">
           @if (getAuthorAvatarUrl(); as authorAvatarUrl) {
           <img [src]="authorAvatarUrl" [alt]="recipe.autor_nombre + ' profile photo'"
-            (error)="$any($event.target).src='assets/placeholder.jpg'">
+            (error)="$any($event.target).src='assets/icons/DishlyIcon.webp'">
           } @else {
           {{ getInitials(recipe.autor_nombre) }}
           }
@@ -45,7 +43,7 @@
               <img [src]="thumbnails[selectedThumbnailIndex]"
                    alt="Recipe main image"
                    class="main-image current-main-image img-fluid w-100 h-100"
-                   (error)="$any($event.target).src='assets/placeholder.jpg'">
+                   (error)="$any($event.target).src='assets/icons/DishlyIcon.webp'">
               } @else {
               <div
                 class="main-image-track"
@@ -53,11 +51,11 @@
                 [style.transform]="mainImageSlideTransform">
                 <div class="main-image-slide">
                   <img [src]="mainImageSlideLeftSrc" alt="" class="main-image-slide-img"
-                    (error)="$any($event.target).src='assets/placeholder.jpg'">
+                    (error)="$any($event.target).src='assets/icons/DishlyIcon.webp'">
                 </div>
                 <div class="main-image-slide">
                   <img [src]="mainImageSlideRightSrc" alt="" class="main-image-slide-img"
-                    (error)="$any($event.target).src='assets/placeholder.jpg'">
+                    (error)="$any($event.target).src='assets/icons/DishlyIcon.webp'">
                 </div>
               </div>
               }
@@ -99,7 +97,7 @@
                    [class.active]="i === selectedThumbnailIndex"
                    [class.summary-thumb]="isSummaryThumbnail(i)"
                    (click)="selectThumbnail(i)">
-                <img [src]="thumb" alt="Recipe thumbnail" class="img-fluid w-100 h-100" (error)="$any($event.target).src='assets/placeholder.jpg'">
+                <img [src]="thumb" alt="Recipe thumbnail" class="img-fluid w-100 h-100" (error)="$any($event.target).src='assets/icons/DishlyIcon.webp'">
                 @if (isSummaryThumbnail(i)) {
                 <div class="thumb-more-overlay">+{{ hiddenThumbnailsCount() }}</div>
                 }
@@ -306,7 +304,7 @@
           } @else if (isOwnRecipe()) {
           <div class="review-locked-banner">
             <div class="locked-banner-icon">
-              <lucide-icon name="chef-hat" [size]="18"></lucide-icon>
+              <lucide-icon name="chef-hat" [size]="20"></lucide-icon>
             </div>
             <div class="locked-banner-text">
               <span class="locked-banner-title">This is your recipe</span>
@@ -350,7 +348,7 @@
           @if (reviews.length === 0) {
           <div class="reviews-empty-state pt-4 text-center mt-3">
             <div class="empty-icon-wrapper mx-auto mb-3">
-              <lucide-icon name="chef-hat" [size]="26"></lucide-icon>
+              <lucide-icon name="chef-hat" [size]="20"></lucide-icon>
             </div>
             <p class="empty-text h5 mb-1">There are no reviews yet</p>
             <p class="empty-subtext mb-0">Be the first to review this recipe!</p>

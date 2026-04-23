@@ -1,20 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthServices } from '../../Core/Services/Auth/auth-services';
 import { ForumService } from '../../Core/Services/Forum/forum.service';
 import { ForumComment, ForumDetail, ForumOwner, ForumSummary } from '../../Core/Interfaces/Forum';
+import { DeletePostModal } from '../../Core/Components/modals/delete-post-modal/delete-post-modal';
 
 @Component({
   selector: 'app-forum',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, DeletePostModal],
   templateUrl: './forum.html',
   styleUrl: './forum.css',
 })
-export class Forum implements OnInit {
+export class Forum implements OnInit, AfterViewChecked, OnDestroy {
   private readonly forumService = inject(ForumService);
   private readonly authService = inject(AuthServices);
   private readonly commentsPerPage = 30;
@@ -68,9 +69,26 @@ export class Forum implements OnInit {
 
   protected deleteModalOpen = false;
   private pendingDeleteComment: ForumComment | null = null;
+  protected deletePostModalOpen = false;
 
   private temporaryForumId = -1;
   private temporaryCommentId = -1;
+  private conversationPanelEl: HTMLElement | null = null;
+  private commentPanelEl: HTMLElement | null = null;
+  private panelsResizeObserver: ResizeObserver | null = null;
+  private shouldSyncPanels = false;
+
+  @ViewChild('forumConversationPanel')
+  private set forumConversationPanelRef(panel: ElementRef<HTMLElement> | undefined) {
+    this.conversationPanelEl = panel?.nativeElement ?? null;
+    this.attachPanelsObserver();
+  }
+
+  @ViewChild('forumCommentPanel')
+  private set forumCommentPanelRef(panel: ElementRef<HTMLElement> | undefined) {
+    this.commentPanelEl = panel?.nativeElement ?? null;
+    this.attachPanelsObserver();
+  }
 
   ngOnInit(): void {
     this.loadForums();
@@ -180,6 +198,26 @@ export class Forum implements OnInit {
         this.createForumError = this.extractErrorMessage(error, 'Could not create the forum.');
       }
     });
+  }
+
+  protected closeCreateForm(): void {
+    this.newForumTitle = '';
+    this.newForumDescription = '';
+    this.createForumError = null;
+    this.selectedForum = null;
+  }
+
+  ngAfterViewChecked(): void {
+    if (!this.shouldSyncPanels) {
+      return;
+    }
+
+    this.syncPanelsHeight();
+    this.shouldSyncPanels = false;
+  }
+
+  ngOnDestroy(): void {
+    this.panelsResizeObserver?.disconnect();
   }
 
   protected submitComment(): void {
@@ -425,12 +463,20 @@ export class Forum implements OnInit {
     if (!this.selectedForum || !this.selectedForum.is_owner || this.deletingForum) {
       return;
     }
+    this.deletePostModalOpen = true;
+  }
 
-    const shouldDelete = window.confirm('Are you sure you want to delete this forum? All comments will be removed.');
-    if (!shouldDelete) {
+  protected cancelDeletePostModal(): void {
+    this.deletePostModalOpen = false;
+  }
+
+  protected confirmDeleteForum(): void {
+    if (!this.selectedForum || !this.selectedForum.is_owner || this.deletingForum) {
+      this.deletePostModalOpen = false;
       return;
     }
 
+    this.deletePostModalOpen = false;
     this.deletingForum = true;
     this.forumActionError = null;
 
@@ -656,6 +702,43 @@ export class Forum implements OnInit {
       can_edit: true,
       can_delete: true,
     };
+  }
+
+  private attachPanelsObserver(): void {
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+
+    this.panelsResizeObserver?.disconnect();
+
+    if (!this.conversationPanelEl || !this.commentPanelEl) {
+      return;
+    }
+
+    this.panelsResizeObserver = new ResizeObserver(() => {
+      this.syncPanelsHeight();
+    });
+
+    this.panelsResizeObserver.observe(this.conversationPanelEl);
+    this.panelsResizeObserver.observe(this.commentPanelEl);
+    this.shouldSyncPanels = true;
+  }
+
+  private syncPanelsHeight(): void {
+    if (!this.conversationPanelEl || !this.commentPanelEl) {
+      return;
+    }
+
+    this.conversationPanelEl.style.height = '';
+    this.commentPanelEl.style.height = '';
+
+    const targetHeight = Math.max(
+      this.conversationPanelEl.offsetHeight,
+      this.commentPanelEl.offsetHeight
+    );
+
+    this.conversationPanelEl.style.height = `${targetHeight}px`;
+    this.commentPanelEl.style.height = `${targetHeight}px`;
   }
 
 }

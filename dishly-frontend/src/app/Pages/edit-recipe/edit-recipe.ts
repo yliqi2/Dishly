@@ -523,7 +523,7 @@ export class EditRecipe implements OnDestroy, OnInit {
       .filter((imagePath): imagePath is string => !!imagePath)
       .map((imagePath) => ({
         file: null,
-        url: this.authService.getAssetUrl(imagePath),
+        url: this.authService.getAssetUrl(imagePath, recipe.updated_at ?? undefined),
         existingPath: imagePath,
       }));
 

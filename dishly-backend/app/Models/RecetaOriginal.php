@@ -10,18 +10,16 @@ class RecetaOriginal extends Model
 
     protected $primaryKey = 'id_receta';
 
-    public $timestamps = false;
-
     protected $fillable = [
         'titulo', 'descripcion', 'instrucciones', 'tiempo_preparacion',
         'tiempo_preparacion_unidad', 'dificultad', 'porciones', 'price',
         'imagen_1', 'imagen_2', 'imagen_3', 'imagen_4', 'imagen_5',
-        'fecha_creacion', 'id_autor', 'active',
+        'fecha_creacion', 'id_autor', 'active', 'created_at', 'updated_at',
     ];
 
     protected $casts = [
         'active' => 'boolean',
-        'price'  => 'decimal:2',
+        'price' => 'decimal:2',
     ];
 
     public function ingredientes()

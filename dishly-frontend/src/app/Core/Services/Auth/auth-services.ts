@@ -218,17 +218,18 @@ export class AuthServices extends ApiBaseService {
   }
 
   getAssetUrl(path: string, cacheBust?: string): string {
-    if (!path) return 'assets/placeholder.jpg';
+    if (!path) return 'assets/icons/DishlyIcon.webp';
 
     const trimmedPath = path.trim();
+    const normalizedPath = trimmedPath.replace(/\.(jpe?g|png|gif|bmp|jfif|tiff?)(\?.*)?$/i, '.webp$2');
     let url: string;
 
-    if (/^https?:\/\//i.test(trimmedPath)) {
-      url = trimmedPath
+    if (/^https?:\/\//i.test(normalizedPath)) {
+      url = normalizedPath
         .replace('://localhost:8000', '://localhost:8080')
         .replace('://127.0.0.1:8000', '://127.0.0.1:8080');
     } else {
-      const cleanPath = trimmedPath.replace(/^\/+/, '');
+      const cleanPath = normalizedPath.replace(/^\/+/, '');
       url = `/img-proxy/${cleanPath}`;
     }
 

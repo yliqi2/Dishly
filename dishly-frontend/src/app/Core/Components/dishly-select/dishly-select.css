@@ -16,12 +16,12 @@
   width: 100%;
   min-height: 44px;
   padding: 10px 20px;
-  background-color: var(--background);
-  border: 1px solid var(--neutral-900);
+  background-color: var(--secondaryWhite);
+  border: 1px solid var(--neutral-black);
   border-radius: var(--border-radius);
   font-size: 1rem;
   font-weight: 500;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   cursor: pointer;
   text-align: left;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -29,7 +29,7 @@
 }
 
 .dishly-select__trigger.is-placeholder {
-  color: var(--neutral-900);
+  color: var(--neutral-black);
 }
 
 .dishly-select__trigger:hover {
@@ -37,18 +37,18 @@
 }
 
 .dishly-select__trigger:active {
-  box-shadow: 0 0 0 3px var(--highlight-focus);
+  box-shadow: 0 0 0 3px var(--color-shadow);
 }
 
 .dishly-select.is-open .dishly-select__trigger {
   border-color: var(--highlight);
-  box-shadow: 0 0 0 4px var(--highlight-focus);
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  box-shadow: 0 0 0 4px var(--color-shadow);
+  border-radius: var(--border-radius);
 }
 
 .dishly-select:focus-within .dishly-select__trigger {
   border-color: var(--highlight);
-  box-shadow: 0 0 0 4px var(--highlight-focus);
+  box-shadow: 0 0 0 4px var(--color-shadow);
 }
 
 .dishly-select__label {
@@ -64,7 +64,7 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   transition: transform 0.2s ease;
 }
 
@@ -82,11 +82,11 @@
   margin: 0;
   padding: 4px 0;
   list-style: none;
-  background: var(--background);
+  background: var(--neutral-white);
   border: 1px solid var(--highlight);
   border-top: none;
-  border-radius: 0 0 var(--border-radius) var(--border-radius);
-  box-shadow: 0 8px 24px var(--black-alpha-12);
+  border-radius: var(--border-radius);
+  box-shadow: 0 8px 24px var(--color-shadow);
   max-height: 240px;
   overflow-y: auto;
 }
@@ -98,14 +98,15 @@
   padding: 10px 20px;
   font-size: 1rem;
   font-weight: 500;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   cursor: pointer;
   transition: background-color 0.15s ease;
+  background: var(--secondaryWhite);
 }
 
 .dishly-select__option:hover,
 .dishly-select__option:focus-visible {
-  background-color: var(--highlight-focus);
+  background-color: var(--color-highlight-overlay);
   color: var(--highlight);
 }
 
@@ -114,13 +115,13 @@
 }
 
 .dishly-select__option.is-selected {
-  background-color: var(--highlight-focus);
+  background-color: var(--color-highlight-overlay);
   color: var(--highlight);
   font-weight: 700;
 }
 
 .dishly-select__option:active {
-  background-color: var(--highlight-alpha-15);
+  background-color: var(--color-highlight-overlay-soft);
 }
 
 .dishly-select__check {
@@ -129,3 +130,4 @@
   color: var(--highlight);
   flex-shrink: 0;
 }
+

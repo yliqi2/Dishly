@@ -1,6 +1,6 @@
 .footer {
-	background: var(--footer-surface-alt);
-	color: var(--on-highlight);
+	background: var(--neutral-black);
+	color: var(--neutral-white);
 	padding: 60px 0 32px;
 	margin-top: 80px;
 }
@@ -33,11 +33,11 @@
 .brand-icon-box {
 	width: 48px;
 	height: 48px;
-	border-radius: 12px;
+	border-radius: var(--border-radius);
 	background: var(--highlight);
 	display: grid;
 	place-items: center;
-	color: var(--on-highlight);
+	color: var(--neutral-white);
 }
 
 .brand-icon {
@@ -60,13 +60,13 @@
 }
 
 .brand-subtitle {
-	color: var(--on-highlight);
+	color: var(--neutral-white);
 	font-size: 16px;
 	margin-top: 4px;
 }
 
 .footer__description {
-	color: var(--on-highlight);
+	color: var(--neutral-white);
 	line-height: 1.6;
 	margin: 0;
 	font-size: 16px;
@@ -80,13 +80,13 @@
 
 .footer__section h3 {
 	margin: 0 0 8px;
-	color: var(--on-highlight);
+	color: var(--neutral-white);
 	font-size: 17px;
 	font-weight: 700;
 }
 
 .footer__section a {
-	color: var(--on-highlight);
+	color: var(--neutral-white);
 	text-decoration: none;
 	font-size: 15px;
 	transition: color 0.2s ease;
@@ -103,11 +103,11 @@
 	align-items: center;
 	padding-top: 32px;
 	margin: 0;
-	border-top: 1px solid var(--footer-divider);
+	border-top: 1px solid var(--color-gray-medium);
 }
 
 .footer__copyright {
-	color: var(--on-highlight);
+	color: var(--neutral-white);
 	font-size: 16px;
 	margin: 0;
 }
@@ -119,7 +119,7 @@
 }
 
 .footer__social-link {
-	color: var(--on-highlight);
+	color: var(--neutral-white);
 	transition: color 0.2s;
 	display: flex;
 	align-items: center;

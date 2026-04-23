@@ -13,7 +13,7 @@
 /* ── Background blobs ─────────────────────────────── */
 .lp-blob {
   position: absolute;
-  border-radius: 50%;
+  border-radius: var(--border-radius);
   filter: blur(80px);
   opacity: 0.25;
   pointer-events: none;
@@ -31,7 +31,7 @@
 .lp-blob-2 {
   width: 380px;
   height: 380px;
-  background: var(--orange-400);
+  background: var(--highlight);
   bottom: -80px;
   left: -80px;
   animation: blobFloat 10s ease-in-out infinite alternate-reverse;
@@ -51,10 +51,10 @@
 .lp-card {
   position: relative;
   z-index: 1;
-  background: var(--background);
-  border: 1px solid var(--orange-500-alpha-15);
-  border-radius: 28px;
-  box-shadow: 0 24px 60px var(--shadow-lg);
+  background: var(--neutral-white);
+  border: 1px solid var(--color-highlight-overlay);
+  border-radius: var(--border-radius);
+  box-shadow: 0 24px 60px var(--color-shadow);
   padding: 56px 48px 48px;
   text-align: center;
   max-width: 560px;
@@ -86,9 +86,9 @@
 .hat-top {
   width: 64px;
   height: 56px;
-  background: var(--background);
-  border: 3px solid var(--neutral-900);
-  border-radius: 50% 50% 0 0 / 60% 60% 0 0;
+  background: var(--neutral-white);
+  border: 3px solid var(--neutral-black);
+  border-radius: var(--border-radius);
   position: relative;
 }
 
@@ -100,16 +100,16 @@
   transform: translateX(-50%);
   width: 80%;
   height: 6px;
-  background: var(--orange-500);
-  border-radius: 4px;
+  background: var(--highlight);
+  border-radius: var(--border-radius);
 }
 
 .hat-brim {
   width: 76px;
   height: 14px;
-  background: var(--background);
-  border: 3px solid var(--neutral-900);
-  border-radius: 8px;
+  background: var(--neutral-white);
+  border: 3px solid var(--neutral-black);
+  border-radius: var(--border-radius);
   margin-top: -2px;
 }
 
@@ -117,9 +117,9 @@
 .chef-face {
   width: 70px;
   height: 60px;
-  background: var(--amber-skin);
-  border-radius: 40%;
-  border: 3px solid var(--amber-skin-border);
+  background: var(--secondaryWhite);
+  border-radius: var(--border-radius);
+  border: 3px solid var(--secondaryWhite);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -136,8 +136,8 @@
 .eye {
   width: 9px;
   height: 9px;
-  background: var(--slate-800);
-  border-radius: 50%;
+  background: var(--color-slate-deep);
+  border-radius: var(--border-radius);
   animation: blink 4s ease-in-out infinite;
 }
 
@@ -157,18 +157,18 @@
 .chef-mouth {
   width: 22px;
   height: 10px;
-  border: 3px solid var(--terracotta);
+  border: 3px solid var(--highlight-hover);
   border-top: none;
-  border-radius: 0 0 20px 20px;
-  background: var(--terracotta);
+  border-radius: var(--border-radius);
+  background: var(--highlight-hover);
 }
 .chef-mouth::after {
   content: '';
   display: block;
   width: 10px;
   height: 4px;
-  background: var(--coral-accent);
-  border-radius: 0 0 10px 10px;
+  background: var(--highlight-hover);
+  border-radius: var(--border-radius);
   margin: 2px auto 0;
 }
 
@@ -176,9 +176,9 @@
 .chef-body {
   width: 70px;
   height: 44px;
-  background: var(--background);
-  border: 3px solid var(--neutral-900);
-  border-radius: 0 0 16px 16px;
+  background: var(--neutral-white);
+  border: 3px solid var(--neutral-black);
+  border-radius: var(--border-radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -195,8 +195,8 @@
 .chef-buttons span {
   width: 8px;
   height: 8px;
-  background: var(--orange-500);
-  border-radius: 50%;
+  background: var(--highlight);
+  border-radius: var(--border-radius);
   display: block;
 }
 
@@ -212,7 +212,7 @@
 
 .swirl {
   font-size: 18px;
-  color: var(--orange-500);
+  color: var(--highlight);
   opacity: 0;
   animation: steamUp 2.4s ease-in-out infinite;
   display: block;
@@ -259,7 +259,7 @@
 }
 
 .text-warning {
-    color: var(--orange-500) !important;
+    color: var(--highlight) !important;
 }
 
 /* ── Title ────────────────────────────────────────── */
@@ -267,7 +267,7 @@
   font-family: var(--font-display, 'Poppins', sans-serif);
   font-size: 22px;
   font-weight: 700;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   margin: 16px 0 12px;
   line-height: 1.35;
 }
@@ -275,7 +275,7 @@
 /* ── Subtitle ─────────────────────────────────────── */
 .lp-subtitle {
   font-size: 1rem;
-  color: var(--neutral-900);
+  color: var(--neutral-black);
   line-height: 1.65;
   margin: 0;
   max-width: 420px;
@@ -296,7 +296,7 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: var(--neutral-900);
+  background: var(--neutral-black);
 }
 
 .lp-divider span {
@@ -313,3 +313,4 @@
     font-size: 18px;
   }
 }
+

@@ -6,15 +6,11 @@
     </div>
   </section>
 
-  @if (loading()) {
-  <div class="profile-wrapper page-container page-container--no-gutter py-4">
-    <div class="profile-card text-center">Loading profile...</div>
-  </div>
-  } @else if (error()) {
+  @if (error() && !loading()) {
   <div class="profile-wrapper page-container page-container--no-gutter py-4">
     <div class="profile-card text-center">{{ error() }}</div>
   </div>
-  } @else if (user()) {
+  } @else if (user() && !loading()) {
   <div class="profile-wrapper page-container page-container--no-gutter">
     <div class="profile-card">
       <div class="profile-header">

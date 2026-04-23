@@ -51,7 +51,7 @@
       <div class="cart-list">
         @for (item of items(); track item.id_receta) {
         <article class="cart-card shadow-sm">
-          <img [src]="item.imageUrl" [alt]="item.title" class="cart-card__image" (error)="$any($event.target).src='assets/placeholder.jpg'">
+          <img [src]="item.imageUrl" [alt]="item.title" class="cart-card__image" (error)="$any($event.target).src='assets/icons/DishlyIcon.webp'">
 
           <div class="cart-card__content">
             <h3 class="cart-card__title">{{ item.title }}</h3>

@@ -5,7 +5,7 @@
   .drm-backdrop {
     position: fixed;
     inset: 0;
-    background: var(--modal-overlay-bg);
+    background: #1118271F;
     z-index: 1050;
     display: flex;
     align-items: center;
@@ -21,9 +21,10 @@
   
   .drm-content {
     border-radius: var(--border-radius);
-    background: var(--modal-content-bg);
+    background: var(--neutral-white);
+    border: 1px solid var(--neutral-black);
     padding: 1.5rem;
-    box-shadow: var(--modal-card-shadow);
+    box-shadow: var(--color-shadow);
   }
   
   .drm-header {
@@ -36,7 +37,7 @@
     gap: 0.5rem;
     font-size: 1.2rem;
     font-weight: 700;
-    color: var(--danger);
+    color: var(--color-red-base);
     margin: 0;
   }
   
@@ -46,7 +47,7 @@
   
   .drm-body p {
     margin: 0;
-    color: var(--neutral-900);
+    color: var(--neutral-black);
     font-size: 1rem;
     line-height: 1.5;
   }
@@ -59,14 +60,14 @@
   
   .drm-footer .btn-secondary {
     flex: 1;
-    background-color: var(--gray-600);
-    color: var(--on-highlight);
+    background-color: var(--neutral-black);
+    color: var(--neutral-white);
   }
 
   .drm-footer .btn-secondary:focus-visible {
-    outline: 3px solid var(--gray-500);
+    outline: 3px solid var(--neutral-black);
     outline-offset: 4px;
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--border-radius);
   }
 
   .drm-footer .btn-danger {

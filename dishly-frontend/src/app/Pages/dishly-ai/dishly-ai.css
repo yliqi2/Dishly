@@ -1,451 +1,102 @@
-/* ─── Header ─────────────────────────────────────────────── */
-.ai-header {
-  padding-top: var(--layout-gutter);
-  padding-bottom: 40px;
-  text-align: center;
+.dishly-ai-shell {
+  display: grid;
+  gap: 24px;
+  padding: 0 0 40px;
 }
 
-.ai-header__inner {
-  max-width: 660px;
-  margin: 0 auto;
+.ai-hero-card {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px;
+  background: var(--neutral-white);
+  border: 1px solid var(--neutral-black);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 12px var(--color-shadow);
 }
 
-.ai-header__badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: var(--highlight-focus);
+.ai-hero-card__copy {
+  max-width: 760px;
+}
+
+.ai-eyebrow {
+  margin: 0 0 10px;
   color: var(--highlight);
-  border: 1px solid var(--highlight);
-  border-radius: var(--border-radius);
-  padding: 6px 14px;
-  font-size: 1rem;
-  font-weight: 600;
-  font-family: var(--font-display);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  line-height: 1;
-  margin-top: 8px;
-}
-
-.ai-header__badge lucide-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  line-height: 0;
-}
-
-.ai-header__badge lucide-icon svg {
-  display: block;
-  width: 16px;
-  height: 16px;
-}
-
-.ai-header__title {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: clamp(2rem, 5vw, 3rem);
-  color: var(--neutral-900);
-  margin: 0;
-  line-height: 1.15;
-}
-
-.ai-header__highlight {
-  color: var(--highlight);
-}
-
-.ai-header__subtitle {
-  color: var(--neutral-900);
+  letter-spacing: 0.14em;
   font-size: 1rem;
+  font-weight: 700;
+}
+
+.ai-hero-card h2 {
   margin: 0;
+  font-family: var(--font-display);
+  color: var(--neutral-black);
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  line-height: 1.1;
+}
+
+.subtitle {
+  margin: 12px 0 0;
+  color: var(--neutral-black);
+  font-size: 1rem;
   line-height: 1.6;
 }
 
-/* ─── Search bar ──────────────────────────────────────────── */
-.ai-search-section {
-  padding-bottom: 32px;
-}
-
-.ai-search-bar {
+.ai-hero-card__badge {
+  min-width: 180px;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--background);
-  border-radius: var(--border-radius);
-  padding: 10px 10px 10px 24px;
-  box-shadow: 0 4px 12px var(--shadow-md);
-  border: 1.5px solid var(--neutral-900);
-  max-width: 720px;
-  margin: 0 auto;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  color: var(--neutral-900);
-}
-
-.ai-search-bar:focus-within,
-.ai-search-bar--active {
-  border-color: var(--highlight);
-  box-shadow: 0 0 0 4px var(--highlight-focus);
-}
-
-.ai-search-bar > lucide-icon {
-  display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  line-height: 0;
-  color: var(--neutral-900);
-}
-
-.ai-search-bar > lucide-icon svg {
-  display: block;
-  width: 20px;
-  height: 20px;
-}
-
-.ai-search-bar__input {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-  line-height: 1.25;
-  padding-block: 0;
-  color: var(--neutral-900);
-  background: transparent;
-  font-family: var(--font-sans);
-}
-
-.ai-search-bar__input::placeholder {
-  color: var(--neutral-900);
-}
-
-.ai-search-bar__clear {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--neutral-900);
-  display: flex;
-  align-items: center;
-  padding: 4px;
-  border-radius: var(--border-radius);
-  transition: color 0.15s, background 0.15s;
-}
-
-.ai-search-bar__clear:hover {
-  color: var(--danger);
-  background: var(--danger-bg);
-}
-
-.ai-search-bar__btn {
-  background-color: var(--highlight);
-  color: var(--on-highlight);
-  border: none;
-  border-radius: var(--border-radius-sm);
-  padding: 10px 28px;
-  font-weight: 700;
-  font-size: 1rem;
-  font-family: var(--font-display);
-  cursor: pointer;
-  transition: filter 0.2s ease, transform 0.1s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 90px;
-  justify-content: center;
-  box-sizing: border-box;
-}
-
-.ai-search-bar__btn:hover:not(:disabled),
-.ai-search-bar__btn:focus-visible:not(:disabled) {
-  filter: brightness(0.96);
-  transform: translateY(-1px);
-}
-
-.ai-search-bar__btn:active:not(:disabled) {
-  transform: translateY(0) scale(0.98);
-  filter: brightness(0.9);
-}
-
-.ai-search-bar__btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* ─── Spinner ─────────────────────────────────────────────── */
-.ai-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid var(--white-alpha-35);
-  border-top-color: var(--on-highlight);
-  border-radius: var(--border-radius);
-  animation: spin 0.7s linear infinite;
-  display: inline-block;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ─── Error ───────────────────────────────────────────────── */
-.ai-error {
-  display: flex;
-  align-items: center;
   gap: 10px;
-  background: var(--danger-bg);
-  color: var(--danger);
-  border: 1px solid var(--red-300);
+  padding: 20px;
   border-radius: var(--border-radius);
-  padding: 14px 20px;
-  font-weight: 500;
-  max-width: 720px;
-  margin: 0 auto 24px;
-}
-
-/* ─── Empty state ─────────────────────────────────────────── */
-.ai-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  color: var(--neutral-900);
-  padding: 64px 0;
-  text-align: center;
-}
-
-.ai-empty p {
-  font-size: 1rem;
-  color: var(--neutral-900);
-}
-
-/* ─── Results ─────────────────────────────────────────────── */
-.ai-results-section {
-  padding-bottom: 64px;
-}
-
-/* ─── Detail panel ────────────────────────────────────────── */
-.ai-detail {
-  border: 1.5px solid var(--neutral-900);
-  border-radius: var(--border-radius);
-  background: var(--background);
-  box-shadow: 0 4px 24px var(--shadow-md);
-  overflow: hidden;
-  margin-top: 0;
-}
-
-.ai-detail__header {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 0;
-}
-
-.ai-detail__cover {
-  width: 100%;
-  height: 100%;
-  min-height: 260px;
-  object-fit: cover;
-  display: block;
-  border-right: 1px solid var(--neutral-900);
-}
-
-.ai-detail__header-info {
-  background: var(--secondaryBackground);
-  padding: 28px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.ai-detail__title {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1.5rem;
-  color: var(--neutral-900);
-  margin: 0;
-  line-height: 1.25;
-}
-
-.ai-detail__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.ai-tag {
-  font-size: 1rem;
-  font-weight: 600;
-  background: var(--highlight-focus);
-  color: var(--highlight);
-  border: 1px solid var(--highlight-glow);
-  border-radius: var(--border-radius);
-  padding: 3px 12px;
-  text-transform: capitalize;
-}
-
-.ai-tag--cuisine {
-  background: var(--violet-50);
-  color: var(--violet-600);
-  border-color: var(--violet-200);
-}
-
-.ai-detail__stats {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.ai-stat {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--neutral-900);
-}
-
-.ai-detail__summary {
-  font-size: 1rem;
-  color: var(--neutral-900);
-  line-height: 1.6;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin: 0;
-}
-
-/* ─── Detail body ─────────────────────────────────────────── */
-.ai-detail__body {
-  padding: 28px 32px;
-  border-top: 1px solid var(--neutral-900);
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 32px;
-}
-
-.ai-section__title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  background: var(--secondaryWhite);
+  color: var(--neutral-black);
+  border: 1px solid var(--neutral-black);
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1rem;
-  color: var(--neutral-900);
-  margin: 0 0 14px;
 }
 
-.ai-ingredients {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ai-ingredient {
-  font-size: 1rem;
-  color: var(--neutral-900);
-  padding: 6px 12px;
-  background: var(--gray-100);
-  border: 1px solid var(--neutral-900);
+.ai-icon {
+  width: 68px;
+  height: 68px;
   border-radius: var(--border-radius);
-  line-height: 1.4;
-}
-
-.ai-steps {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.ai-step {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-}
-
-.ai-step__num {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
   background: var(--highlight);
-  color: var(--on-highlight);
-  border-radius: var(--border-radius);
-  font-size: 1rem;
-  font-weight: 700;
-  display: flex;
+  color: var(--neutral-white);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 1px;
+  font-size: 26px;
+  letter-spacing: 0.08em;
 }
 
-.ai-step__text {
-  font-size: 1rem;
-  color: var(--neutral-900);
-  line-height: 1.6;
+.ai-content {
+  width: 100%;
 }
 
-.ai-plain-instructions {
-  font-size: 1rem;
-  color: var(--neutral-900);
-  line-height: 1.7;
-  white-space: pre-line;
+@media (max-width: 900px) {
+  .ai-hero-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .ai-hero-card__badge {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
 }
 
-/* ─── Detail footer ───────────────────────────────────────── */
-.ai-detail__footer {
-  padding: 16px 32px;
-  border-top: 1px solid var(--neutral-900);
-  text-align: right;
-  background: var(--secondaryBackground);
-}
-
-.ai-source-link {
-  color: var(--highlight);
-  font-weight: 600;
-  font-size: 1rem;
-  text-decoration: none;
-}
-
-.ai-source-link:hover {
-  text-decoration: underline;
-}
-
-/* ─── Responsive ──────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .ai-detail__header {
-    grid-template-columns: 1fr;
+  .dishly-ai-shell {
+    padding-bottom: 32px;
   }
 
-  .ai-detail__cover {
-    height: 200px;
-    min-height: unset;
-  }
-
-  .ai-detail__header-info {
-    padding: 20px;
-  }
-
-  .ai-detail__body {
-    grid-template-columns: 1fr;
-    padding: 20px;
-    gap: 24px;
-  }
-
-  .ai-detail__footer {
-    padding: 14px 20px;
+  .subtitle {
+    font-size: 16px;
   }
 }

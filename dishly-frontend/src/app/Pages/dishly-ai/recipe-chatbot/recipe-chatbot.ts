@@ -14,7 +14,7 @@ import { ChatMessage, RecetaData } from '../../../Models/recipe-chatbot.model';
   standalone: true,
   imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './recipe-chatbot.html',
-  styleUrls: ['./recipe-chatbot.scss']
+  styleUrls: ['./recipe-chatbot.css']
 })
 export class RecipeChatbot implements OnInit {
   // ViewChilds
@@ -63,7 +63,7 @@ export class RecipeChatbot implements OnInit {
 
   protected getRecipeImageUrl(path: string | null | undefined): string {
     if (!path) {
-      return 'assets/placeholder.jpg';
+      return 'assets/icons/DishlyIcon.webp';
     }
 
     return this.authService.getAssetUrl(path);
@@ -217,3 +217,4 @@ export class RecipeChatbot implements OnInit {
     return 'Something went wrong while processing your message. Please try again.';
   }
 }
+
