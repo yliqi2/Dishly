@@ -10,6 +10,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
@@ -56,6 +58,7 @@ services:
       composer install --no-interaction --optimize-autoloader &&
       [ ! -f /var/www/html/.env ] && cp /var/www/html/.env.example /var/www/html/.env || true &&
       php artisan key:generate --no-interaction &&
+      php artisan config:clear &&
       php artisan config:cache &&
       php artisan route:cache &&
       php artisan view:cache &&

@@ -1,0 +1,1 @@
+<?php $d='public/recipes/';$f=glob($d.'*.{jpg,jpeg,jfif}',GLOB_BRACE);$c=0;foreach($f as $i){$p=pathinfo($i);$w=$d.$p['filename'].'.webp';$m=@imagecreatefromjpeg($i);if($m){if(imagewebp($m,$w,85)) $c++;imagedestroy($m);}}echo 'Generados: '.$c;

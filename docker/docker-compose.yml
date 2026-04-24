@@ -10,6 +10,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
@@ -60,7 +62,8 @@ services:
       composer install --no-interaction --optimize-autoloader &&
       [ ! -f /var/www/html/.env ] && cp /var/www/html/.env.example /var/www/html/.env || true &&
       (grep -q '^APP_KEY=base64:' /var/www/html/.env || php artisan key:generate --no-interaction) &&
-      php artisan migrate --force || true &&
+      php artisan config:clear &&
+      php artisan migrate --force &&
       echo 'Server started' &&
       apache2-foreground
       "
