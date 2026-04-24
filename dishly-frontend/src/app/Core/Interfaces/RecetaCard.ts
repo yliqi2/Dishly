@@ -15,4 +15,6 @@ export interface RecetaCard {
     categorias: CategoriaReceta[];
     imagen_1: string | null;
     media_valoraciones: number;
+    purchased?: boolean;
+    updated_at?: string | null;
 }

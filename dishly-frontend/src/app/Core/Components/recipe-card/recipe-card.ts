@@ -6,11 +6,12 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { LucideAngularModule } from 'lucide-angular';
 import { RecetaCard } from '../../Interfaces/RecetaCard';
 import { AuthServices } from '../../Services/Auth/auth-services';
+import { DeleteRecipeModal } from '../modals/delete-recipe-modal/delete-recipe-modal';
 
 @Component({
   selector: 'app-recipe-card',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule],
+  imports: [CommonModule, RouterLink, LucideAngularModule, DeleteRecipeModal],
   templateUrl: './recipe-card.html',
   styleUrl: './recipe-card.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -20,8 +21,10 @@ export class RecipeCardComponent {
   private readonly authService = inject(AuthServices);
 
   receta = input.required<RecetaCard>();
+  showPrice = input(true);
   recipeDeactivated = output<number>();
   protected readonly isDeactivating = signal(false);
+  protected readonly showDeleteModal = signal(false);
   private readonly currentUser = toSignal(this.authService.user$, {
     initialValue: null as Record<string, unknown> | null,
   });
@@ -46,11 +49,27 @@ export class RecipeCardComponent {
   });
 
   protected readonly displayPrice = computed(() => {
+    if (!this.showPrice()) {
+      return null;
+    }
     const p = this.receta().price;
     if (p !== null && Number(p) > 0) {
       return Number(p);
     }
     return null;
+  });
+
+  protected readonly shouldShowAcquiredBadge = computed(() => {
+    const r = this.receta();
+    if (!r.purchased) {
+      return false;
+    }
+    const user = this.currentUser();
+    const myId = Number(user?.['id_usuario'] ?? 0);
+    if (!myId) {
+      return false;
+    }
+    return Number(r.id_autor) !== myId;
   });
 
   protected readonly displayTime = computed(() => {
@@ -84,11 +103,12 @@ export class RecipeCardComponent {
     }
 
     const roundedUp = Math.ceil(numericMedia * 10) / 10;
-    return roundedUp.toFixed(1);
+    const fixed = roundedUp.toFixed(1);
+    return fixed.endsWith('.0') ? fixed.slice(0, -2) : fixed;
   });
 
   protected readonly mainImage = computed(() => {
-    return this.authService.getAssetUrl(this.receta().imagen_1 ?? '');
+    return this.authService.getAssetUrl(this.receta().imagen_1 ?? '', this.receta().updated_at ?? undefined);
   });
 
   protected readonly chefName = computed(() => {
@@ -107,16 +127,18 @@ export class RecipeCardComponent {
     return currentUserRole === 'admin' || currentUserId === this.receta().id_autor;
   });
 
-  protected deactivateRecipe(): void {
-    if (this.isDeactivating()) {
-      return;
+  protected openDeleteModal(): void {
+    if (!this.isDeactivating()) {
+      this.showDeleteModal.set(true);
     }
+  }
 
-    const confirmed = window.confirm('Are you sure you want to delete this recipe?');
-    if (!confirmed) {
-      return;
-    }
+  protected cancelDelete(): void {
+    this.showDeleteModal.set(false);
+  }
 
+  protected confirmDelete(): void {
+    this.showDeleteModal.set(false);
     this.isDeactivating.set(true);
     this.http.put(`/api/recetas/desactivar/${this.receta().id_receta}`, {}).subscribe({
       next: () => {

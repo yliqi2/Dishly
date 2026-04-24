@@ -1,11 +1,10 @@
 import { CategoriaReceta } from "./CategoriaReceta";
 import { IngredienteReceta } from "./IngredienteReceta";
 
-
-
-
 export interface RecetaOriginal {
-    active?: number;
+    active?: boolean;
+    purchased?: boolean;
+    updated_at?: string | null;
     id_receta: number;
     id_autor: number;
     autor_nombre: string;

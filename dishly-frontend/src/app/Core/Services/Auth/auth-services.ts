@@ -1,8 +1,11 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Observable, tap, BehaviorSubject } from 'rxjs';
+import { Observable, of, tap, BehaviorSubject, catchError, map } from 'rxjs';
 import { Router } from '@angular/router';
 import { ApiBaseService } from '../api-base.service';
+import { jwtDecode } from 'jwt-decode';
+
+type JwtPayload = { exp?: number };
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +13,7 @@ import { ApiBaseService } from '../api-base.service';
 export class AuthServices extends ApiBaseService {
   private router = inject(Router);
   private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-  private userSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
+  private userSubject = new BehaviorSubject<User | null>(this.readInitialUser());
   user$ = this.userSubject.asObservable();
 
   private getStorage(): Storage | null {
@@ -36,7 +39,42 @@ export class AuthServices extends ApiBaseService {
     }
   }
 
+  private isAccessTokenValid(token: string): boolean {
+    try {
+      const payload = jwtDecode<JwtPayload>(token);
+      if (typeof payload.exp !== 'number') {
+        return true;
+      }
+      return payload.exp * 1000 > Date.now();
+    } catch {
+      return false;
+    }
+  }
+
+  private clearExpiredLocalAuth(): void {
+    this.removeItem('token');
+    this.removeItem('user');
+    this.userSubject.next(null);
+  }
+
+  private readInitialUser(): User | null {
+    const token = this.getStorage()?.getItem('token');
+    if (!token) {
+      return null;
+    }
+    if (!this.isAccessTokenValid(token)) {
+      this.getStorage()?.removeItem('token');
+      this.getStorage()?.removeItem('user');
+      return null;
+    }
+    const raw = this.getStorage()?.getItem('user');
+    return raw ? (JSON.parse(raw) as User) : null;
+  }
+
   private getUserFromStorage(): User | null {
+    if (!this.getToken()) {
+      return null;
+    }
     const user = this.getItem('user');
     return user ? JSON.parse(user) : null;
   }
@@ -102,15 +140,20 @@ export class AuthServices extends ApiBaseService {
     this.removeItem('rememberedCredentials');
   }
 
-  logout(): void {
-    this.http.post(`${this.apiUrl}/logout`, {}).subscribe({
-      next: () => {
-        this.clearAuth();
-      },
-      error: () => {
-        this.clearAuth();
-      }
-    });
+  logout(): Observable<void> {
+    const hadToken = !!this.getToken();
+    if (hadToken) {
+      return this.http.post<void>(`${this.apiUrl}/logout`, {}).pipe(
+        tap(() => this.clearAuth()),
+        catchError(() => {
+          this.clearAuth();
+          return of(undefined);
+        }),
+        map(() => undefined)
+      );
+    }
+    this.clearAuth();
+    return of(undefined);
   }
 
   private clearAuth(): void {
@@ -124,13 +167,24 @@ export class AuthServices extends ApiBaseService {
     this.clearAuth();
   }
 
+  handleUnauthorizedSession(): void {
+    this.clearAuth();
+  }
+
   getToken(): string | null {
-    return this.getItem('token');
+    const token = this.getItem('token');
+    if (!token) {
+      return null;
+    }
+    if (!this.isAccessTokenValid(token)) {
+      this.clearExpiredLocalAuth();
+      return null;
+    }
+    return token;
   }
 
   getUser(): User | null {
-    const user = this.getItem('user');
-    return user ? JSON.parse(user) : null;
+    return this.getUserFromStorage();
   }
 
   isAuthenticated(): boolean {
@@ -164,17 +218,18 @@ export class AuthServices extends ApiBaseService {
   }
 
   getAssetUrl(path: string, cacheBust?: string): string {
-    if (!path) return 'assets/placeholder.jpg';
+    if (!path) return 'assets/icons/DishlyIcon.webp';
 
     const trimmedPath = path.trim();
+    const normalizedPath = trimmedPath.replace(/\.(jpe?g|png|gif|bmp|jfif|tiff?)(\?.*)?$/i, '.webp$2');
     let url: string;
 
-    if (/^https?:\/\//i.test(trimmedPath)) {
-      url = trimmedPath
+    if (/^https?:\/\//i.test(normalizedPath)) {
+      url = normalizedPath
         .replace('://localhost:8000', '://localhost:8080')
         .replace('://127.0.0.1:8000', '://127.0.0.1:8080');
     } else {
-      const cleanPath = trimmedPath.replace(/^\/+/, '');
+      const cleanPath = normalizedPath.replace(/^\/+/, '');
       url = `/img-proxy/${cleanPath}`;
     }
 

@@ -1,0 +1,51 @@
+<div
+  class="drm-backdrop"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="drm-recipe-title"
+  (click)="onBackdropClick()"
+  (keydown)="onModalKeydown($event)"
+>
+  <div #dialogRoot class="drm-shell" tabindex="-1" (click)="$event.stopPropagation()">
+    <div class="drm-content animate-pop">
+
+      <div class="drm-header">
+        <h2 class="drm-title" id="drm-recipe-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 11v6M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Delete Recipe
+        </h2>
+      </div>
+
+      <div class="drm-body">
+        @if (recipeTitle) {
+          <p>Are you sure you want to delete <strong>{{ recipeTitle }}</strong>? This action cannot be undone.</p>
+        } @else {
+          <p>Are you sure you want to delete this recipe? This action cannot be undone.</p>
+        }
+      </div>
+
+      <div class="drm-footer">
+        <button type="button" class="btn-secondary" (click)="cancelled.emit()">Cancel</button>
+        <button
+          type="button"
+          class="btn-danger"
+          (click)="confirmed.emit()"
+          [disabled]="isProcessing"
+          [attr.aria-busy]="isProcessing"
+        >
+          @if (isProcessing) {
+            <span class="btn-loading-icon" aria-hidden="true"></span>
+          } @else {
+            Delete Recipe
+          }
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

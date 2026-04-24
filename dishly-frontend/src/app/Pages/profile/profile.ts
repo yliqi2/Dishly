@@ -6,6 +6,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Profile as ProfileService } from '../../Core/Services/Profile/profile-services';
 import { RecipeCardComponent } from '../../Core/Components/recipe-card/recipe-card';
+import { Breadcrumbs } from '../../Core/Components/breadcrumbs/breadcrumbs';
 
 type User = {
   nombre?: string;
@@ -19,7 +20,7 @@ type User = {
 
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule, RouterLink, LucideAngularModule, RecipeCardComponent],
+  imports: [CommonModule, RouterLink, LucideAngularModule, RecipeCardComponent, Breadcrumbs],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
   changeDetection: ChangeDetectionStrategy.OnPush

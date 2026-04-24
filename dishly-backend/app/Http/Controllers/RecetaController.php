@@ -2,22 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RecetaOriginal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use App\Models\RecetaOriginal;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
 use Throwable;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class RecetaController extends Controller
 {
     public function getCategorias()
     {
         $categorias = DB::table('categoria')->select('id_categoria', 'nombre')->get();
+
         return response()->json($categorias);
+    }
+
+    public function getIngredientes()
+    {
+        $ingredientes = DB::table('ingrediente')
+            ->select('nombre')
+            ->orderBy('nombre')
+            ->pluck('nombre')
+            ->values();
+
+        return response()->json($ingredientes);
     }
 
     public function store(Request $request)
@@ -33,7 +47,7 @@ class RecetaController extends Controller
                 'porciones' => ['required', 'integer', 'min:1'],
                 'price' => ['nullable', 'regex:/^\d+([\,\.]\d{1,2})?$/'],
                 'imagenes' => ['required', 'array', 'min:1', 'max:5'],
-                'imagenes.*' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:10240'],
+                'imagenes.*' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:20480'],
                 'categorias' => ['required', 'array', 'min:1'],
                 'categorias.*' => ['integer', 'exists:categoria,id_categoria', 'distinct'],
                 'ingredientes' => ['required', 'array', 'min:1'],
@@ -43,7 +57,7 @@ class RecetaController extends Controller
             ]);
 
             $authorId = optional($request->user())->id_usuario ?? $request->input('id_autor');
-            if (!$authorId) {
+            if (! $authorId) {
                 return response()->json([
                     'message' => 'Author is required.',
                 ], 422);
@@ -54,7 +68,7 @@ class RecetaController extends Controller
             $imagePaths = $this->storeUploadedImages($request);
 
             $recipe = DB::transaction(function () use ($data, $authorId, $imagePaths, $categories, $ingredients) {
-                $receta = new RecetaOriginal();
+                $receta = new RecetaOriginal;
                 $receta->titulo = trim((string) $data['titulo']);
                 $receta->descripcion = trim((string) $data['descripcion']);
                 $receta->instrucciones = trim((string) $data['instrucciones']);
@@ -96,6 +110,7 @@ class RecetaController extends Controller
                             ]);
                         }
                         $rowsByIngredientId[$ingredientId]['cantidad'] += $qty;
+
                         continue;
                     }
 
@@ -145,13 +160,13 @@ class RecetaController extends Controller
                 ->where('active', 1)
                 ->first();
 
-            if (!$recipe) {
+            if (! $recipe) {
                 return response()->json([
                     'message' => 'Recipe not found.',
                 ], 404);
             }
 
-            if (!$user || ((int) $recipe->id_autor !== (int) $user->id_usuario && $user->rol !== 'admin')) {
+            if (! $user || ((int) $recipe->id_autor !== (int) $user->id_usuario && $user->rol !== 'admin')) {
                 return response()->json([
                     'message' => 'You are not allowed to edit this recipe.',
                 ], 403);
@@ -175,7 +190,7 @@ class RecetaController extends Controller
                 'image_order' => ['required', 'array', 'min:1', 'max:5'],
                 'image_order.*' => ['required', 'string'],
                 'imagenes_nuevas' => ['nullable', 'array', 'max:5'],
-                'imagenes_nuevas.*' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:10240'],
+                'imagenes_nuevas.*' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:20480'],
             ]);
 
             $categories = array_values($data['categorias'] ?? []);
@@ -207,6 +222,7 @@ class RecetaController extends Controller
                         'imagen_3' => $orderedImagePaths[2] ?? null,
                         'imagen_4' => $orderedImagePaths[3] ?? null,
                         'imagen_5' => $orderedImagePaths[4] ?? null,
+                        'updated_at' => now(),
                     ]);
 
                 DB::table('receta_categoria')
@@ -241,6 +257,7 @@ class RecetaController extends Controller
                         }
 
                         $rowsByIngredientId[$ingredientId]['cantidad'] += $qty;
+
                         continue;
                     }
 
@@ -308,18 +325,42 @@ class RecetaController extends Controller
         $storedPaths = [];
         $publicPath = public_path('recipes');
 
-        if (!file_exists($publicPath)) {
+        if (! file_exists($publicPath)) {
             mkdir($publicPath, 0755, true);
         }
 
         foreach ($files as $index => $file) {
-            $ext = strtolower((string) $file->getClientOriginalExtension());
-            $filename = Str::lower(Str::random(20)) . '-' . (time() + $index + 1) . '.' . $ext;
-            $file->move($publicPath, $filename);
-            $storedPaths[] = 'recipes/' . $filename;
+            $filename = Str::lower(Str::random(20)).'-'.(time() + $index + 1).'.webp';
+            $targetPath = $publicPath.DIRECTORY_SEPARATOR.$filename;
+            $sourcePath = (string) $file->getRealPath();
+            if ($sourcePath === '' || ! file_exists($sourcePath)) {
+                throw new \RuntimeException('Could not read uploaded recipe image.');
+            }
+            $this->saveImageAsWebp($sourcePath, $targetPath);
+            $storedPaths[] = 'recipes/'.$filename;
         }
 
         return $storedPaths;
+    }
+
+    private function saveImageAsWebp(string $sourcePath, string $targetPath): void
+    {
+        $detectedMime = mime_content_type($sourcePath) ?: 'unknown';
+
+        if ($detectedMime === 'image/webp') {
+            if (! @copy($sourcePath, $targetPath)) {
+                throw new \RuntimeException('Could not persist uploaded webp file.');
+            }
+
+            return;
+        }
+
+        /** @var class-string $webpConverterClass */
+        $webpConverterClass = 'WebPConvert\\WebPConvert';
+        $webpConverterClass::convert($sourcePath, $targetPath, [
+            'quality' => 90,
+            'fail' => 'throw',
+        ]);
     }
 
     private function extractRecipeImagePaths(object $recipe): array
@@ -340,7 +381,7 @@ class RecetaController extends Controller
         $usedNew = [];
 
         foreach ($imageOrder as $entry) {
-            if (!is_string($entry)) {
+            if (! is_string($entry)) {
                 throw ValidationException::withMessages([
                     'image_order' => ['Invalid image order entry.'],
                 ]);
@@ -349,7 +390,7 @@ class RecetaController extends Controller
             if (str_starts_with($entry, 'existing:')) {
                 $path = substr($entry, 9);
 
-                if ($path === '' || !in_array($path, $currentImagePaths, true) || in_array($path, $usedExisting, true)) {
+                if ($path === '' || ! in_array($path, $currentImagePaths, true) || in_array($path, $usedExisting, true)) {
                     throw ValidationException::withMessages([
                         'image_order' => ['Invalid existing image reference.'],
                     ]);
@@ -357,13 +398,14 @@ class RecetaController extends Controller
 
                 $usedExisting[] = $path;
                 $resolved[] = $path;
+
                 continue;
             }
 
             if (str_starts_with($entry, 'new:')) {
                 $index = (int) substr($entry, 4);
 
-                if (!array_key_exists($index, $newImagePaths) || in_array($index, $usedNew, true)) {
+                if (! array_key_exists($index, $newImagePaths) || in_array($index, $usedNew, true)) {
                     throw ValidationException::withMessages([
                         'image_order' => ['Invalid uploaded image reference.'],
                     ]);
@@ -371,6 +413,7 @@ class RecetaController extends Controller
 
                 $usedNew[] = $index;
                 $resolved[] = $newImagePaths[$index];
+
                 continue;
             }
 
@@ -403,7 +446,7 @@ class RecetaController extends Controller
     private function deleteStoredImages(array $paths): void
     {
         foreach ($paths as $path) {
-            if (!is_string($path) || trim($path) === '') {
+            if (! is_string($path) || trim($path) === '') {
                 continue;
             }
 
@@ -418,13 +461,13 @@ class RecetaController extends Controller
     {
         try {
             $user = Auth::guard('api')->user();
-            
+
             $recipes = DB::table('receta_original')
-                    ->where('id_autor', $user->id_usuario)
-                    ->where('active', 1)
-                    ->orderByDesc('fecha_creacion')
-                    ->get();
-            
+                ->where('id_autor', $user->id_usuario)
+                ->where('active', 1)
+                ->orderByDesc('fecha_creacion')
+                ->get();
+
             if ($recipes->isEmpty()) {
                 return response()->json([]);
             }
@@ -463,6 +506,7 @@ class RecetaController extends Controller
                 $recipe->ingredientes = $ingredientes->get($recipe->id_receta, []);
                 $recipe->media_valoraciones = $valoraciones->get($recipe->id_receta)->media_valoraciones ?? null;
                 $recipe->autor_nombre = $user->nombre;
+                $recipe->purchased = false;
             }
 
             $sortedRecipes = $recipes->sortByDesc('fecha_creacion')->values();
@@ -482,12 +526,12 @@ class RecetaController extends Controller
     {
         try {
             $user = Auth::guard('api')->user();
-            
+
             $count = DB::table('receta_original')
-                    ->where('id_autor', $user->id_usuario)
-                    ->where('active', 1)
-                    ->count();
-            
+                ->where('id_autor', $user->id_usuario)
+                ->where('active', 1)
+                ->count();
+
             return response()->json($count);
         } catch (Throwable $e) {
             return response()->json([
@@ -497,58 +541,32 @@ class RecetaController extends Controller
                 ],
             ], 500);
         }
-    } 
-    
-        public function getAllRecetas()
+    }
+
+    public function getCountAcquiredRecipes()
     {
         try {
-            $recipes = DB::table('receta_original')
-                ->where('active', 1)
-                ->orderByDesc('fecha_creacion')
-                ->get();
-            
-            if ($recipes->isEmpty()) {
-                return response()->json([]);
-            }
+            $user = Auth::guard('api')->user();
 
-            $recipeIds = $recipes->pluck('id_receta')->toArray();
-            $authorIds = $recipes->pluck('id_autor')->unique()->toArray();
+            $count = DB::table('receta_adquirida')
+                ->where('id_usuario', $user->id_usuario)
+                ->count();
 
-            $categorias = DB::table('receta_categoria')
-                ->join('categoria', 'receta_categoria.id_categoria', '=', 'categoria.id_categoria')
-                ->whereIn('receta_categoria.id_receta', $recipeIds)
-                ->select('receta_categoria.id_receta', 'categoria.id_categoria', 'categoria.nombre')
-                ->get()
-                ->groupBy('id_receta')
-                ->map(function ($items) {
-                    return $items->values()->toArray();
-                });
+            return response()->json($count);
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get count of acquired recipes',
+                'errors' => [
+                    $e->getMessage(),
+                ],
+            ], 500);
+        }
+    }
 
-            $valoraciones = DB::table('valoracion')
-                ->whereIn('id_receta', $recipeIds)
-                ->select('id_receta', DB::raw('AVG(puntuacion) as media_valoraciones'))
-                ->groupBy('id_receta')
-                ->get()
-                ->keyBy('id_receta');
-
-            $autores = DB::table('users')
-                ->whereIn('id_usuario', $authorIds)
-                ->select('id_usuario', 'nombre', 'icon_path', 'updated_at')
-                ->get()
-                ->keyBy('id_usuario');
-
-            $recetasConDatos = $recipes->map(function ($receta) use ($categorias, $valoraciones, $autores) {
-                $receta->categorias = $categorias[$receta->id_receta] ?? [];
-                $receta->media_valoraciones = $valoraciones[$receta->id_receta]->media_valoraciones ?? null;
-                $receta->autor_nombre = $autores[$receta->id_autor]->nombre ?? null;
-                $receta->autor_icon_path = $autores[$receta->id_autor]->icon_path ?? null;
-                $receta->autor_updated_at = $autores[$receta->id_autor]->updated_at ?? null;
-                return $receta;
-            });
-
-            $sortedRecetas = $recetasConDatos->sortByDesc('fecha_creacion')->values();
-
-            return response()->json($sortedRecetas);
+    public function getAllRecetas()
+    {
+        try {
+            return response()->json($this->buildRecetasCardList(true));
         } catch (Throwable $e) {
             return response()->json([
                 'message' => 'Could not get recipes',
@@ -559,15 +577,97 @@ class RecetaController extends Controller
         }
     }
 
+    public function getAllRecetasAdmin()
+    {
+        try {
+            return response()->json($this->buildRecetasCardList(false));
+        } catch (Throwable $e) {
+            return response()->json([
+                'message' => 'Could not get recipes',
+                'errors' => [
+                    'server' => [$e->getMessage()],
+                ],
+            ], 500);
+        }
+    }
+
+    /**
+     * @return array<int, mixed>|Collection<int, mixed>
+     */
+    private function buildRecetasCardList(bool $onlyActive)
+    {
+        $query = DB::table('receta_original')->orderByDesc('fecha_creacion');
+        if ($onlyActive) {
+            $query->where('active', 1);
+        }
+        $recipes = $query->get();
+
+        if ($recipes->isEmpty()) {
+            return [];
+        }
+
+        $recipeIds = $recipes->pluck('id_receta')->toArray();
+        $authorIds = $recipes->pluck('id_autor')->unique()->toArray();
+
+        $categorias = DB::table('receta_categoria')
+            ->join('categoria', 'receta_categoria.id_categoria', '=', 'categoria.id_categoria')
+            ->whereIn('receta_categoria.id_receta', $recipeIds)
+            ->select('receta_categoria.id_receta', 'categoria.id_categoria', 'categoria.nombre')
+            ->get()
+            ->groupBy('id_receta')
+            ->map(function ($items) {
+                return $items->values()->toArray();
+            });
+
+        $valoraciones = DB::table('valoracion')
+            ->whereIn('id_receta', $recipeIds)
+            ->select('id_receta', DB::raw('AVG(puntuacion) as media_valoraciones'))
+            ->groupBy('id_receta')
+            ->get()
+            ->keyBy('id_receta');
+
+        $autores = DB::table('users')
+            ->whereIn('id_usuario', $authorIds)
+            ->select('id_usuario', 'nombre', 'icon_path', 'updated_at')
+            ->get()
+            ->keyBy('id_usuario');
+
+        $viewer = $this->optionalJwtApiUser();
+        $purchasedIdSet = [];
+        if ($viewer && $recipeIds !== []) {
+            $purchasedIds = DB::table('receta_adquirida')
+                ->where('id_usuario', $viewer->id_usuario)
+                ->whereIn('id_receta', $recipeIds)
+                ->pluck('id_receta');
+            foreach ($purchasedIds as $rid) {
+                $purchasedIdSet[(int) $rid] = true;
+            }
+        }
+
+        $recetasConDatos = $recipes->map(function ($receta) use ($categorias, $valoraciones, $autores, $purchasedIdSet) {
+            $receta->categorias = $categorias[$receta->id_receta] ?? [];
+            $receta->media_valoraciones = $valoraciones[$receta->id_receta]->media_valoraciones ?? null;
+            $receta->autor_nombre = $autores[$receta->id_autor]->nombre ?? null;
+            $receta->autor_icon_path = $autores[$receta->id_autor]->icon_path ?? null;
+            $receta->autor_updated_at = $autores[$receta->id_autor]->updated_at ?? null;
+            $receta->purchased = isset($purchasedIdSet[(int) $receta->id_receta]);
+
+            return $receta;
+        });
+
+        return $recetasConDatos->sortByDesc('fecha_creacion')->values();
+    }
+
     public function getRecetaById($id)
     {
         try {
+            $user = Auth::guard('api')->user();
+
             $recipe = DB::table('receta_original')
                 ->where('id_receta', $id)
-                ->where('active', 1)
                 ->first();
-            
-            if (!$recipe) {
+
+            if (! $recipe) {
                 return response()->json(['message' => 'Recipe not found'], 404);
             }
 
@@ -603,6 +703,8 @@ class RecetaController extends Controller
             $recipe->autor_nombre = $autor?->nombre;
             $recipe->autor_icon_path = $autor?->icon_path;
             $recipe->autor_updated_at = $autor?->updated_at;
+            $recipe->purchased = $this->resolveRecipePurchaseStatus($recipe, $user);
+            $recipe->active = (bool) $recipe->active;
 
             return response()->json($recipe);
         } catch (Throwable $e) {
@@ -619,19 +721,19 @@ class RecetaController extends Controller
     {
         try {
             $user = Auth::guard('api')->user();
-            
+
             $valoraciones = DB::table('valoracion')
-                    ->join('receta_original', 'valoracion.id_receta', '=', 'receta_original.id_receta')
-                    ->where('valoracion.id_usuario', $user->id_usuario)
-                    ->where('receta_original.active', 1)
-                    ->select(
-                        'valoracion.*', 
-                        'receta_original.titulo as receta_titulo', 
-                        'receta_original.imagen_1 as receta_imagen'
-                    )
-                    ->orderBy('valoracion.fecha', 'desc')
-                    ->get();
-            
+                ->join('receta_original', 'valoracion.id_receta', '=', 'receta_original.id_receta')
+                ->where('valoracion.id_usuario', $user->id_usuario)
+                ->where('receta_original.active', 1)
+                ->select(
+                    'valoracion.*',
+                    'receta_original.titulo as receta_titulo',
+                    'receta_original.imagen_1 as receta_imagen'
+                )
+                ->orderBy('valoracion.fecha', 'desc')
+                ->get();
+
             if ($valoraciones->isEmpty()) {
                 return response()->json([]);
             }
@@ -675,7 +777,7 @@ class RecetaController extends Controller
             $user = Auth::guard('api')->user();
 
             $data = $request->validate([
-                'id_receta'  => ['required', 'integer', 'exists:receta_original,id_receta'],
+                'id_receta' => ['required', 'integer', 'exists:receta_original,id_receta'],
                 'puntuacion' => ['required', 'integer', 'min:1', 'max:5'],
                 'comentario' => ['nullable', 'string', 'max:1000'],
             ]);
@@ -685,7 +787,7 @@ class RecetaController extends Controller
                 ->where('active', 1)
                 ->first();
 
-            if (!$receta) {
+            if (! $receta) {
                 return response()->json([
                     'message' => 'La receta no existe o no está disponible.',
                 ], 404);
@@ -699,13 +801,13 @@ class RecetaController extends Controller
 
             DB::table('valoracion')->updateOrInsert(
                 [
-                    'id_receta'  => $data['id_receta'],
+                    'id_receta' => $data['id_receta'],
                     'id_usuario' => $user->id_usuario,
                 ],
                 [
                     'puntuacion' => $data['puntuacion'],
                     'comentario' => $data['comentario'] ?? null,
-                    'fecha'      => now()->toDateString(),
+                    'fecha' => now()->toDateString(),
                 ]
             );
 
@@ -713,12 +815,12 @@ class RecetaController extends Controller
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validation failed',
-                'errors'  => $e->errors(),
+                'errors' => $e->errors(),
             ], 422);
         } catch (Throwable $e) {
             return response()->json([
                 'message' => 'Could not save valoración',
-                'errors'  => [$e->getMessage()],
+                'errors' => [$e->getMessage()],
             ], 500);
         }
     }
@@ -790,7 +892,7 @@ class RecetaController extends Controller
                 ->where('id_valoracion', $id)
                 ->first();
 
-            if (!$val) {
+            if (! $val) {
                 return response()->json([
                     'message' => 'Review no encontrada.',
                 ], 404);
@@ -820,7 +922,7 @@ class RecetaController extends Controller
         try {
             $user = Auth::guard('api')->user();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['purchased' => false]);
             }
 
@@ -829,31 +931,47 @@ class RecetaController extends Controller
                 ->where('active', 1)
                 ->first();
 
-            if (!$recipe) {
+            if (! $recipe) {
                 return response()->json(['message' => 'Recipe not found'], 404);
             }
 
-            // The author always has access
-            if ((int) $recipe->id_autor === (int) $user->id_usuario) {
-                return response()->json(['purchased' => true]);
-            }
-
-            // Free recipes are accessible to everyone
-            if ($recipe->price === null || (float) $recipe->price <= 0) {
-                return response()->json(['purchased' => true]);
-            }
-
-            $purchased = DB::table('receta_adquirida')
-                ->where('id_usuario', $user->id_usuario)
-                ->where('id_receta', $id)
-                ->exists();
-
-            return response()->json(['purchased' => $purchased]);
+            return response()->json([
+                'purchased' => $this->resolveRecipePurchaseStatus($recipe, $user),
+            ]);
         } catch (Throwable $e) {
             return response()->json([
                 'message' => 'Could not check purchase status',
                 'errors' => [$e->getMessage()],
             ], 500);
+        }
+    }
+
+    private function resolveRecipePurchaseStatus(object $recipe, ?object $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        if ((int) $recipe->id_autor === (int) $user->id_usuario) {
+            return true;
+        }
+
+        if ($recipe->price === null || (float) $recipe->price <= 0) {
+            return true;
+        }
+
+        return DB::table('receta_adquirida')
+            ->where('id_usuario', $user->id_usuario)
+            ->where('id_receta', $recipe->id_receta)
+            ->exists();
+    }
+
+    private function optionalJwtApiUser(): ?object
+    {
+        try {
+            return JWTAuth::parseToken()->authenticate();
+        } catch (Throwable) {
+            return null;
         }
     }
 }

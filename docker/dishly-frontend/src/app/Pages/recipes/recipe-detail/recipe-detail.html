@@ -1,0 +1,422 @@
+<div class="recipe-page bg-white min-vh-100 py-3">
+  <div class="page-layout-container">
+
+    @if (loading) {
+      <app-loading-page></app-loading-page>
+    } @else if (error) {
+      <div class="alert alert-danger rounded-4">{{ error }}</div>
+    } @else if (recipe) {
+
+    <section class="page-header page-container">
+    <div class="page-header__inner">
+      <h1 class="page-title">Recipe Details</h1>
+      <div class="page-underline" aria-hidden="true"></div>
+    </div>
+  </section>
+
+    <div class="author-row d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+      <div class="d-flex align-items-center gap-3">
+        <div class="author-avatar d-flex align-items-center justify-content-center fw-bold shadow-sm">
+          @if (getAuthorAvatarUrl(); as authorAvatarUrl) {
+          <img [src]="authorAvatarUrl" [alt]="recipe.autor_nombre + ' profile photo'"
+            (error)="$any($event.target).src='assets/placeholder.jpg'">
+          } @else {
+          {{ getInitials(recipe.autor_nombre) }}
+          }
+        </div>
+        <span class="author-name">{{ recipe.autor_nombre }}</span>
+      </div>
+      <span class="published-date">Published {{ getPublishedDate() }}</span>
+    </div>
+
+    <div class="recipe-content-grid">
+      <div class="recipe-visuals-column">
+        <div class="recipe-hero-grid mb-4">
+          <div class="recipe-media-stack" [class.recipe-media-stack--single]="!hasMultipleImages()">
+            <div class="main-image-container position-relative overflow-hidden shadow-sm d-flex align-items-stretch justify-content-center" [class.single-image]="!hasMultipleImages()">
+              <img [src]="thumbnails[selectedThumbnailIndex]"
+                   alt="Recipe main image"
+                   class="main-image current-main-image img-fluid w-100 h-100"
+                   [ngClass]="imageAnimationClass"
+                   (error)="$any($event.target).src='assets/placeholder.jpg'">
+
+              @if (isPremium()) {
+              <div class="image-overlay top-right">
+                <span class="badge recipe-tag-premium">Premium</span>
+              </div>
+              }
+
+              <div class="image-overlay bottom-right">
+                <span class="badge recipe-tag-difficulty d-flex align-items-center gap-2">
+                  <div class="difficulty-bars">
+                    <span class="diff-bar" [class.active-easy]="getDifficultyBars() >= 1 && recipe.dificultad === 'easy'"
+                      [class.active-medium]="getDifficultyBars() >= 1 && recipe.dificultad === 'medium'"
+                      [class.active-hard]="getDifficultyBars() >= 1 && recipe.dificultad === 'hard'"></span>
+                    <span class="diff-bar" [class.active-medium]="getDifficultyBars() >= 2 && recipe.dificultad === 'medium'"
+                      [class.active-hard]="getDifficultyBars() >= 2 && recipe.dificultad === 'hard'"></span>
+                    <span class="diff-bar" [class.active-hard]="getDifficultyBars() >= 3 && recipe.dificultad === 'hard'"></span>
+                  </div>
+                  {{ getDifficultyLabel() }}
+                </span>
+              </div>
+
+              @if (hasMultipleImages()) {
+              <button type="button" class="carousel-btn prev d-inline-flex align-items-center justify-content-center" (click)="prevImage()">
+                <lucide-icon name="chevron-left" [size]="24"></lucide-icon>
+              </button>
+              <button type="button" class="carousel-btn next d-inline-flex align-items-center justify-content-center" (click)="nextImage()">
+                <lucide-icon name="chevron-right" [size]="24"></lucide-icon>
+              </button>
+              }
+            </div>
+
+            @if (hasMultipleImages()) {
+            <div class="thumbnail-gallery-below">
+              @for (thumb of visibleThumbnails(); track $index; let i = $index) {
+              <div class="thumb-item-custom shadow-sm"
+                   [class.active]="i === selectedThumbnailIndex"
+                   [class.summary-thumb]="isSummaryThumbnail(i)"
+                   (click)="selectThumbnail(i)">
+                <img [src]="thumb" alt="Recipe thumbnail" class="img-fluid w-100 h-100" (error)="$any($event.target).src='assets/placeholder.jpg'">
+                @if (isSummaryThumbnail(i)) {
+                <div class="thumb-more-overlay">+{{ hiddenThumbnailsCount() }}</div>
+                }
+              </div>
+              }
+            </div>
+            }
+          </div>
+
+          <div class="recipe-details recipe-details--inline shadow-sm border p-4 rounded-4 bg-white">
+          <div class="mb-4 d-flex flex-column gap-3">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <h1 class="recipe-title mb-0">{{ recipe.titulo }}</h1>
+            </div>
+            <p class="detail-text mb-0 text-muted">{{ recipe.descripcion }}</p>
+          </div>
+
+          <div class="stats-row mb-4">
+            <div class="stat-item">
+              <div class="stat-card-custom border rounded-4 p-3 d-flex flex-column align-items-center gap-1 shadow-sm h-100">
+                <div class="stat-icon-wrapper time d-inline-flex align-items-center justify-content-center mx-auto">
+                  <lucide-icon name="clock" [size]="20"></lucide-icon>
+                </div>
+                <span class="stat-label">Time</span>
+                <span class="stat-value text-nowrap">{{ getTimeLabel() }}</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-card-custom border rounded-4 p-3 d-flex flex-column align-items-center gap-1 shadow-sm h-100">
+                <div class="stat-icon-wrapper servings d-inline-flex align-items-center justify-content-center mx-auto">
+                  <lucide-icon name="users" [size]="20"></lucide-icon>
+                </div>
+                <span class="stat-label">Servings</span>
+                <span class="stat-value text-nowrap">{{ recipe.porciones }} people</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-card-custom border rounded-4 p-3 d-flex flex-column align-items-center gap-1 shadow-sm h-100">
+                <div class="stat-icon-wrapper level d-inline-flex align-items-center justify-content-center mx-auto">
+                  <lucide-icon name="flame" [size]="20"></lucide-icon>
+                </div>
+                <span class="stat-label">Level</span>
+                <span class="stat-value text-nowrap">{{ getDifficultyLabel() }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="buy-content mt-2">
+            <div class="price-tag d-flex flex-column">
+              <span class="price-label">Price</span>
+              <span class="price-value">{{ getDisplayPrice() }}</span>
+            </div>
+            @if (isOwnRecipe()) {
+            <a
+              [routerLink]="['/recipes', recipe.id_receta, 'edit']"
+              class="btn btn-buy-custom btn-lg rounded-3 fw-bold d-inline-flex align-items-center justify-content-center gap-2 text-decoration-none">
+              <lucide-icon name="pencil" [size]="18"></lucide-icon>
+              Edit Recipe
+            </a>
+            } @else if (isPremium()) {
+            <button
+              type="button"
+              class="btn btn-buy-custom btn-lg rounded-3 fw-bold d-inline-flex align-items-center justify-content-center gap-2"
+              [class.is-added]="isInCart"
+              (click)="addToCart()">
+              <lucide-icon name="shopping-cart" [size]="18"></lucide-icon>
+              {{ isInCart ? 'View Cart' : 'Add to Cart' }}
+            </button>
+            } @else {
+            <div class="free-access-badge d-flex align-items-center justify-content-center fw-bold">
+              Free access
+            </div>
+            }
+          </div>
+
+          @if (cartNotice) {
+          <p class="cart-feedback mb-0">{{ cartNotice }}</p>
+          }
+          </div>
+        </div>
+
+        <div class="categories-block shadow-sm border p-4 rounded-4 bg-white mb-4">
+          <div class="categories-header d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mb-3">
+            <div>
+              <h2 class="section-title mb-1">Categories</h2>
+              <p class="categories-subtitle mb-0">Quick labels for this recipe.</p>
+            </div>
+            <span class="categories-count">{{ recipe.categorias.length }} {{ recipe.categorias.length === 1 ? 'tag' : 'tags' }}</span>
+          </div>
+
+          <div class="categories-list d-flex flex-wrap gap-2">
+            @for (cat of recipe.categorias; track cat.id_categoria) {
+            <span class="badge recipe-tag-category">{{ cat.nombre }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="detail-card shadow-sm border p-4 rounded-4 bg-white mb-4">
+          <div class="detail-section mb-0">
+            <h3 class="detail-title mb-3 d-flex align-items-center gap-2 h5 fw-bold">
+              <lucide-icon name="clipboard-list" [size]="20" class="text-highlight-color"></lucide-icon>
+              Ingredients
+            </h3>
+            <div class="ingredients-container d-flex flex-column gap-2">
+              @for (ing of recipe.ingredientes; track $index) {
+              <div class="ingredient-row d-flex justify-content-between p-2 px-3 bg-light-custom rounded-3 shadow-sm">
+                <span class="text-secondary fw-medium">{{ ing.nombre }}</span>
+                <span class="fw-bold text-dark">{{ ing.cantidad }} {{ ing.unidad }}</span>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-card shadow-sm border p-4 rounded-4 bg-white mb-4">
+          <div class="detail-section mb-0">
+            <h3 class="detail-title mb-3 d-flex align-items-center gap-2 h5 fw-bold">
+              <lucide-icon name="chef-hat" [size]="20" class="text-highlight-color"></lucide-icon>
+              Instructions
+            </h3>
+
+            <div class="instructions-wrapper" [class.instructions-locked]="isLocked">
+              <div class="instructions-container d-flex flex-column gap-3">
+                @for (step of instructions; track $index; let i = $index) {
+                <div class="instruction-step d-flex gap-3 align-start">
+                  <div class="step-number-custom d-flex align-items-center justify-content-center flex-shrink-0 mt-1 shadow-sm fw-bold">
+                    {{ i + 1 }}
+                  </div>
+                  <p class="detail-text mb-0 pt-1 lh-sm text-muted">{{ step }}</p>
+                </div>
+                }
+              </div>
+
+              @if (isLocked) {
+                <div class="lock-overlay">
+                  <div class="lock-overlay-content">
+                    <div class="lock-icon-circle">
+                      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                    </div>
+                    <p class="lock-title">Premium Content</p>
+                    <p class="lock-subtitle">Add to cart to unlock the full instructions</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="reviews-section shadow-sm border p-4 p-lg-4 mb-4 rounded-4 bg-white">
+          <div class="reviews-header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-3">
+            <div>
+              <h2 class="section-title mb-1">Reviews</h2>
+              <p class="reviews-subtitle mb-0">See what people think about this recipe.</p>
+            </div>
+            <div class="reviews-overview d-flex align-items-center gap-3">
+              <div class="reviews-average text-end">
+                <span class="reviews-average__value">{{ reviewAverageSignal() | number:'1.1-1' }}</span>
+                <span class="reviews-average__meta">/ 5 average</span>
+              </div>
+              <span class="reviews-count">{{ reviews.length }} {{ reviews.length === 1 ? 'review' : 'reviews' }}</span>
+            </div>
+          </div>
+          @if (!isLocked && !isOwnRecipe()) {
+          <div class="review-rating-picker d-flex align-items-center flex-wrap gap-2 mb-3">
+            <span class="review-rating-label">Your rating</span>
+            <div class="rating-stars d-flex gap-2">
+              @for (i of [1,2,3,4,5]; track $index) {
+              <button type="button" class="rating-star-btn p-0 border-0 bg-transparent"
+                (mouseenter)="setHoverRating(i)" (mouseleave)="setHoverRating(0)" (click)="setRating(i)">
+                <svg viewBox="0 0 24 24" width="26" height="26"
+                  [attr.fill]="i <= (hoverRating || userRating) ? '#FD8923' : '#E5E7EB'" class="interactive-star">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+              </button>
+              }
+            </div>
+          </div>
+          <div class="review-compose d-flex flex-column flex-md-row align-items-stretch gap-3 mb-2">
+            <div class="review-input-group d-flex gap-2 flex-grow-1 mb-0">
+              <input type="text" class="form-control form-control-lg border bg-light rounded-3 flex-grow-1"
+                placeholder="Share your thoughts about this recipe..." [(ngModel)]="reviewComment" (keyup.enter)="submitReview()">
+            </div>
+            <button class="btn btn-submit-custom review-submit-btn px-4 rounded-3 fw-bold d-inline-flex align-items-center justify-content-center gap-2"
+              (click)="submitReview()">
+              <lucide-icon name="send" [size]="18"></lucide-icon>
+              Submit
+            </button>
+          </div>
+          } @else if (isOwnRecipe()) {
+          <div class="review-locked-banner">
+            <div class="locked-banner-icon">
+              <lucide-icon name="chef-hat" [size]="18"></lucide-icon>
+            </div>
+            <div class="locked-banner-text">
+              <span class="locked-banner-title">This is your recipe</span>
+              <span class="locked-banner-sub">You can't leave a review on your own content.</span>
+            </div>
+          </div>
+          } @else {
+          <div class="review-locked-banner">
+            <div class="locked-banner-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <div class="locked-banner-text">
+              <span class="locked-banner-title">Buy this recipe to leave a review</span>
+              <span class="locked-banner-sub">Purchase the recipe to unlock the review form</span>
+            </div>
+          </div>
+          }
+
+          @if (submitError) {
+          <p class="text-danger mb-2">{{ submitError }}</p>
+          }
+
+          @if (reviews.length > 1) {
+          <div class="reviews-toolbar d-flex justify-content-end align-items-center gap-2 mb-3">
+            <label class="reviews-sort-label" for="reviews-sort">Sort by</label>
+            <select id="reviews-sort" class="reviews-sort-select" [value]="reviewSort"
+              (change)="setReviewSort($any($event.target).value)">
+              <option value="latest">Latest reviews</option>
+              <option value="highest">Highest rated</option>
+              <option value="lowest">Lowest rated</option>
+            </select>
+          </div>
+          }
+
+          @if (reviews.length === 0) {
+          <div class="reviews-empty-state pt-4 text-center mt-3">
+            <div class="empty-icon-wrapper mx-auto mb-3">
+              <lucide-icon name="chef-hat" [size]="26"></lucide-icon>
+            </div>
+            <p class="empty-text h5 mb-1">There are no reviews yet</p>
+            <p class="empty-subtext mb-0 text-muted">Be the first to review this recipe!</p>
+          </div>
+          } @else {
+          <div class="reviews-list pt-3 d-flex flex-column gap-3">
+            @for (review of paginatedReviews; track review.id_valoracion) {
+            <div class="review-card p-3 rounded-3">
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <div class="review-avatar d-flex align-items-center justify-content-center fw-bold flex-shrink-0">
+                  @if (getReviewAvatarUrl(review); as reviewAvatarUrl) {
+                  <img [src]="reviewAvatarUrl" [alt]="review.autor_nombre + ' profile photo'"
+                    (error)="$any($event.target).style.display='none'">
+                  } @else {
+                  {{ getInitials(review.autor_nombre) }}
+                  }
+                </div>
+                <div class="flex-grow-1 min-w-0">
+                  <span class="review-author-name d-block">{{ review.autor_nombre }}</span>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex gap-1">
+                      @for (i of [1,2,3,4,5]; track $index) {
+                      <svg viewBox="0 0 24 24" width="14" height="14"
+                        [attr.fill]="i <= review.puntuacion ? '#FD8923' : '#E5E7EB'">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                      }
+                    </div>
+                    <span class="review-date">{{ formatDate(review.fecha) }}</span>
+                  </div>
+                </div>
+                @if (isOwnReview(review)) {
+                <div class="d-flex gap-2 flex-shrink-0">
+                  <button class="btn-review-action edit" (click)="startEdit(review)" title="Edit">
+                    <lucide-icon name="pencil" [size]="15"></lucide-icon>
+                  </button>
+                  <button class="btn-review-action delete" (click)="deleteReview(review)" title="Delete">
+                    <lucide-icon name="trash-2" [size]="15"></lucide-icon>
+                  </button>
+                </div>
+                }
+              </div>
+              @if (editingReviewId === review.id_valoracion) {
+              <div class="review-edit-panel d-flex flex-column gap-2 mt-2">
+                <div class="review-edit-rating d-flex align-items-center gap-2 flex-wrap">
+                  <span class="review-rating-label">Your rating</span>
+                  <div class="rating-stars d-flex gap-2">
+                    @for (i of [1,2,3,4,5]; track $index) {
+                    <button type="button" class="rating-star-btn p-0 border-0 bg-transparent"
+                      (mouseenter)="setEditHoverRating(i)" (mouseleave)="setEditHoverRating(0)" (click)="setEditRating(i)">
+                      <svg viewBox="0 0 24 24" width="24" height="24"
+                        [attr.fill]="i <= (editingHoverRating || editingRating) ? '#FD8923' : '#E5E7EB'" class="interactive-star">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      </svg>
+                    </button>
+                    }
+                  </div>
+                </div>
+                <div class="d-flex gap-2">
+                  <input type="text" class="form-control form-control-sm border bg-light rounded-3 flex-grow-1"
+                    [(ngModel)]="editingComment" (keyup.enter)="saveEdit(review)">
+                  <button type="button" class="btn-review-action edit" (click)="saveEdit(review)" title="Save">
+                    <lucide-icon name="check" [size]="15"></lucide-icon>
+                  </button>
+                  <button type="button" class="btn-review-action delete" (click)="cancelEdit()" title="Cancel">
+                    <lucide-icon name="x" [size]="15"></lucide-icon>
+                  </button>
+                </div>
+              </div>
+              } @else {
+              <p class="review-comment mb-0">{{ review.comentario }}</p>
+              }
+            </div>
+            }
+          </div>
+          }
+
+          @if (hasReviewPagination()) {
+          <div class="reviews-pagination d-flex flex-wrap justify-content-center align-items-center gap-2">
+            <button type="button" class="reviews-page-btn" [disabled]="currentReviewPage === 1"
+              (click)="goToReviewPage(currentReviewPage - 1)">
+              Prev
+            </button>
+
+            @for (page of reviewPageNumbers(); track page) {
+            <button type="button" class="reviews-page-btn" [class.active]="page === currentReviewPage"
+              (click)="goToReviewPage(page)">
+              {{ page }}
+            </button>
+            }
+
+            <button type="button" class="reviews-page-btn" [disabled]="currentReviewPage === totalReviewPages"
+              (click)="goToReviewPage(currentReviewPage + 1)">
+              Next
+            </button>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    } <!-- end @else if (recipe) -->
+  </div>
+</div>

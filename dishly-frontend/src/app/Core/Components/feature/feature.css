@@ -11,7 +11,7 @@
 .recipes-title {
     font-size: 40px;
     margin: 0 0 12px 0;
-    color: var(--PrimaryText);
+    color: var(--neutral-black);
     font-family: var(--font-display);
     font-weight: var(--font-display-extrabold);
 }
@@ -39,23 +39,23 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: var(--highlight, #f97316);
-    color: #ffffff;
+    background: var(--highlight);
+    color: var(--neutral-white);
     text-align: center;
     padding: 14px 36px;
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     font-size: 16px;
     font-weight: 700;
     text-decoration: none;
     transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+    box-shadow: 0 4px 12px var(--color-shadow);
 }
 
 .btn-view-all:hover {
-    background: #ea580c;
-    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.35);
+    background: var(--highlight-hover);
+    box-shadow: 0 6px 16px var(--color-shadow);
     transform: translateY(-2px);
 }
 

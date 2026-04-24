@@ -4,6 +4,7 @@ import {
   Component,
   inject,
   signal,
+  computed,
   ViewChild,
   ElementRef
 } from '@angular/core';
@@ -12,6 +13,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AuthServices } from '../../Core/Services/Auth/auth-services';
 import { LucideAngularModule } from 'lucide-angular';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { ConfirmDeleteModal } from '../../Core/Components/modals/confirm-delete-modal/confirm-delete-modal';
+import { Breadcrumbs } from '../../Core/Components/breadcrumbs/breadcrumbs';
 
 type User = {
   nombre?: string;
@@ -25,7 +28,7 @@ type User = {
 
 @Component({
   selector: 'app-edit-profile',
-  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, ConfirmDeleteModal, Breadcrumbs],
   templateUrl: './edit-profile.html',
   styleUrl: './edit-profile.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -46,6 +49,7 @@ export class EditProfile {
   protected readonly passwordError = signal('');
   protected readonly passwordSuccess = signal('');
   protected readonly deleteError = signal('');
+  protected readonly showDeleteModal = signal(false);
   protected readonly isSavingPersonal = signal(false);
   protected readonly isSavingPassword = signal(false);
   protected readonly isDeleting = signal(false);
@@ -186,14 +190,28 @@ export class EditProfile {
     this.passwordForm.markAsUntouched();
   }
 
-  protected deleteAccount(): void {
+  protected readonly deleteContext = computed(() => ({
+    error: () => this.deleteError(),
+    isProcessing: () => this.isDeleting(),
+    onClose: () => this.closeDeleteModal(),
+    onConfirm: () => this.confirmDeleteAccount(),
+  }));
+
+  protected openDeleteModal(): void {
     this.deleteError.set('');
-    const confirmed = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
-    if (!confirmed) return;
+    this.showDeleteModal.set(true);
+  }
+
+  protected closeDeleteModal(): void {
+    this.showDeleteModal.set(false);
+  }
+
+  protected confirmDeleteAccount(): void {
     this.isDeleting.set(true);
     this.authService.deactivateAccount().subscribe({
       next: () => {
         this.isDeleting.set(false);
+        this.showDeleteModal.set(false);
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -202,6 +220,10 @@ export class EditProfile {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  protected deleteAccount(): void {
+    this.openDeleteModal();
   }
 
   protected toggleCurrentPasswordVisibility(): void {

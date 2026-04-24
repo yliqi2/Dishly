@@ -1,6 +1,6 @@
 .footer {
-	background: #1a1a1a;
-	color: #e0e0e0;
+	background: var(--neutral-black);
+	color: var(--neutral-white);
 	padding: 60px 0 32px;
 	margin-top: 80px;
 }
@@ -33,11 +33,11 @@
 .brand-icon-box {
 	width: 48px;
 	height: 48px;
-	border-radius: 12px;
+	border-radius: var(--border-radius);
 	background: var(--highlight);
 	display: grid;
 	place-items: center;
-	color: white;
+	color: var(--neutral-white);
 }
 
 .brand-icon {
@@ -60,16 +60,52 @@
 }
 
 .brand-subtitle {
-	color: #b0b0b0;
+	color: var(--neutral-white);
 	font-size: 16px;
 	margin-top: 4px;
 }
 
 .footer__description {
-	color: #b0b0b0;
+	color: var(--neutral-white);
 	line-height: 1.6;
 	margin: 0;
 	font-size: 16px;
+}
+
+.footer__section {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.footer__section h3 {
+	margin: 0 0 8px;
+	color: var(--neutral-white);
+	font-size: 17px;
+	font-weight: 700;
+}
+
+.footer__section a {
+	color: var(--neutral-white);
+	text-decoration: none;
+	font-size: 15px;
+	transition: color 0.2s ease, background 0.2s ease, transform 0.1s ease;
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 8px;
+	border-radius: var(--border-radius);
+}
+
+.footer__section a:hover {
+	color: var(--highlight);
+	background: #ffffff12;
+	transform: translateY(-1px);
+}
+
+.footer__section a:focus-visible {
+	outline: 3px solid var(--highlight);
+	outline-offset: 2px;
+	border-radius: var(--border-radius);
 }
 
 
@@ -79,11 +115,11 @@
 	align-items: center;
 	padding-top: 32px;
 	margin: 0;
-	border-top: 1px solid #333;
+	border-top: 1px solid var(--color-gray-medium);
 }
 
 .footer__copyright {
-	color: #888;
+	color: var(--neutral-white);
 	font-size: 16px;
 	margin: 0;
 }
@@ -95,7 +131,7 @@
 }
 
 .footer__social-link {
-	color: #b0b0b0;
+	color: var(--neutral-white);
 	transition: color 0.2s;
 	display: flex;
 	align-items: center;
@@ -120,7 +156,7 @@
 		grid-template-columns: 1fr 1fr;
 		gap: 32px;
 		margin: 0 0 32px 0;
-		justify-items: center;
+		justify-items: stretch;
 	}
 
 	.footer__brand {
@@ -153,7 +189,7 @@
 		grid-template-columns: 1fr;
 		gap: 28px;
 		margin-bottom: 28px;
-		justify-items: center;
+		justify-items: stretch;
 	}
 
 	.brand-icon-box {

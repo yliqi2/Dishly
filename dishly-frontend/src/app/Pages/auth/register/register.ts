@@ -86,7 +86,7 @@ export class Register {
     if (!errors) return '';
 
     if (errors['required']) return 'This field is required';
-    if (errors['requiredTrue']) return 'You must accept the terms and privacy policy';
+    if (errors['requiredTrue']) return 'You must accept the terms and cookie policy';
     if (errors['minlength']) return `Minimum ${errors['minlength'].requiredLength} characters`;
     if (errors['maxlength']) return `Maximum ${errors['maxlength'].requiredLength} characters`;
     if (errors['email']) return 'Invalid email format';

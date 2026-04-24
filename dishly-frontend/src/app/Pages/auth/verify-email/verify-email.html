@@ -1,28 +1,6 @@
-<div class="ve-container">
-  <div class="ve-card">
-    <div class="ve-chef" aria-hidden="true">
-      <div class="chef-hat">
-        <div class="hat-top"></div>
-        <div class="hat-brim"></div>
-      </div>
-      <div class="chef-face">
-        <div class="chef-eyes">
-          <span class="eye"></span>
-          <span class="eye"></span>
-        </div>
-        <div class="chef-mouth"></div>
-      </div>
-      <div class="chef-body">
-        <div class="chef-buttons">
-          <span></span><span></span><span></span>
-        </div>
-      </div>
-      <div class="steam">
-        <span class="swirl s1">~</span>
-        <span class="swirl s2">~</span>
-        <span class="swirl s3">~</span>
-      </div>
-
+<section class="ve-container" aria-live="polite">
+  <article class="ve-card">
+    <app-chef-animation class="ve-chef" aria-hidden="true">
       <div class="ve-status-badge" [class.ve-status-badge--error]="isError()">
         @if (isLoading()) {
           <span class="spinner"></span>
@@ -32,7 +10,7 @@
           <i class="bi bi-check-lg" aria-hidden="true"></i>
         }
       </div>
-    </div>
+    </app-chef-animation>
 
     @if (isLoading()) {
       <h1 class="ve-title">Verifying your email...</h1>
@@ -63,5 +41,5 @@
         Go to login
       </a>
     }
-  </div>
-</div>
+  </article>
+</section>

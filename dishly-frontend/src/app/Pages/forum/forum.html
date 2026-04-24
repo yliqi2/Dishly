@@ -1,13 +1,14 @@
-<section class="page-header page-container">
+<section class="page-header page-container mb-4">
   <div class="page-header__inner">
     <h1 class="page-title">Community Forum</h1>
     <div class="page-underline" aria-hidden="true"></div>
+    <app-breadcrumbs></app-breadcrumbs>
   </div>
 </section>
 
 <section class="page-container forum-page">
   <aside class="forum-sidebar">
-    <div class="forum-panel forum-panel--accent">
+    <section class="forum-panel forum-panel--accent">
       <div class="forum-panel__hero">
         <p class="forum-eyebrow">Open conversations</p>
         <h2>Share ideas, ask questions and help other cooks.</h2>
@@ -25,7 +26,7 @@
               }
             </span>
             <span class="forum-user-chip__meta">
-              <strong>{{ currentUserName() }}</strong>
+              <strong class="notranslate" translate="no">{{ currentUserName() }}</strong>
               <span>Ready to start a discussion</span>
             </span>
           </div>
@@ -60,13 +61,18 @@
             <p class="forum-message forum-message--error">{{ createForumError }}</p>
           }
 
-          <button class="btn-primary btn-sm forum-create__button" type="submit" [disabled]="creatingForum">
-            @if (creatingForum) {
-              <span class="btn-loading-icon" aria-hidden="true"></span>
-            } @else {
-              <span>Create forum</span>
-            }
-          </button>
+          <div class="forum-create__actions">
+            <button class="btn-primary btn-sm forum-create__button" type="submit" [disabled]="creatingForum">
+              @if (creatingForum) {
+                <span class="btn-loading-icon" aria-hidden="true"></span>
+              } @else {
+                <span>Create forum</span>
+              }
+            </button>
+            <button class="btn-secondary btn-sm forum-create__button" type="button" (click)="closeCreateForm()">
+              Close form
+            </button>
+          </div>
         </form>
       } @else {
         <div class="forum-guest-card">
@@ -74,47 +80,52 @@
           <a class="btn-primary btn-sm" routerLink="/login">Log in</a>
         </div>
       }
-    </div>
+    </section>
 
-    <div class="forum-panel forum-list-panel">
-      <div class="forum-list-panel__header">
-        <h2>All forums</h2>
-        <span>{{ forums.length }}</span>
-      </div>
-
-      @if (loadingForums) {
-        <p class="forum-empty">Loading discussions...</p>
-      } @else if (sidebarError) {
-        <p class="forum-message forum-message--error">{{ sidebarError }}</p>
-      } @else if (forums.length === 0) {
-        <p class="forum-empty">No forums yet. Be the first to start one.</p>
-      } @else {
-        <div class="forum-list">
-          @for (forum of forums; track forum.id_foro) {
-            <button
-              class="forum-list__item"
-              type="button"
-              [class.forum-list__item--active]="isSelected(forum.id_foro)"
-              (click)="selectForum(forum.id_foro)"
-            >
-              <div class="forum-list__topline">
-                <strong>{{ forum.titulo }}</strong>
-                <span>{{ forum.comments_count ?? 0 }} comments</span>
-              </div>
-              <p>{{ forum.descripcion }}</p>
-              <div class="forum-list__meta">
-                <span>By {{ forum.owner.nombre || 'Dishly user' }}</span>
-                <span>{{ formatDate(forum.last_activity_at ?? forum.created_at ?? forum.fecha_creacion) }}</span>
-              </div>
-            </button>
-          }
-        </div>
-      }
-    </div>
   </aside>
 
-  <div class="forum-content">
-    @if (loadingForum && !selectedForum) {
+  <main class="forum-content" role="main">
+    @if (loadingForums && !selectedForum) {
+      <div class="forum-panel forum-state-panel">
+        <p class="forum-empty">Loading discussions...</p>
+      </div>
+    } @else if (sidebarError && forums.length === 0 && !selectedForum) {
+      <div class="forum-panel forum-state-panel">
+        <p class="forum-message forum-message--error">{{ sidebarError }}</p>
+      </div>
+    } @else if (!selectedForum) {
+      <section class="forum-panel forum-list-panel forum-list-panel--main">
+        <div class="forum-list-panel__header">
+          <h2>All forums</h2>
+          <span>{{ forums.length }}</span>
+        </div>
+
+        @if (forums.length === 0) {
+          <p class="forum-empty">No forums yet. Be the first to start one.</p>
+        } @else {
+          <div class="forum-list">
+            @for (forum of forums; track forum.id_foro) {
+              <button
+                class="forum-list__item"
+                type="button"
+                [class.forum-list__item--active]="isSelected(forum.id_foro)"
+                (click)="selectForum(forum.id_foro)"
+              >
+                <div class="forum-list__topline">
+                  <strong>{{ forum.titulo }}</strong>
+                  <span>{{ forum.comments_count ?? 0 }} comments</span>
+                </div>
+                <p>{{ forum.descripcion }}</p>
+                <div class="forum-list__meta">
+                  <span>By <span class="notranslate" translate="no">{{ forum.owner.nombre || 'Dishly user' }}</span></span>
+                  <span>{{ formatDate(forum.last_activity_at ?? forum.created_at ?? forum.fecha_creacion) }}</span>
+                </div>
+              </button>
+            }
+          </div>
+        }
+      </section>
+    } @else if (loadingForum) {
       <div class="forum-panel forum-state-panel">
         <p class="forum-empty">Loading discussion...</p>
       </div>
@@ -122,38 +133,79 @@
       <div class="forum-panel forum-state-panel">
         <p class="forum-message forum-message--error">{{ detailError }}</p>
       </div>
-    } @else if (!selectedForum) {
-      <div class="forum-panel forum-state-panel">
-        <p class="forum-empty">Select a discussion from the list to read the conversation.</p>
-      </div>
     } @else {
       <article class="forum-panel forum-detail">
         <header class="forum-detail__header">
-          <div class="forum-owner">
-            @if (getOwnerAvatar(selectedForum.owner); as ownerAvatar) {
-              <img [src]="ownerAvatar" [alt]="selectedForum.owner.nombre" class="forum-owner__avatar" />
-            } @else {
-              <div class="forum-owner__fallback">{{ ownerInitial(selectedForum.owner.nombre) }}</div>
-            }
-
-            <div>
-              <p class="forum-eyebrow">Started by {{ selectedForum.owner.nombre || 'Dishly user' }}</p>
+          <div class="forum-owner-row">
+            <div class="forum-owner">
+              <div>
               <h2>{{ selectedForum.titulo }}</h2>
               <p class="forum-detail__meta">
                 {{ formatDate(selectedForum.created_at ?? selectedForum.fecha_creacion) }}
-                <span class="forum-detail__separator">·</span>
-                {{ selectedForum.comments.length }} comments
               </p>
+              @if (!editingForum) {
+                <p class="forum-detail__description">{{ selectedForum.descripcion }}</p>
+              }
+              </div>
             </div>
+            @if (isAuthenticated() && selectedForum.is_owner && !editingForum) {
+              <div class="forum-detail__actions">
+                <button class="btn-secondary btn-sm" type="button" (click)="startEditingForum()">Edit post</button>
+                <button
+                  class="btn-danger btn-sm"
+                  type="button"
+                  [disabled]="deletingForum"
+                  (click)="deleteForum()"
+                >
+                  Delete post
+                </button>
+              </div>
+            }
           </div>
 
-          <p class="forum-detail__description">{{ selectedForum.descripcion }}</p>
+          @if (editingForum) {
+            <div class="forum-editor">
+              <label class="forum-field">
+                <span>Title</span>
+                <input
+                  type="text"
+                  name="editingForumTitle"
+                  [(ngModel)]="editingForumTitle"
+                  maxlength="160"
+                />
+              </label>
+
+              <label class="forum-field">
+                <span>Description</span>
+                <textarea
+                  name="editingForumDescription"
+                  [(ngModel)]="editingForumDescription"
+                  rows="4"
+                  maxlength="4000"
+                ></textarea>
+              </label>
+
+              <div class="forum-editor__actions">
+                <button class="btn-primary btn-sm" type="button" [disabled]="updatingForum" (click)="saveForumChanges()">
+                  Save post
+                </button>
+                <button class="btn-secondary btn-sm" type="button" (click)="cancelEditingForum()">Cancel</button>
+              </div>
+            </div>
+          }
+
+          @if (forumActionError) {
+            <p class="forum-message forum-message--error">{{ forumActionError }}</p>
+          }
+
         </header>
 
-        <section class="forum-comments">
+        <section #forumConversationPanel class="forum-comments forum-comments--surface">
           <div class="forum-comments__header">
             <h3>Conversation</h3>
-            <span>{{ selectedForum.comments.length }} messages</span>
+            @if (selectedForum.comments.length > 0) {
+              <span>{{ selectedForum.comments.length }} messages</span>
+            }
           </div>
 
           @if (selectedForum.comments.length === 0) {
@@ -173,19 +225,19 @@
                   <div class="comment-card__body">
                     <div class="comment-card__header">
                       <div>
-                        <strong>{{ comment.autor_nombre }}</strong>
+                        <strong class="notranslate" translate="no">{{ comment.autor_nombre }}</strong>
                         <p>{{ formatDate(comment.created_at ?? comment.fecha) }}</p>
                       </div>
 
                       @if (comment.can_edit || comment.can_delete) {
                         <div class="comment-card__actions">
                           @if (comment.can_edit) {
-                            <button class="comment-action" type="button" (click)="startEditing(comment)">Edit</button>
+                            <button class="btn-secondary btn-sm" type="button" (click)="startEditing(comment)">Edit</button>
                           }
 
                           @if (comment.can_delete) {
                             <button
-                              class="comment-action comment-action--danger"
+                              class="btn-danger btn-sm"
                               type="button"
                               [disabled]="deletingCommentId === comment.id_linea_foro"
                               (click)="deleteComment(comment)"
@@ -215,7 +267,7 @@
                           >
                             Save
                           </button>
-                          <button class="comment-action" type="button" (click)="cancelEditing()">Cancel</button>
+                          <button class="btn-secondary btn-sm" type="button" (click)="cancelEditing()">Cancel</button>
                         </div>
                       </div>
                     } @else {
@@ -225,10 +277,20 @@
                 </article>
               }
             </div>
+
+            @if (hasMoreComments) {
+              <button class="btn-secondary btn-sm forum-comments__load-more" type="button" [disabled]="loadingMoreComments" (click)="loadMoreComments()">
+                @if (loadingMoreComments) {
+                  <span class="btn-loading-icon" aria-hidden="true"></span>
+                } @else {
+                  <span>Load more comments</span>
+                }
+              </button>
+            }
           }
         </section>
 
-        <section class="forum-panel forum-panel--subtle forum-comment-form">
+        <section #forumCommentPanel class="forum-panel forum-panel--subtle forum-comment-form">
           <div class="forum-comments__header">
             <h3>Leave a comment</h3>
             @if (!isAuthenticated()) {
@@ -243,20 +305,6 @@
             </p>
           } @else {
             <label class="forum-field">
-              <span>Your message</span>
-              <div class="forum-comment-form__identity">
-                <span class="forum-user-chip__avatar forum-user-chip__avatar--small" aria-hidden="true">
-                  @if (currentUserIconUrl(); as commentUserAvatar) {
-                    <img [src]="commentUserAvatar" [alt]="currentUserName()" />
-                  } @else {
-                    <span>{{ ownerInitial(currentUserName()) }}</span>
-                  }
-                </span>
-                <div>
-                  <strong>{{ currentUserName() }}</strong>
-                  <span>Your profile photo will appear with the comment</span>
-                </div>
-              </div>
               <textarea
                 name="newComment"
                 [(ngModel)]="newComment"
@@ -281,5 +329,50 @@
         </section>
       </article>
     }
-  </div>
+  </main>
 </section>
+
+@if (deleteModalOpen) {
+  <div
+    class="delete-modal-backdrop"
+    (click)="cancelDeleteModal()"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="delete-modal-title"
+    (keydown.escape)="cancelDeleteModal()"
+  >
+    <div class="delete-modal-shell" tabindex="-1">
+      <div class="delete-modal-content animate-pop" (click)="$event.stopPropagation()">
+        <div class="delete-modal-header">
+          <h3 class="delete-modal-title" id="delete-modal-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19 6l-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Delete comment
+          </h3>
+        </div>
+
+        <div class="delete-modal-body">
+          <p>Are you sure you want to delete this comment? This action cannot be undone.</p>
+        </div>
+
+        <div class="delete-modal__actions">
+          <button class="btn-secondary" type="button" (click)="cancelDeleteModal()">Cancel</button>
+          <button class="btn-danger" type="button" (click)="confirmDelete()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (deletePostModalOpen) {
+  <app-delete-post-modal
+    [isProcessing]="deletingForum"
+    (onCancel)="cancelDeletePostModal()"
+    (onConfirm)="confirmDeleteForum()"
+  ></app-delete-post-modal>
+}

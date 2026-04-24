@@ -4,7 +4,14 @@
   <meta charset="utf-8">
   <title>Dishly - Recipes & Tutorials</title>
   <base href="/">
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Dishly is a recipe marketplace and community: discover premium recipes, search by category and difficulty, upload your own, shop with a secure cart, and get ideas with Dishly AI.">
+  <meta name="keywords" content="dishly, recipes, cooking, premium recipes, meal ideas, food marketplace, recipe search, upload recipe, dishly ai">
+  <meta name="author" content="Dishly Team">
+  <meta name="robots" content="index,follow">
+  <meta name="application-name" content="Dishly">
+
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" media="print" onload="this.media='all'">
@@ -17,6 +24,22 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
+  <div id="google_translate_element" aria-hidden="true"></div>
   <app-root></app-root>
+  <script>
+    function googleTranslateElementInit() {
+      if (!window.google || !window.google.translate) return;
+
+      new window.google.translate.TranslateElement(
+        {
+          pageLanguage: 'en',
+          includedLanguages: 'en,es,ca',
+          autoDisplay: false
+        },
+        'google_translate_element'
+      );
+    }
+  </script>
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

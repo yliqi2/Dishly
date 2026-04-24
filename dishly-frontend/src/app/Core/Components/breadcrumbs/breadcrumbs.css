@@ -1,0 +1,44 @@
+:host {
+	display: block;
+}
+
+.breadcrumbs {
+	margin-top: 10px;
+}
+
+.breadcrumbs__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+}
+
+.breadcrumbs__item {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 1rem;
+	line-height: 1.4;
+}
+
+.breadcrumbs__link,
+.breadcrumbs__current {
+	color: var(--neutral-black);
+	text-decoration: none;
+}
+
+.breadcrumbs__link:hover {
+	color: var(--highlight);
+	text-decoration: underline;
+}
+
+.breadcrumbs__current {
+	font-weight: 700;
+}
+
+.breadcrumbs__sep {
+	color: var(--color-gray-medium);
+}

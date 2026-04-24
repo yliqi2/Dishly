@@ -3,6 +3,7 @@ export interface PurchasedItemSummary {
   titulo: string;
   precio_unitario: number;
   imagen_1: string | null;
+  updated_at?: string | null;
 }
 
 export interface PayCartResponse {

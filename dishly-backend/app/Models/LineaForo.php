@@ -11,14 +11,14 @@ class LineaForo extends Model
 
     protected $primaryKey = 'id_linea_foro';
 
+    public $timestamps = true;
+
     protected $fillable = [
         'mensaje',
         'fecha',
         'id_foro',
         'id_usuario',
     ];
-
-    public $timestamps = true;
 
     public function foro(): BelongsTo
     {

@@ -6,14 +6,13 @@ use App\Mail\SendEmail;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Throwable;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -86,28 +85,28 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!$token = Auth::guard('api')->attempt($credentials)) {
+        if (! $token = Auth::guard('api')->attempt($credentials)) {
             return response()->json([
-                'message' => 'Your email or password is incorrect. Please try again.'
+                'message' => 'Your email or password is incorrect. Please try again.',
             ], 401);
         }
 
         /** @var User $user */
         $user = Auth::guard('api')->user();
 
-        if (!$user->is_active) {
+        if (! $user->is_active) {
             Auth::guard('api')->logout();
 
             return response()->json([
-                'message' => 'Your email or password is incorrect. Please try again.'
+                'message' => 'Your email or password is incorrect. Please try again.',
             ], 401);
         }
 
-        if (!($user->usuario_verificado ?? false)) {
+        if (! ($user->usuario_verificado ?? false)) {
             Auth::guard('api')->logout();
 
             return response()->json([
-                'message' => 'Please verify your email before logging in.'
+                'message' => 'Please verify your email before logging in.',
             ], 403);
         }
 
@@ -123,7 +122,7 @@ class AuthController extends Controller
         Auth::guard('api')->logout();
 
         return response()->json([
-            'message' => 'Logged out successfully'
+            'message' => 'Logged out successfully',
         ]);
     }
 
@@ -140,7 +139,7 @@ class AuthController extends Controller
         $email = (string) $request->query('email', $request->input('email', ''));
         $code = (string) $request->query('code', $request->input('code', ''));
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($code) !== 6) {
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($code) !== 6) {
             return response()->json([
                 'message' => 'This verification link is invalid or has expired.',
                 'status' => 'invalid',
@@ -152,7 +151,7 @@ class AuthController extends Controller
             ->where('is_active', true)
             ->first();
 
-        if (!$user || $user->recovery_code !== $code) {
+        if (! $user || $user->recovery_code !== $code) {
             return response()->json([
                 'message' => 'This verification link is invalid or has expired.',
                 'status' => 'invalid',
@@ -182,7 +181,7 @@ class AuthController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id_usuario,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id_usuario,
             'password' => 'nullable|string|min:8',
         ]);
 
@@ -199,10 +198,9 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Profile updated successfully',
-            'user' => $user
+            'user' => $user,
         ]);
     }
-
 
     public function uploadIcon(Request $request)
     {
@@ -211,30 +209,35 @@ class AuthController extends Controller
             $user = $request->user();
 
             $request->validate([
-                'icon' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+                'icon' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:20480',
             ], [
                 'icon.required' => 'Icon image is required.',
                 'icon.image' => 'File must be an image.',
                 'icon.mimes' => 'Icon must be jpeg, png, jpg, gif, or webp.',
-                'icon.max' => 'Icon must be less than 10MB.',
+                'icon.max' => 'Icon must be less than 20MB.',
             ]);
 
             $file = $request->file('icon');
-            $ext = $file->getClientOriginalExtension();
-            $filename = $user->id_usuario . '.' . $ext;
+            $filename = $user->id_usuario.'.webp';
             $publicPath = public_path('users/icons');
+            $targetPath = $publicPath.DIRECTORY_SEPARATOR.$filename;
 
-            if (!file_exists($publicPath)) {
+            if (! file_exists($publicPath)) {
                 mkdir($publicPath, 0755, true);
             }
 
             $oldPath = $user->icon_path ? public_path(ltrim($user->icon_path, '/')) : null;
-            if ($oldPath && file_exists($oldPath)) {
+            if ($oldPath && $oldPath !== $targetPath && file_exists($oldPath)) {
                 unlink($oldPath);
             }
 
-            $file->move($publicPath, $filename);
-            $user->icon_path = 'users/icons/' . $filename;
+            $sourcePath = (string) $file->getRealPath();
+            if ($sourcePath === '' || ! file_exists($sourcePath)) {
+                throw new \RuntimeException('Could not read uploaded icon file.');
+            }
+            $this->saveImageAsWebp($sourcePath, $targetPath);
+            $user->icon_path = 'users/icons/'.$filename;
+            $user->updated_at = now();
             $user->save();
 
             return response()->json([
@@ -253,17 +256,37 @@ class AuthController extends Controller
 
     private function frontendVerificationUrl(string $email, string $code): string
     {
-        $frontendUrl = rtrim((string) config('app.frontend_url', 'https://servomechanically-nonaffecting-stephanie.ngrok-free.dev'), '/');
+        $frontendUrl = rtrim((string) config('app.frontend_url', 'https://https://stanchly-dulotic-sherri.ngrok-free.dev'), '/');
 
         return $frontendUrl
-            . '/verifyEmail?email=' . urlencode($email)
-            . '&code=' . urlencode($code);
+            .'/verifyEmail?email='.urlencode($email)
+            .'&code='.urlencode($code);
     }
 
     private function verificationRedirectUrl(string $status): string
     {
-        $frontendUrl = rtrim((string) config('app.frontend_url', 'https://servomechanically-nonaffecting-stephanie.ngrok-free.dev'), '/');
+        $frontendUrl = rtrim((string) config('app.frontend_url', 'https://https://stanchly-dulotic-sherri.ngrok-free.dev'), '/');
 
-        return $frontendUrl . '/login?verification=' . urlencode($status);
+        return $frontendUrl.'/login?verification='.urlencode($status);
+    }
+
+    private function saveImageAsWebp(string $sourcePath, string $targetPath): void
+    {
+        $detectedMime = mime_content_type($sourcePath) ?: 'unknown';
+
+        if ($detectedMime === 'image/webp') {
+            if (! @copy($sourcePath, $targetPath)) {
+                throw new \RuntimeException('Could not persist uploaded webp file.');
+            }
+
+            return;
+        }
+
+        /** @var class-string $webpConverterClass */
+        $webpConverterClass = 'WebPConvert\\WebPConvert';
+        $webpConverterClass::convert($sourcePath, $targetPath, [
+            'quality' => 90,
+            'fail' => 'throw',
+        ]);
     }
 }

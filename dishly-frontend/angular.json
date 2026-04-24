@@ -49,7 +49,13 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
@@ -65,7 +71,7 @@
             "allowedHosts": [
               "localhost",
               ".ngrok-free.dev",
-              "servomechanically-nonaffecting-stephanie.ngrok-free.dev"
+              "stanchly-dulotic-sherri.ngrok-free.dev"
             ]
           },
           "configurations": {

@@ -2,6 +2,7 @@
   <div class="page-header__inner">
     <h1 class="page-title">Edit Recipe</h1>
     <div class="page-underline" aria-hidden="true"></div>
+    <app-breadcrumbs></app-breadcrumbs>
   </div>
 </section>
 
@@ -37,8 +38,9 @@
             <button type="button" class="btn btn-sm btn-danger preview-remove" (click)="removePhoto(vm.coverIndex)"
               aria-label="Eliminar imagen subida">
               <i class="bi bi-trash"></i>
+              <span>Remove</span>
             </button>
-            <span class="cover-label badge rounded-pill">Cover</span>
+            <span class="cover-label">Cover</span>
           </div>
           } @else {
           <button type="button" class="btn bento-cover bento-placeholder bento-placeholder--cover"
@@ -54,13 +56,17 @@
             @for (item of vm.nonCoverItems; track item.photo.url) {
             <div class="preview-item">
               <img [src]="item.photo.url" alt="Recipe photo" class="w-100 h-100 object-fit-cover" />
-              <button type="button" class="btn btn-sm btn-danger preview-remove"
-                (click)="removePhoto(item.originalIndex)" aria-label="Eliminar imagen subida">
-                <i class="bi bi-trash"></i>
-              </button>
-              <button type="button" class="btn btn-sm cover-btn" (click)="selectCover(item.originalIndex)">
-                Set as cover
-              </button>
+              <div class="preview-actions">
+                <button type="button" class="btn btn-sm cover-btn" (click)="selectCover(item.originalIndex)">
+                  <i class="bi bi-image"></i>
+                  <span>Set as cover</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-danger preview-remove"
+                  (click)="removePhoto(item.originalIndex)" aria-label="Eliminar imagen subida">
+                  <i class="bi bi-trash"></i>
+                  <span>Remove</span>
+                </button>
+              </div>
             </div>
             }
             @for (p of vm.placeholders; track $index) {
@@ -220,7 +226,7 @@
               [attr.aria-describedby]="getError('dificultad') ? 'upload-dificultad-error' : null">
               <div class="difficulty-hats" aria-hidden="true">
                 <span class="chef-hat-badge" aria-hidden="true">
-                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon Chef" />
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.webp" alt="Icon Chef" />
                 </span>
               </div>
               <span class="difficulty-pill">Easy</span>
@@ -232,10 +238,10 @@
               [attr.aria-describedby]="getError('dificultad') ? 'upload-dificultad-error' : null">
               <div class="difficulty-hats" aria-hidden="true">
                 <span class="chef-hat-badge" aria-hidden="true">
-                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon chef x2" />
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.webp" alt="Icon chef x2" />
                 </span>
                 <span class="chef-hat-badge" aria-hidden="true">
-                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.webp" alt="" />
                 </span>
               </div>
               <span class="difficulty-pill">Medium</span>
@@ -247,13 +253,13 @@
               [attr.aria-describedby]="getError('dificultad') ? 'upload-dificultad-error' : null">
               <div class="difficulty-hats" aria-hidden="true">
                 <span class="chef-hat-badge" aria-hidden="true">
-                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="Icon chef x3" />
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.webp" alt="Icon chef x3" />
                 </span>
                 <span class="chef-hat-badge" aria-hidden="true">
-                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.webp" alt="" />
                 </span>
                 <span class="chef-hat-badge" aria-hidden="true">
-                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.svg" alt="" />
+                  <img class="chef-hat-img" src="assets/icons/DishlyIcon.webp" alt="" />
                 </span>
               </div>
               <span class="difficulty-pill">Hard</span>

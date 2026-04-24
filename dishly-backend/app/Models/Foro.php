@@ -12,6 +12,8 @@ class Foro extends Model
 
     protected $primaryKey = 'id_foro';
 
+    public $timestamps = true;
+
     protected $fillable = [
         'titulo',
         'descripcion',
@@ -19,8 +21,6 @@ class Foro extends Model
         'id_usuario',
         'id_receta',
     ];
-
-    public $timestamps = true;
 
     public function propietario(): BelongsTo
     {

@@ -5,7 +5,7 @@ import {
   importProvidersFrom
 } from '@angular/core';
 
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -26,6 +26,7 @@ import {
   Pencil,
   ShieldCheck,
   ShoppingCart,
+  ShoppingBag,
   TrendingUp,
   Upload,
   User,
@@ -37,7 +38,9 @@ import {
   ClipboardList,
   Send,
   Calendar,
+  Search,
   SearchX,
+  CircleAlert,
   Trash2,
   Check,
   X
@@ -55,7 +58,7 @@ export const appConfig: ApplicationConfig = {
       })
     ),
     provideClientHydration(withEventReplay()),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     importProvidersFrom(
       LucideAngularModule.pick({
         ChevronLeft,
@@ -70,6 +73,7 @@ export const appConfig: ApplicationConfig = {
         Pencil,
         ShieldCheck,
         ShoppingCart,
+        ShoppingBag,
         TrendingUp,
         Upload,
         User,
@@ -81,7 +85,9 @@ export const appConfig: ApplicationConfig = {
         ClipboardList,
         Send,
         Calendar,
+        Search,
         SearchX,
+        CircleAlert,
         Trash2,
         Check,
         X

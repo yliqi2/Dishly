@@ -2,6 +2,7 @@
   <div class="page-header__inner">
     <h1 class="page-title">Secure Checkout</h1>
     <div class="page-underline" aria-hidden="true"></div>
+    <app-breadcrumbs></app-breadcrumbs>
     <p class="page-subtitle">Complete your purchase safely. We only accept Visa cards.</p>
   </div>
 </section>
@@ -11,27 +12,7 @@
   <!-- ── SUCCESS STATE ─────────────────────────────── -->
   @if (paid()) {
   <div class="pm-success">
-    <div class="pm-chef" aria-hidden="true">
-      <div class="chef-hat">
-        <div class="hat-top"></div>
-        <div class="hat-brim"></div>
-      </div>
-      <div class="chef-face">
-        <div class="chef-eyes">
-          <span class="eye"></span>
-          <span class="eye"></span>
-        </div>
-        <div class="chef-mouth chef-mouth--happy"></div>
-      </div>
-      <div class="chef-body">
-        <div class="chef-buttons"><span></span><span></span><span></span></div>
-      </div>
-      <div class="steam">
-        <span class="swirl s1">~</span>
-        <span class="swirl s2">~</span>
-        <span class="swirl s3">~</span>
-      </div>
-    </div>
+    <app-chef-animation class="pm-chef" [happy]="true" aria-hidden="true"></app-chef-animation>
     <h2 class="pm-success__title">Payment Confirmed!</h2>
     <p class="pm-success__subtitle">Your recipes are ready. The chef has got you covered!</p>
     <div class="pm-success__badge">

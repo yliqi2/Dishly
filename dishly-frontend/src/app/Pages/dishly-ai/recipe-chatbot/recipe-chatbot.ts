@@ -4,18 +4,22 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
+import { LucideAngularModule } from 'lucide-angular';
 import { RecipeChatbotService } from '../../../Services/recipe-chatbot.service';
 import { AuthServices } from '../../../Core/Services/Auth/auth-services';
-import { ChatMessage, RecetaData } from '../../../Models/recipe-chatbot.model';
+import { SpoonacularRecipe, SpoonacularService } from '../../../Core/Services/Spoonacular/spoonacular.service';
+import { ChatMessage, InternetSearchResult, RecetaData } from '../../../Models/recipe-chatbot.model';
 
 @Component({
   selector: 'app-recipe-chatbot',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule],
   templateUrl: './recipe-chatbot.html',
-  styleUrls: ['./recipe-chatbot.scss']
+  styleUrls: ['./recipe-chatbot.css']
 })
 export class RecipeChatbot implements OnInit {
+  private static readonly INTERNET_SEARCH_TRIGGER = /\b(?:search\b[\s\S]*?\bon internet\b|busca\b[\s\S]*?\ben internet\b)\b/iu;
+
   // ViewChilds
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
   @ViewChild('messageInput') private messageInput!: ElementRef;
@@ -23,19 +27,21 @@ export class RecipeChatbot implements OnInit {
   // Servicios injectados
   private readonly chatbotService = inject(RecipeChatbotService);
   private readonly authService = inject(AuthServices);
+  private readonly spoonacularService = inject(SpoonacularService);
 
   // Estado con signals
   messages: ChatMessage[] = [];
   newMessage: string = '';
+  showClearModal = false;
   isLoading = signal<boolean>(false);
 
   sugerencias: string[] = [
-    'Hi Dishly, what can you do?',
-    'I want a smash burger recipe',
-    'I need something quick and easy for dinner',
-    'I have tomato and cheese, what can I make?',
-    'I want a chocolate dessert',
-    'Recommend something in under 30 minutes'
+    'Generate a smash burger recipe with crispy onions',
+    'Create a quick 20-minute dinner recipe with chicken and rice',
+    'I have tomato and cheese, generate a recipe I can cook now',
+    'Generate an easy chocolate dessert recipe for 4 people',
+    'Create a high-protein breakfast recipe with eggs and oats',
+    'Generate a vegetarian pasta recipe under 30 minutes'
   ];
 
   protected get currentUserName(): string {
@@ -61,7 +67,7 @@ export class RecipeChatbot implements OnInit {
 
   protected getRecipeImageUrl(path: string | null | undefined): string {
     if (!path) {
-      return 'assets/placeholder.jpg';
+      return 'assets/icons/DishlyIcon.webp';
     }
 
     return this.authService.getAssetUrl(path);
@@ -86,7 +92,7 @@ export class RecipeChatbot implements OnInit {
     this.messages.push({
       id: Date.now(),
       role: 'assistant',
-      content: 'Hello. I am Dishly AI. I can chat with you about cooking and suggest recipe ideas based on your ingredients, the time you have, or the kind of dish you want. What would you like to make today?',
+      content: 'Hello. I am Dishly AI Recipe Generator. Tell me your ingredients, preferred style, available time, or difficulty level, and I will generate a full recipe for you.',
       timestamp: new Date(),
       receta: null
     });
@@ -110,11 +116,20 @@ export class RecipeChatbot implements OnInit {
     this.isLoading.set(true);
     this.scrollToBottom();
 
+    const internetQuery = this.extractInternetQuery(textToSend);
+    if (internetQuery) {
+      await this.sendInternetRecipe(internetQuery);
+      this.isLoading.set(false);
+      this.scrollToBottom();
+      setTimeout(() => this.messageInput?.nativeElement?.focus(), 100);
+      return;
+    }
+
     // Indicador de escritura
     const typingIndicator: ChatMessage = {
       id: Date.now() + 1,
       role: 'assistant',
-      content: 'Thinking about the best answer for you...',
+      content: 'Generating your recipe idea...',
       timestamp: new Date(),
       receta: null,
       isTyping: true
@@ -132,7 +147,7 @@ export class RecipeChatbot implements OnInit {
         const assistantMessage: ChatMessage = {
           id: Date.now(),
           role: 'assistant',
-          content: response.receta?.mensaje_chat || response.message || 'I have an idea for you. If you want, give me a bit more detail and I will refine it.',
+          content: response.receta?.mensaje_chat || response.message || 'I generated a recipe idea for you. If you want, give me more detail and I will refine it.',
           timestamp: new Date(),
           receta: response.receta ?? null
         };
@@ -141,7 +156,7 @@ export class RecipeChatbot implements OnInit {
         this.messages.push({
           id: Date.now(),
           role: 'assistant',
-          content: response?.message || 'Sorry, I could not find a recipe that matches your request. Could you try different keywords?',
+          content: response?.message || 'Sorry, I could not generate a recipe that matches your request. Could you try different ingredients or keywords?',
           timestamp: new Date(),
           receta: null
         });
@@ -171,10 +186,17 @@ export class RecipeChatbot implements OnInit {
   }
 
   limpiarChat() {
-    if (confirm('Do you want to clear this conversation?')) {
-      this.messages = [];
-      this.addWelcomeMessage();
-    }
+    this.showClearModal = true;
+  }
+
+  cancelClearChat() {
+    this.showClearModal = false;
+  }
+
+  confirmClearChat() {
+    this.messages = [];
+    this.addWelcomeMessage();
+    this.showClearModal = false;
   }
 
   private scrollToBottom(): void {
@@ -207,4 +229,72 @@ export class RecipeChatbot implements OnInit {
 
     return 'Something went wrong while processing your message. Please try again.';
   }
+
+  private extractInternetQuery(message: string): string | null {
+    if (!RecipeChatbot.INTERNET_SEARCH_TRIGGER.test(message)) {
+      return null;
+    }
+
+    const normalizedMessage = message.trim();
+    const englishQuery = normalizedMessage.match(/\bsearch\b([\s\S]*?)\bon internet\b/iu);
+    const spanishQuery = normalizedMessage.match(/\bbusca\b([\s\S]*?)\ben internet\b/iu);
+    const extractedQuery = (englishQuery?.[1] ?? spanishQuery?.[1] ?? '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    return extractedQuery || 'easy recipe';
+  }
+
+  private async sendInternetRecipe(query: string): Promise<void> {
+    try {
+      const response = await lastValueFrom(this.spoonacularService.searchRecipes(query, 1));
+      const recipe = response.results?.[0];
+
+      if (!recipe) {
+        this.messages.push({
+          id: Date.now(),
+          role: 'assistant',
+          content: `I could not find internet results for "${query}". Try a different search.`,
+          timestamp: new Date(),
+          receta: null
+        });
+        return;
+      }
+
+      this.messages.push({
+        id: Date.now(),
+        role: 'assistant',
+        content: '',
+        timestamp: new Date(),
+        internetResult: this.buildInternetResult(recipe),
+        receta: null
+      });
+    } catch {
+      this.messages.push({
+        id: Date.now(),
+        role: 'assistant',
+        content: 'I could not run the internet search right now. Please try again in a moment.',
+        timestamp: new Date(),
+        receta: null
+      });
+    }
+  }
+
+  private buildInternetResult(recipe: SpoonacularRecipe): InternetSearchResult {
+    const summary = this.removeHtml(recipe.summary ?? '').trim();
+    const source = recipe.sourceUrl || 'https://spoonacular.com/food-api';
+
+    return {
+      title: recipe.title,
+      timeText: `${recipe.readyInMinutes || 'N/A'} min`,
+      servingsText: String(recipe.servings || 'N/A'),
+      summary: summary || undefined,
+      sourceUrl: source
+    };
+  }
+
+  private removeHtml(value: string): string {
+    return value.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  }
 }
+

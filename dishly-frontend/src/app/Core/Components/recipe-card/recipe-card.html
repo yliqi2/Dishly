@@ -1,21 +1,33 @@
-<article class="card recipe-card h-100 border rounded-4 shadow-sm overflow-hidden">
+<article class="card recipe-card border rounded-4 shadow-sm overflow-hidden">
 
   <!-- Image + overlay tags -->
-  <div class="recipe-image-wrapper position-relative">
-    <img [src]="mainImage()" alt="Recipe image" class="recipe-image w-100" loading="lazy" (error)="$any($event.target).src='assets/placeholder.jpg'">
+  <a
+    class="recipe-image-wrapper position-relative recipe-image-link d-block"
+    [routerLink]="['/recipes', receta().id_receta]"
+    tabindex="-1"
+    aria-hidden="true">
+    <img [src]="mainImage()" alt="Recipe image" class="recipe-image w-100" loading="lazy" (error)="$any($event.target).src='assets/icons/DishlyIcon.webp'">
 
     <!-- Top tags -->
     <div class="position-absolute top-0 start-0 end-0 d-flex justify-content-between align-items-start p-3">
-      <div class="d-flex flex-wrap gap-2" style="max-width: 60%;">
-        @for (cat of displayedCategories(); track cat.id_categoria) {
-        <span class="badge recipe-tag-category text-truncate" style="max-width: 100px;">{{ cat.nombre }}</span>
-        }
+      <div class="recipe-tag-category-list">
+        <div class="recipe-tag-category-row">
+          @for (cat of displayedCategories(); track cat.id_categoria) {
+          <span class="badge recipe-tag-category recipe-tag-category-item">
+            <span class="recipe-tag-category-item__text">{{ cat.nombre }}</span>
+          </span>
+          }
+        </div>
         @if (extraCategoriesCount() > 0) {
-        <span class="badge recipe-tag-category">+{{ extraCategoriesCount() }}</span>
+        <div class="recipe-tag-category-extra-row">
+          <span class="badge recipe-tag-category recipe-tag-category--extra">+{{ extraCategoriesCount() }}</span>
+        </div>
         }
       </div>
       <span class="badge recipe-tag-rating d-flex align-items-center gap-1 flex-shrink-0">
-        <lucide-icon name="star" size="14" strokeWidth="2.5" class="star-icon"></lucide-icon>
+        <svg class="star-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
         {{ mediaValoraciones() }}
       </span>
     </div>
@@ -23,7 +35,9 @@
     <!-- Bottom tags -->
     <div class="position-absolute bottom-0 start-0 end-0 d-flex justify-content-between align-items-end p-3">
       <div>
-        @if (displayPrice() !== null) {
+        @if (shouldShowAcquiredBadge()) {
+        <span class="badge recipe-tag-acquired fs-6">Adquired</span>
+        } @else if (displayPrice() !== null) {
         <span class="badge recipe-tag-price fs-6">{{ displayPrice() }} €</span>
         }
       </div>
@@ -39,24 +53,26 @@
         {{ difficultyLabel() }}
       </span>
     </div>
-  </div>
+  </a>
 
   <!-- Card body -->
   <div class="card-body d-flex flex-column p-4">
     <h3 class="card-title recipe-title">{{ receta().titulo }}</h3>
-    <p class="card-text recipe-desc text-secondary flex-grow-1">{{ receta().descripcion }}</p>
+    <p class="card-text recipe-desc text-secondary">{{ receta().descripcion }}</p>
 
-    <hr class="my-3">
+    <hr class="my-3 mt-auto">
 
     <!-- Footer meta -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div class="d-flex flex-column gap-1">
         <div class="d-flex align-items-center gap-2 text-secondary small">
           <lucide-icon name="chef-hat" size="16" strokeWidth="2"></lucide-icon>
-          <span class="text-truncate" style="max-width: 120px;">{{ chefName() }}</span>
+          <a class="text-truncate recipe-chef-name recipe-chef-link" [routerLink]="['/profile', receta().id_autor]">
+            {{ chefName() }}
+          </a>
         </div>
         @if (publishedDate()) {
-        <div class="d-flex align-items-center gap-2 text-secondary" style="font-size: 13px; opacity: 0.8;">
+        <div class="d-flex align-items-center gap-2 text-secondary recipe-published-meta">
           <lucide-icon name="calendar" size="14" strokeWidth="2"></lucide-icon>
           <span>{{ publishedDate() }}</span>
         </div>
@@ -85,7 +101,7 @@
         Edit recipe
       </a>
       <button type="button" class="btn-danger btn-sm btn-recipe-deactivate w-100" [disabled]="isDeactivating()"
-        (click)="deactivateRecipe()">
+        (click)="openDeleteModal()">
         @if (isDeactivating()) {
         <span class="btn-loading-icon" aria-hidden="true"></span>
         } @else {
@@ -97,3 +113,12 @@
   </div>
 
 </article>
+
+@if (showDeleteModal()) {
+  <app-delete-recipe-modal
+    [recipeTitle]="receta().titulo"
+    [isProcessing]="isDeactivating()"
+    (confirmed)="confirmDelete()"
+    (cancelled)="cancelDelete()"
+  ></app-delete-recipe-modal>
+}

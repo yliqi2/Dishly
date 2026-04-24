@@ -1,0 +1,85 @@
+:host {
+    display: contents;
+  }
+  
+  .drm-backdrop {
+    position: fixed;
+    inset: 0;
+    background: #1118271F;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  
+  .drm-shell {
+    width: min(480px, 100%);
+    z-index: 1051;
+    outline: none;
+  }
+  
+  .drm-content {
+    border-radius: var(--border-radius);
+    background: var(--neutral-white);
+    border: 1px solid var(--neutral-black);
+    padding: 1.5rem;
+    box-shadow: var(--color-shadow);
+  }
+  
+  .drm-header {
+    margin-bottom: 1rem;
+  }
+  
+  .drm-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-red-base);
+    margin: 0;
+  }
+  
+  .drm-body {
+    margin-bottom: 1.5rem;
+  }
+  
+  .drm-body p {
+    margin: 0;
+    color: var(--neutral-black);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .drm-footer {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+  
+  .drm-footer .btn-secondary {
+    flex: 1;
+    background-color: var(--neutral-black);
+    color: var(--neutral-white);
+  }
+
+  .drm-footer .btn-secondary:focus-visible {
+    outline: 3px solid var(--neutral-black);
+    outline-offset: 4px;
+    border-radius: var(--border-radius);
+  }
+
+  .drm-footer .btn-danger {
+    flex: 1;
+  }
+  
+  @keyframes modalPop {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  .animate-pop {
+    animation: modalPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  

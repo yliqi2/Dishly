@@ -4,16 +4,17 @@
   <div class="chat-header">
     <div class="header-info">
       <span class="assistant-brand-avatar" aria-hidden="true">
-        <img src="assets/icons/DishlyIcon.svg" alt="" />
+        <img src="assets/icons/DishlyIcon.webp" alt="" />
       </span>
       <div>
-        <span class="status-text">Dishly AI online</span>
-        <p class="status-subtext">Talk about food and get recipe ideas directly inside the chat</p>
+        <span class="status-text"><span class="notranslate" translate="no">Dishly AI</span> Recipe Generator online</span>
+        <p class="status-subtext">Describe ingredients or cravings and get a generated recipe in this chat</p>
       </div>
     </div>
     <div class="header-actions">
       <button class="btn-clear" (click)="limpiarChat()" title="Clear chat">
-        Clear chat
+        <lucide-icon name="trash-2" [size]="16" aria-hidden="true"></lucide-icon>
+        <span>Clear chat</span>
       </button>
     </div>
   </div>
@@ -43,10 +44,27 @@
         @if (message.role === 'assistant') {
           <div class="message assistant-message">
             <div class="message-avatar message-avatar--assistant">
-              <img src="assets/icons/DishlyIcon.svg" alt="Dishly AI" />
+              <img src="assets/icons/DishlyIcon.webp" alt="Dishly AI" translate="no" />
             </div>
             <div class="message-content">
-              <div class="message-text">{{ message.content }}</div>
+              @if (message.internetResult; as internetResult) {
+                <div class="message-text message-text--internet">
+                  <p>{{ internetResult.title }}</p>
+                  <p><strong>Time:</strong> {{ internetResult.timeText }}</p>
+                  <p><strong>Servings:</strong> {{ internetResult.servingsText }}</p>
+                  @if (internetResult.summary) {
+                    <p><strong>Summary:</strong> {{ internetResult.summary }}</p>
+                  }
+                  <p>
+                    <strong>Source:</strong>
+                    <a [href]="internetResult.sourceUrl" target="_blank" rel="noopener noreferrer">
+                      {{ internetResult.sourceUrl }}
+                    </a>
+                  </p>
+                </div>
+              } @else {
+                <div class="message-text">{{ message.content }}</div>
+              }
               <div class="message-time">{{ message.timestamp | date:'HH:mm' }}</div>
 
               @if (message.receta) {
@@ -57,7 +75,7 @@
                       [alt]="message.receta.titulo"
                       class="message-recipe-media__image"
                       loading="lazy"
-                      (error)="$any($event.target).src='assets/placeholder.jpg'"
+                      (error)="$any($event.target).src='assets/icons/DishlyIcon.webp'"
                     >
                   }
                 </div>
@@ -81,13 +99,14 @@
   <!-- Sugerencias -->
   @if (messages.length < 3) {
     <div class="suggestions-area">
-      <p class="suggestions-title">Ideas to get started</p>
+      <p class="suggestions-title">Recipe prompts to generate ideas</p>
       <div class="suggestions-list">
         @for (sugerencia of sugerencias; track $index) {
           <button
             class="suggestion-btn"
             (click)="usarSugerencia(sugerencia)"
           >
+            <lucide-icon name="chef-hat" [size]="14" aria-hidden="true"></lucide-icon>
             {{ sugerencia }}
           </button>
         }
@@ -101,7 +120,8 @@
       #messageInput
       [(ngModel)]="newMessage"
       (keydown)="handleKeyPress($event)"
-      placeholder="Write as if you were talking to your chef: ingredients, cravings, time, or just a question..."
+      placeholder="Ask Dishly AI to generate a recipe: ingredients, style, time, servings, or difficulty..."
+      translate="no"
       [disabled]="isLoading()"
       rows="1"
     ></textarea>
@@ -110,7 +130,44 @@
       (click)="sendMessage()"
       [disabled]="!newMessage.trim() || isLoading()"
     >
-      📤
+      <lucide-icon name="send" [size]="18" aria-hidden="true"></lucide-icon>
+      <span>Send</span>
     </button>
   </div>
 </div>
+
+@if (showClearModal) {
+  <div class="clear-modal-backdrop" (click)="cancelClearChat()">
+    <div
+      class="clear-modal-shell animate-pop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="clear-chat-modal-title"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="clear-modal-content">
+        <div class="clear-modal-header">
+          <h3 class="clear-modal-title" id="clear-chat-modal-title">
+            <svg class="clear-modal-title__icon" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M19 6l-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Clear Chat
+          </h3>
+        </div>
+
+        <div class="clear-modal-body">
+          <p>This will remove all current messages from <span class="notranslate" translate="no">Dishly AI</span>. Do you want to continue?</p>
+        </div>
+
+        <div class="clear-modal__actions">
+          <button class="btn-secondary" type="button" (click)="cancelClearChat()">Cancel</button>
+          <button class="btn-danger" type="button" (click)="confirmClearChat()">Clear chat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,5 +1,4 @@
 <?php
-// app/Models/RecetaOriginal.php
 
 namespace App\Models;
 
@@ -8,21 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 class RecetaOriginal extends Model
 {
     protected $table = 'receta_original';
+
     protected $primaryKey = 'id_receta';
-    public $timestamps = false;
-    
+
     protected $fillable = [
         'titulo', 'descripcion', 'instrucciones', 'tiempo_preparacion',
         'tiempo_preparacion_unidad', 'dificultad', 'porciones', 'price',
         'imagen_1', 'imagen_2', 'imagen_3', 'imagen_4', 'imagen_5',
-        'fecha_creacion', 'id_autor', 'active'
+        'fecha_creacion', 'id_autor', 'active', 'created_at', 'updated_at',
     ];
-    
+
     protected $casts = [
         'active' => 'boolean',
-        'price' => 'decimal:2'
+        'price' => 'decimal:2',
     ];
-    
+
     public function ingredientes()
     {
         return $this->belongsToMany(
@@ -32,19 +31,17 @@ class RecetaOriginal extends Model
             'id_ingrediente'
         )->withPivot('cantidad', 'unidad');
     }
-    
+
     public function autor()
     {
         return $this->belongsTo(User::class, 'id_autor', 'id_usuario');
     }
-    
-    // Scope para recetas activas
+
     public function scopeActive($query)
     {
         return $query->where('active', true);
     }
-    
-    // Accesor para obtener todas las imágenes como array
+
     public function getImagenesAttribute()
     {
         return array_filter([
@@ -52,7 +49,7 @@ class RecetaOriginal extends Model
             $this->imagen_2,
             $this->imagen_3,
             $this->imagen_4,
-            $this->imagen_5
+            $this->imagen_5,
         ]);
     }
 }

@@ -48,19 +48,18 @@ services:
       - DB_DATABASE=${MYSQL_DATABASE}
       - DB_USERNAME=${MYSQL_USER}
       - DB_PASSWORD=${MYSQL_PASSWORD}
-      - APP_ENV=local
-      - APP_DEBUG=true
+      - APP_ENV=production
+      - APP_DEBUG=false
       - APP_URL=http://localhost:${BACKEND_PORT}
     command: >
       bash -c "
-      mkdir -p /var/www/html/storage/logs /var/www/html/storage/framework/cache/data /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/bootstrap/cache &&
-      touch /var/www/html/storage/logs/laravel.log &&
-      chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache &&
-      chmod -R ug+rwx /var/www/html/storage /var/www/html/bootstrap/cache &&
       composer install --no-interaction --optimize-autoloader &&
       [ ! -f /var/www/html/.env ] && cp /var/www/html/.env.example /var/www/html/.env || true &&
-      (grep -q '^APP_KEY=base64:' /var/www/html/.env || php artisan key:generate --no-interaction) &&
-      php artisan migrate --force || true &&
+      php artisan key:generate --no-interaction &&
+      php artisan config:cache &&
+      php artisan route:cache &&
+      php artisan view:cache &&
+      php artisan migrate --force &&
       echo 'Server started' &&
       apache2-foreground
       "
@@ -74,7 +73,7 @@ services:
     working_dir: /app
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - VITE_ALLOWED_HOSTS=servomechanically-nonaffecting-stephanie.ngrok-free.dev
+      - VITE_ALLOWED_HOSTS=stanchly-dulotic-sherri.ngrok-free.dev
     volumes:
       - ./dishly-frontend:/app
       - /app/node_modules
@@ -106,49 +105,28 @@ services:
       - frontend
     networks:
       - dishly-network
+
+  # =====================
+  # N8N
+  # =====================
   n8n:
     image: n8nio/n8n:latest
-    container_name: n8n
-    restart: always
+    container_name: n8n_app
+    restart: unless-stopped
     ports:
-      - "${N8N_PORT}:5678"
+      - "${N8N_PORT:-5678}:5678"
     environment:
-      - N8N_BASIC_AUTH_ACTIVE=false
-      - N8N_HOST=localhost
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - NODE_ENV=production
-      - TZ=Europe/Madrid
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-admin}
+      - WEBHOOK_URL=http://n8n:5678/
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./input:/files #Directorio donde tendremos el archivo PDF
     networks:
       - dishly-network
-  ollama:
-    image: ollama/ollama
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics
-    gpus: all
-    volumes:
-      - ollama_data:/root/.ollama
-    restart: unless-stopped
-    networks:
-      - dishly-network
-
-  ollama-setup:
-    image: ollama/ollama
-    container_name: ollama_setup
-    networks:
-      - dishly-network
-    volumes:
-      - ollama_data:/root/.ollama
-    entrypoint: /bin/sh
-    command: -c "ollama serve & sleep 5 && ollama pull gemma3:1b"
 
 volumes:
   mysql_data:
-  ollama_data:
   n8n_data:
 
 networks:

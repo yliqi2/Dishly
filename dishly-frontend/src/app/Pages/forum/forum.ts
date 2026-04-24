@@ -1,22 +1,25 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthServices } from '../../Core/Services/Auth/auth-services';
 import { ForumService } from '../../Core/Services/Forum/forum.service';
 import { ForumComment, ForumDetail, ForumOwner, ForumSummary } from '../../Core/Interfaces/Forum';
+import { DeletePostModal } from '../../Core/Components/modals/delete-post-modal/delete-post-modal';
+import { Breadcrumbs } from '../../Core/Components/breadcrumbs/breadcrumbs';
 
 @Component({
   selector: 'app-forum',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, DeletePostModal, Breadcrumbs],
   templateUrl: './forum.html',
   styleUrl: './forum.css',
 })
-export class Forum implements OnInit {
+export class Forum implements OnInit, AfterViewChecked, OnDestroy {
   private readonly forumService = inject(ForumService);
   private readonly authService = inject(AuthServices);
+  private readonly commentsPerPage = 30;
 
   protected readonly user = toSignal<Record<string, unknown> | null>(this.authService.user$, { initialValue: null });
   protected readonly isAuthenticated = computed(() => !!this.user());
@@ -40,11 +43,18 @@ export class Forum implements OnInit {
   protected loadingForum = false;
   protected sidebarError: string | null = null;
   protected detailError: string | null = null;
+  protected forumActionError: string | null = null;
 
   protected creatingForum = false;
   protected newForumTitle = '';
   protected newForumDescription = '';
   protected createForumError: string | null = null;
+
+  protected editingForum = false;
+  protected updatingForum = false;
+  protected deletingForum = false;
+  protected editingForumTitle = '';
+  protected editingForumDescription = '';
 
   protected postingComment = false;
   protected newComment = '';
@@ -54,9 +64,32 @@ export class Forum implements OnInit {
   protected editingCommentMessage = '';
   protected savingEditedComment = false;
   protected deletingCommentId: number | null = null;
+  protected loadingMoreComments = false;
+  protected hasMoreComments = false;
+  private nextCommentsPage = 2;
+
+  protected deleteModalOpen = false;
+  private pendingDeleteComment: ForumComment | null = null;
+  protected deletePostModalOpen = false;
 
   private temporaryForumId = -1;
   private temporaryCommentId = -1;
+  private conversationPanelEl: HTMLElement | null = null;
+  private commentPanelEl: HTMLElement | null = null;
+  private panelsResizeObserver: ResizeObserver | null = null;
+  private shouldSyncPanels = false;
+
+  @ViewChild('forumConversationPanel')
+  private set forumConversationPanelRef(panel: ElementRef<HTMLElement> | undefined) {
+    this.conversationPanelEl = panel?.nativeElement ?? null;
+    this.attachPanelsObserver();
+  }
+
+  @ViewChild('forumCommentPanel')
+  private set forumCommentPanelRef(panel: ElementRef<HTMLElement> | undefined) {
+    this.commentPanelEl = panel?.nativeElement ?? null;
+    this.attachPanelsObserver();
+  }
 
   ngOnInit(): void {
     this.loadForums();
@@ -70,6 +103,7 @@ export class Forum implements OnInit {
       next: (forums) => {
         this.forums = forums;
         this.loadingForums = false;
+        this.sidebarError = null;
 
         const targetForumId = selectedForumId
           ?? this.selectedForum?.id_foro
@@ -85,7 +119,10 @@ export class Forum implements OnInit {
       error: (error) => {
         this.loadingForums = false;
         this.sidebarError = error?.error?.message ?? 'Could not load forums.';
-        this.selectedForum = null;
+
+        if (this.forums.length === 0) {
+          this.selectedForum = null;
+        }
       }
     });
   }
@@ -97,14 +134,17 @@ export class Forum implements OnInit {
 
     this.loadingForum = true;
     this.detailError = null;
+    this.forumActionError = null;
     this.editingCommentId = null;
     this.commentError = null;
+    this.editingForum = false;
 
-    this.forumService.getForum(forumId).subscribe({
+    this.forumService.getForum(forumId, 1, this.commentsPerPage).subscribe({
       next: (forum) => {
         this.selectedForum = forum;
         this.loadingForum = false;
         this.upsertForumSummary(forum);
+        this.syncCommentsPagination(forum);
       },
       error: (error) => {
         this.loadingForum = false;
@@ -127,6 +167,11 @@ export class Forum implements OnInit {
       return;
     }
 
+    if (this.isDuplicatedForumTitle(titulo)) {
+      this.createForumError = 'A forum with this title already exists. Please choose a different title.';
+      return;
+    }
+
     this.creatingForum = true;
     this.createForumError = null;
 
@@ -142,8 +187,10 @@ export class Forum implements OnInit {
         this.creatingForum = false;
         this.newForumTitle = '';
         this.newForumDescription = '';
+        this.sidebarError = null;
         this.selectedForum = forum;
         this.upsertForumSummary(forum, true);
+        this.loadForums(forum.id_foro);
       },
       error: (error) => {
         this.creatingForum = false;
@@ -152,6 +199,26 @@ export class Forum implements OnInit {
         this.createForumError = this.extractErrorMessage(error, 'Could not create the forum.');
       }
     });
+  }
+
+  protected closeCreateForm(): void {
+    this.newForumTitle = '';
+    this.newForumDescription = '';
+    this.createForumError = null;
+    this.selectedForum = null;
+  }
+
+  ngAfterViewChecked(): void {
+    if (!this.shouldSyncPanels) {
+      return;
+    }
+
+    this.syncPanelsHeight();
+    this.shouldSyncPanels = false;
+  }
+
+  ngOnDestroy(): void {
+    this.panelsResizeObserver?.disconnect();
   }
 
   protected submitComment(): void {
@@ -194,6 +261,7 @@ export class Forum implements OnInit {
           comments_count: this.selectedForum!.comments.length,
           last_activity_at: comment.created_at ?? comment.fecha,
         };
+        this.updateCommentsMeta(1);
         this.syncForumSummary(this.selectedForum);
       },
       error: (error) => {
@@ -203,6 +271,7 @@ export class Forum implements OnInit {
           comments: this.selectedForum!.comments.filter((item) => item.id_linea_foro !== optimisticComment.id_linea_foro),
           comments_count: Math.max(0, (this.selectedForum!.comments_count ?? this.selectedForum!.comments.length) - 1),
         };
+        this.updateCommentsMeta(-1);
         this.bumpSummaryCommentCount(this.selectedForum.id_foro, -1, this.selectedForum.last_activity_at ?? null);
         this.newComment = mensaje;
         this.commentError = this.extractErrorMessage(error, 'Could not publish the comment.');
@@ -259,11 +328,24 @@ export class Forum implements OnInit {
       return;
     }
 
-    const confirmed = window.confirm('Delete this comment?');
-    if (!confirmed) {
+    this.pendingDeleteComment = comment;
+    this.deleteModalOpen = true;
+  }
+
+  protected cancelDeleteModal(): void {
+    this.deleteModalOpen = false;
+    this.pendingDeleteComment = null;
+  }
+
+  protected confirmDelete(): void {
+    const comment = this.pendingDeleteComment;
+    if (!comment || !this.selectedForum) {
+      this.cancelDeleteModal();
       return;
     }
 
+    this.deleteModalOpen = false;
+    this.pendingDeleteComment = null;
     this.deletingCommentId = comment.id_linea_foro;
     this.commentError = null;
 
@@ -273,6 +355,7 @@ export class Forum implements OnInit {
           ...this.selectedForum!,
           comments: this.selectedForum!.comments.filter((item) => item.id_linea_foro !== comment.id_linea_foro),
         };
+        this.updateCommentsMeta(-1);
         this.bumpSummaryCommentCount(this.selectedForum.id_foro, -1, this.selectedForum.last_activity_at ?? null);
         this.deletingCommentId = null;
       },
@@ -285,6 +368,140 @@ export class Forum implements OnInit {
 
   protected isSelected(forumId: number): boolean {
     return this.selectedForum?.id_foro === forumId;
+  }
+
+  protected loadMoreComments(): void {
+    if (!this.selectedForum || this.loadingMoreComments || !this.hasMoreComments) {
+      return;
+    }
+
+    this.loadingMoreComments = true;
+    this.forumActionError = null;
+
+    this.forumService.getForum(this.selectedForum.id_foro, this.nextCommentsPage, this.commentsPerPage).subscribe({
+      next: (forumPage) => {
+        if (!this.selectedForum || this.selectedForum.id_foro !== forumPage.id_foro) {
+          this.loadingMoreComments = false;
+          return;
+        }
+
+        this.selectedForum = {
+          ...this.selectedForum,
+          comments: this.mergeComments(this.selectedForum.comments, forumPage.comments),
+          comments_meta: forumPage.comments_meta,
+          comments_count: forumPage.comments_count,
+          last_activity_at: forumPage.last_activity_at,
+        };
+
+        this.loadingMoreComments = false;
+        this.syncCommentsPagination(this.selectedForum);
+      },
+      error: (error) => {
+        this.loadingMoreComments = false;
+        this.forumActionError = this.extractErrorMessage(error, 'Could not load more comments.');
+      }
+    });
+  }
+
+  protected startEditingForum(): void {
+    if (!this.selectedForum?.is_owner) {
+      return;
+    }
+
+    this.editingForum = true;
+    this.forumActionError = null;
+    this.editingForumTitle = this.selectedForum.titulo;
+    this.editingForumDescription = this.selectedForum.descripcion;
+  }
+
+  protected cancelEditingForum(): void {
+    this.editingForum = false;
+    this.updatingForum = false;
+    this.editingForumTitle = '';
+    this.editingForumDescription = '';
+  }
+
+  protected saveForumChanges(): void {
+    if (!this.selectedForum || !this.selectedForum.is_owner) {
+      return;
+    }
+
+    const titulo = this.editingForumTitle.trim();
+    const descripcion = this.editingForumDescription.trim();
+
+    if (!titulo || !descripcion) {
+      this.forumActionError = 'Title and description are required.';
+      return;
+    }
+
+    if (this.isDuplicatedForumTitle(titulo, this.selectedForum.id_foro)) {
+      this.forumActionError = 'A forum with this title already exists. Please choose a different title.';
+      return;
+    }
+
+    this.updatingForum = true;
+    this.forumActionError = null;
+
+    this.forumService.updateForum(this.selectedForum.id_foro, { titulo, descripcion }).subscribe({
+      next: (forum) => {
+        this.updatingForum = false;
+        this.selectedForum = {
+          ...forum,
+          comments: this.selectedForum?.comments ?? forum.comments,
+          comments_meta: this.selectedForum?.comments_meta ?? forum.comments_meta,
+        };
+        this.upsertForumSummary(this.selectedForum, true);
+        this.cancelEditingForum();
+      },
+      error: (error) => {
+        this.updatingForum = false;
+        this.forumActionError = this.extractErrorMessage(error, 'Could not update this forum.');
+      }
+    });
+  }
+
+  protected deleteForum(): void {
+    if (!this.selectedForum || !this.selectedForum.is_owner || this.deletingForum) {
+      return;
+    }
+    this.deletePostModalOpen = true;
+  }
+
+  protected cancelDeletePostModal(): void {
+    this.deletePostModalOpen = false;
+  }
+
+  protected confirmDeleteForum(): void {
+    if (!this.selectedForum || !this.selectedForum.is_owner || this.deletingForum) {
+      this.deletePostModalOpen = false;
+      return;
+    }
+
+    this.deletePostModalOpen = false;
+    this.deletingForum = true;
+    this.forumActionError = null;
+
+    const forumId = this.selectedForum.id_foro;
+
+    this.forumService.deleteForum(forumId).subscribe({
+      next: () => {
+        this.deletingForum = false;
+        this.cancelEditingForum();
+        this.forums = this.forums.filter((forum) => forum.id_foro !== forumId);
+
+        const nextForumId = this.forums[0]?.id_foro;
+        if (nextForumId) {
+          this.selectForum(nextForumId, true);
+          return;
+        }
+
+        this.selectedForum = null;
+      },
+      error: (error) => {
+        this.deletingForum = false;
+        this.forumActionError = this.extractErrorMessage(error, 'Could not delete this forum.');
+      }
+    });
   }
 
   protected getOwnerAvatar(owner: ForumOwner): string | null {
@@ -388,6 +605,62 @@ export class Forum implements OnInit {
     return String(validationMessage ?? error?.error?.message ?? fallback);
   }
 
+  private isDuplicatedForumTitle(candidateTitle: string, ignoreForumId?: number): boolean {
+    const normalizedCandidate = this.normalizeForumTitle(candidateTitle);
+
+    if (!normalizedCandidate) {
+      return false;
+    }
+
+    return this.forums
+      .filter((forum) => forum.id_foro !== ignoreForumId)
+      .some((forum) => this.normalizeForumTitle(forum.titulo) === normalizedCandidate);
+  }
+
+  private syncCommentsPagination(forum: ForumDetail): void {
+    const currentPage = Number(forum.comments_meta?.current_page ?? 1);
+    this.hasMoreComments = Boolean(forum.comments_meta?.has_more);
+    this.nextCommentsPage = currentPage + 1;
+  }
+
+  private mergeComments(existing: ForumComment[], incoming: ForumComment[]): ForumComment[] {
+    const byId = new Map<number, ForumComment>();
+
+    for (const comment of existing) {
+      byId.set(comment.id_linea_foro, comment);
+    }
+
+    for (const comment of incoming) {
+      byId.set(comment.id_linea_foro, comment);
+    }
+
+    return [...byId.values()].sort((left, right) => left.id_linea_foro - right.id_linea_foro);
+  }
+
+  private updateCommentsMeta(delta: number): void {
+    if (!this.selectedForum?.comments_meta) {
+      return;
+    }
+
+    const total = Math.max(0, Number(this.selectedForum.comments_meta.total ?? 0) + delta);
+    this.selectedForum = {
+      ...this.selectedForum,
+      comments_meta: {
+        ...this.selectedForum.comments_meta,
+        total,
+      },
+    };
+  }
+
+  private normalizeForumTitle(value: string): string {
+    return value
+      .trim()
+      .replace(/\s+/g, ' ')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+  }
+
   private buildOptimisticForum(titulo: string, descripcion: string): ForumDetail {
     const now = new Date().toISOString();
     const currentUser = this.user();
@@ -430,6 +703,35 @@ export class Forum implements OnInit {
       can_edit: true,
       can_delete: true,
     };
+  }
+
+  private attachPanelsObserver(): void {
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+
+    this.panelsResizeObserver?.disconnect();
+
+    if (!this.conversationPanelEl || !this.commentPanelEl) {
+      return;
+    }
+
+    this.panelsResizeObserver = new ResizeObserver(() => {
+      this.syncPanelsHeight();
+    });
+
+    this.panelsResizeObserver.observe(this.conversationPanelEl);
+    this.panelsResizeObserver.observe(this.commentPanelEl);
+    this.shouldSyncPanels = true;
+  }
+
+  private syncPanelsHeight(): void {
+    if (!this.conversationPanelEl || !this.commentPanelEl) {
+      return;
+    }
+
+    this.conversationPanelEl.style.height = '';
+    this.commentPanelEl.style.height = '';
   }
 
 }

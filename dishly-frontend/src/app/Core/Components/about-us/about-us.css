@@ -12,7 +12,7 @@
 .about-title {
 	font-size: 40px;
 	margin: 0 0 12px 0;
-	color: var(--PrimaryText);
+	color: var(--neutral-black);
 	font-family: var(--font-display);
 	font-weight: var(--font-display-extrabold);
 }
@@ -39,11 +39,11 @@
 .feature-icon {
 	width: 88px;
 	height: 88px;
-	border-radius: 14px;
+	border-radius: var(--border-radius);
 	background: var(--highlight);
 	display: inline-grid;
 	place-items: center;
-	color: var(--on-highlight);
+	color: var(--neutral-white);
 	margin-bottom: 20px;
 }
 
@@ -61,13 +61,13 @@
 
 .feature:hover .feature-icon {
 	transform: translateY(-6px) scale(1.03);
-	box-shadow: 0 12px 30px var(--shadow-dark-md);
+	box-shadow: 0 12px 30px var(--color-shadow);
 }
 
 .feature-svg {
 	width: 44px;
 	height: 44px;
-	color: var(--on-highlight);
+	color: var(--neutral-white);
 }
 
 /* Also target the rendered SVG inside the lucide-webcomponent to ensure size */
@@ -82,20 +82,20 @@
 }
 
 .feature:hover .feature-title {
-	color: var(--PrimaryText);
+	color: var(--neutral-black);
 	transform: translateY(-2px);
 }
 
 .feature-title {
 	font-size: 20px;
 	margin: 0 0 12px 0;
-	color: var(--PrimaryText);
+	color: var(--neutral-black);
 	font-weight: 700;
 }
 
 .feature-desc {
 	margin: 0 auto;
-	color: var(--SecondaryText);
+	color: var(--neutral-black);
 	max-width: 320px;
 	line-height: 1.6;
 }
@@ -112,4 +112,5 @@
 		width: 200px;
 	}
 }
+
 

@@ -9,27 +9,33 @@ import { CartService } from '../../../Core/Services/Cart/cart.service';
 import { RecetaDetailsService } from '../../../Core/Services/Core/receta-details-service';
 import { RecetaOriginal } from '../../../Core/Interfaces/RecetaOriginal';
 import { Review } from '../../../Core/Interfaces/Review';
-import { LoadingPage } from '../../loading-page/loading-page';
+import { DeleteReviewModal } from '../../../Core/Components/modals/delete-review-modal/delete-review-modal';
+import { DishlySelectComponent, SelectOption } from '../../../Core/Components/dishly-select/dishly-select';
+import { Breadcrumbs } from '../../../Core/Components/breadcrumbs/breadcrumbs';
 
 type ReviewSortOption = 'latest' | 'highest' | 'lowest';
 
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, FormsModule, RouterLink, LoadingPage],
+  imports: [CommonModule, LucideAngularModule, FormsModule, RouterLink, DeleteReviewModal, DishlySelectComponent, Breadcrumbs],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.css',
 })
 export class RecipeDetail implements OnInit {
   recipe: RecetaOriginal | null = null;
-  loading = true;
   error: string | null = null;
 
   thumbnails: string[] = [];
   instructions: string[] = [];
 
   selectedThumbnailIndex = 0;
-  imageAnimationClass = '';
+  mainImageSlideLeftSrc = '';
+  mainImageSlideRightSrc = '';
+  mainImageSlideTransform = 'translateX(0)';
+  mainImageSlideNoTransition = true;
+  private mainImageSlideTransitioning = false;
+  private readonly mainImageSlideDurationMs = 480;
   userRating = 0;
   hoverRating = 0;
   isLocked = false;
@@ -46,6 +52,11 @@ export class RecipeDetail implements OnInit {
   readonly reviewsPerPage = 5;
   currentReviewPage = 1;
   reviewSort: ReviewSortOption = 'latest';
+  readonly reviewSortOptions: SelectOption[] = [
+    { value: 'latest', label: 'Latest reviews' },
+    { value: 'highest', label: 'Highest rated' },
+    { value: 'lowest', label: 'Lowest rated' },
+  ];
   reviewComment = '';
   submitError: string | null = null;
   cartNotice: string | null = null;
@@ -55,6 +66,9 @@ export class RecipeDetail implements OnInit {
   editingRating = 0;
   editingHoverRating = 0;
   isInCart = false;
+  hasPurchased = false;
+  reviewToDelete: Review | null = null;
+  isDeletingReview = false;
   private currentUserId: number | null = null;
   private currentUserRole: string | null = null;
   private currentUserIconPath: string | null = null;
@@ -87,17 +101,25 @@ export class RecipeDetail implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
       this.error = 'ID de receta no encontrado.';
-      this.loading = false;
       return;
     }
 
     this.recetaService.getRecipeById(id).subscribe({
       next: (data) => {
+        if (data.active === false && !data.purchased) {
+          this.error = 'This recipe is no longer available.';
+          this.cdr.detectChanges();
+          return;
+        }
+
         this.recipe = data;
+        sessionStorage.setItem(`dishly.recipeTitle.${data.id_receta}`, data.titulo);
+        this.hasPurchased = Boolean(data.purchased);
         this.thumbnails = this.computeThumbnails(data);
+        this.selectedThumbnailIndex = 0;
+        this.syncMainImageSlideUrls();
         this.instructions = this.computeInstructions(data.instrucciones);
         this.isInCart = this.cartService.hasRecipe(data.id_receta);
-        this.loading = false;
         this.cdr.detectChanges();
 
         if (this.authService.isAuthenticated()) {
@@ -115,7 +137,6 @@ export class RecipeDetail implements OnInit {
       error: (err) => {
         console.error('Error al cargar la receta:', err);
         this.error = 'The recipe failed to load.';
-        this.loading = false;
         this.cdr.detectChanges();
       }
     });
@@ -126,7 +147,7 @@ export class RecipeDetail implements OnInit {
 
     const addImage = (path: string | null) => {
       if (!path) return;
-      thumbs.push(this.authService.getAssetUrl(path));
+      thumbs.push(this.authService.getAssetUrl(path, r.updated_at ?? undefined));
     };
 
     addImage(r.imagen_1);
@@ -135,7 +156,7 @@ export class RecipeDetail implements OnInit {
     addImage(r.imagen_4);
     addImage(r.imagen_5);
 
-    if (thumbs.length === 0) thumbs.push('assets/placeholder.jpg');
+    if (thumbs.length === 0) thumbs.push('assets/icons/DishlyIcon.webp');
     return thumbs;
   }
 
@@ -232,22 +253,32 @@ export class RecipeDetail implements OnInit {
     if (!this.recipe) return;
 
     if (this.isAdminUser()) {
+      this.hasPurchased = true;
       this.isLocked = false;
       this.cdr.detectChanges();
       return;
     }
 
     if (this.isPremium()) {
+      if (typeof this.recipe.purchased === 'boolean') {
+        this.hasPurchased = this.recipe.purchased;
+        this.isLocked = !this.recipe.purchased;
+        this.cdr.detectChanges();
+        return;
+      }
+
       this.isLocked = true;
       if (this.authService.isAuthenticated()) {
         this.recetaService.checkPurchase(id).subscribe({
           next: (res) => {
+            this.hasPurchased = res.purchased;
             this.isLocked = !res.purchased;
             this.cdr.detectChanges();
           }
         });
       }
     } else {
+      this.hasPurchased = false;
       this.isLocked = false;
     }
   }
@@ -258,6 +289,12 @@ export class RecipeDetail implements OnInit {
 
   addToCart(): void {
     if (!this.recipe || !this.isPremium()) {
+      return;
+    }
+
+    if (this.hasPurchased) {
+      this.cartNotice = 'You already own this recipe.';
+      this.cdr.detectChanges();
       return;
     }
 
@@ -274,9 +311,7 @@ export class RecipeDetail implements OnInit {
     this.cartService.addRecipe(this.recipe).subscribe({
       next: (result) => {
         this.isInCart = result.added || result.duplicate;
-        this.cartNotice = result.added
-          ? 'Recipe added to your cart.'
-          : 'This recipe is already in your cart.';
+        this.cartNotice = result.added ? null : 'This recipe is already in your cart.';
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -300,40 +335,95 @@ export class RecipeDetail implements OnInit {
 
   selectThumbnail(index: number): void {
     if (index === this.selectedThumbnailIndex) return;
-
-    this.triggerImageAnimation(index > this.selectedThumbnailIndex ? 'slide-next' : 'slide-prev');
-    this.selectedThumbnailIndex = index;
+    if (!this.hasMultipleImages()) {
+      this.selectedThumbnailIndex = index;
+      this.syncMainImageSlideUrls();
+      this.cdr.detectChanges();
+      return;
+    }
+    const from = this.selectedThumbnailIndex;
+    const to = index;
+    const direction: 'next' | 'prev' = to > from ? 'next' : 'prev';
+    this.startMainImageSlide(from, to, direction);
   }
 
   prevImage(): void {
-    this.triggerImageAnimation('slide-prev');
-    this.selectedThumbnailIndex = (this.selectedThumbnailIndex > 0)
-      ? this.selectedThumbnailIndex - 1
-      : this.thumbnails.length - 1;
+    if (!this.hasMultipleImages()) {
+      return;
+    }
+    const n = this.thumbnails.length;
+    const from = this.selectedThumbnailIndex;
+    const to = from > 0 ? from - 1 : n - 1;
+    this.startMainImageSlide(from, to, 'prev');
   }
 
   nextImage(): void {
-    this.triggerImageAnimation('slide-next');
-    this.selectedThumbnailIndex = (this.selectedThumbnailIndex < this.thumbnails.length - 1)
-      ? this.selectedThumbnailIndex + 1
-      : 0;
+    if (!this.hasMultipleImages()) {
+      return;
+    }
+    const n = this.thumbnails.length;
+    const from = this.selectedThumbnailIndex;
+    const to = from < n - 1 ? from + 1 : 0;
+    this.startMainImageSlide(from, to, 'next');
   }
 
-  private triggerImageAnimation(direction: 'slide-next' | 'slide-prev'): void {
-    this.imageAnimationClass = '';
-    this.cdr.detectChanges();
+  private syncMainImageSlideUrls(): void {
+    const src = this.thumbnails[this.selectedThumbnailIndex] ?? 'assets/icons/DishlyIcon.webp';
+    this.mainImageSlideLeftSrc = src;
+    this.mainImageSlideRightSrc = src;
+    this.mainImageSlideTransform = 'translateX(0)';
+    this.mainImageSlideNoTransition = true;
+  }
 
-    requestAnimationFrame(() => {
-      this.imageAnimationClass = direction;
+  private startMainImageSlide(from: number, to: number, direction: 'next' | 'prev'): void {
+    if (!this.hasMultipleImages() || from === to) {
+      return;
+    }
+    if (this.mainImageSlideTransitioning) {
+      return;
+    }
+    this.mainImageSlideTransitioning = true;
+
+    if (direction === 'next') {
+      this.mainImageSlideLeftSrc = this.thumbnails[from] ?? '';
+      this.mainImageSlideRightSrc = this.thumbnails[to] ?? '';
+      this.mainImageSlideNoTransition = true;
+      this.mainImageSlideTransform = 'translateX(0)';
       this.cdr.detectChanges();
-
-      window.setTimeout(() => {
-        if (this.imageAnimationClass === direction) {
-          this.imageAnimationClass = '';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.mainImageSlideNoTransition = false;
+          this.mainImageSlideTransform = 'translateX(-50%)';
           this.cdr.detectChanges();
-        }
-      }, 320);
-    });
+          window.setTimeout(() => this.finishMainImageSlide(to), this.mainImageSlideDurationMs);
+        });
+      });
+    } else {
+      this.mainImageSlideLeftSrc = this.thumbnails[to] ?? '';
+      this.mainImageSlideRightSrc = this.thumbnails[from] ?? '';
+      this.mainImageSlideNoTransition = true;
+      this.mainImageSlideTransform = 'translateX(-50%)';
+      this.cdr.detectChanges();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.mainImageSlideNoTransition = false;
+          this.mainImageSlideTransform = 'translateX(0)';
+          this.cdr.detectChanges();
+          window.setTimeout(() => this.finishMainImageSlide(to), this.mainImageSlideDurationMs);
+        });
+      });
+    }
+  }
+
+  private finishMainImageSlide(to: number): void {
+    this.selectedThumbnailIndex = to;
+    const src = this.thumbnails[to] ?? 'assets/icons/DishlyIcon.webp';
+    this.mainImageSlideNoTransition = true;
+    this.mainImageSlideLeftSrc = src;
+    this.mainImageSlideRightSrc = src;
+    this.mainImageSlideTransform = 'translateX(0)';
+    this.cdr.detectChanges();
+    this.mainImageSlideTransitioning = false;
   }
 
   setRating(rating: number): void { this.userRating = rating; }
@@ -404,7 +494,11 @@ export class RecipeDetail implements OnInit {
     return this.reviews.length > this.reviewsPerPage;
   }
 
-  setReviewSort(sort: ReviewSortOption): void {
+  setReviewSort(value: string): void {
+    if (value !== 'latest' && value !== 'highest' && value !== 'lowest') {
+      return;
+    }
+    const sort = value as ReviewSortOption;
     if (this.reviewSort === sort) {
       return;
     }
@@ -530,20 +624,43 @@ export class RecipeDetail implements OnInit {
     });
   }
 
+  openDeleteModal(review: Review): void {
+    this.reviewToDelete = review;
+  }
+
+  closeDeleteModal(): void {
+    this.reviewToDelete = null;
+    this.isDeletingReview = false;
+  }
+
+  confirmDeleteReview(): void {
+    if (!this.reviewToDelete) return;
+    this.isDeletingReview = true;
+    this.deleteReview(this.reviewToDelete);
+  }
+
   deleteReview(review: Review): void {
     this.reviewService.deleteReview(review.id_valoracion).subscribe({
       next: () => {
         this.reviews = this.reviews.filter(r => r.id_valoracion !== review.id_valoracion);
         this.currentReviewPage = Math.min(this.currentReviewPage, this.totalReviewPages);
         this.bumpReviewChanges();
+        this.reviewToDelete = null;
+        this.isDeletingReview = false;
         this.cdr.detectChanges();
       },
-      error: () => {}
+      error: () => {
+        this.isDeletingReview = false;
+      }
     });
   }
 
   isOwnReview(review: Review): boolean {
     return this.currentUserId !== null && review.id_usuario === this.currentUserId;
+  }
+
+  canDeleteReview(review: Review): boolean {
+    return this.isOwnReview(review) || this.isAdminUser();
   }
 
   formatDate(dateStr: string): string {
