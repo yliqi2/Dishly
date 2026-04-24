@@ -297,6 +297,12 @@
 	display: block;
 }
 
+.avatar.avatar--with-image {
+	background: transparent;
+	color: transparent;
+	font-size: 0;
+}
+
 .user-meta {
 	display: flex;
 	flex-direction: column;

@@ -37,12 +37,14 @@ export class DishlySelectComponent {
 
   toggle(): void {
     this.isOpen.update(v => !v);
+    this.requestTranslateRefresh();
   }
 
   select(option: SelectOption): void {
     this.valueChange.emit(option.value);
     this.isOpen.set(false);
     this.focusCombobox();
+    this.requestTranslateRefresh();
   }
 
   private focusCombobox(): void {
@@ -87,5 +89,15 @@ export class DishlySelectComponent {
     if (!this.el.nativeElement.contains(event.target)) {
       this.isOpen.set(false);
     }
+  }
+
+  private requestTranslateRefresh(): void {
+    queueMicrotask(() => {
+      const doc = globalThis.document;
+      if (!doc) return;
+      const combo = doc.querySelector('.goog-te-combo') as HTMLSelectElement | null;
+      if (!combo || !combo.value) return;
+      combo.dispatchEvent(new Event('change'));
+    });
   }
 }

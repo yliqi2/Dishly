@@ -19,20 +19,22 @@ app-footer {
 .global-loading-overlay {
 	position: fixed;
 	inset: 0;
-	background: transparent;
+	background: color-mix(in srgb, var(--neutral-white) 72%, transparent);
+	backdrop-filter: blur(2px);
 	display: grid;
 	place-items: center;
 	z-index: 2;
-	pointer-events: none;
+	pointer-events: auto;
 }
 
 .global-loading-spinner {
 	width: 3rem;
 	height: 3rem;
 	border-radius: 50%;
-	border: 0.35rem solid var(--neutral-white);
+	border: 0.35rem solid color-mix(in srgb, var(--neutral-black) 18%, var(--neutral-white));
 	border-top-color: var(--highlight);
 	animation: global-spin 0.9s linear infinite;
+	box-shadow: 0 0 0 8px color-mix(in srgb, var(--neutral-white) 92%, transparent);
 }
 
 @keyframes global-spin {

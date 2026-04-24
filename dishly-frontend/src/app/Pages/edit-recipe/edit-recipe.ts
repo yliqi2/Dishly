@@ -62,6 +62,7 @@ export class EditRecipe implements OnDestroy, OnInit {
   filteredCategorias: CategoriaItem[] = [];
   private recipeId: number | null = null;
 
+  // Sirve para sincronizar las fotos y el índice de la foto principal
   readonly vm$ = combineLatest([this.photos$, this.coverIndex$]).pipe(
     map(([photos, coverIndex]) => {
       const nonCoverItems = photos
@@ -73,17 +74,20 @@ export class EditRecipe implements OnDestroy, OnInit {
       return { photos, coverIndex, nonCoverItems, placeholders };
     })
   );
+
   readonly photosError$ = new BehaviorSubject<boolean>(false);
   readonly submitting$ = new BehaviorSubject<boolean>(false);
   readonly submitError$ = new BehaviorSubject<string | null>(null);
   readonly submitSuccess$ = new BehaviorSubject<string | null>(null);
 
+  // Sirve para validar si el valor es un número entero
   private readonly integerValidator = (control: AbstractControl): ValidationErrors | null => {
     const v = control.value;
     if (v === null || v === '') return null;
     return Number.isInteger(Number(v)) ? null : { integer: true };
   };
 
+  // Sirve para validar si el valor es un precio válido
   private readonly priceValidator = (control: AbstractControl): ValidationErrors | null => {
     const v = control.value;
     if (v === null || v === '') return null;
@@ -100,6 +104,7 @@ export class EditRecipe implements OnDestroy, OnInit {
 
   readonly form: FormGroup;
 
+  // Sirve para crear el formulario de la página
   constructor(private readonly fb: FormBuilder) {
     this.form = this.fb.group({
       titulo: ['', [Validators.required, Validators.maxLength(255)]],
@@ -115,11 +120,13 @@ export class EditRecipe implements OnDestroy, OnInit {
     });
   }
 
+  // Sirve para validar si el campo es inválido
   isFieldInvalid(fieldName: string, parent?: AbstractControl | null): boolean {
     const control = parent ? parent.get(fieldName) : this.form.get(fieldName);
     return !!(control && control.invalid && control.touched);
   }
 
+  // Sirve para obtener el mensaje de error del campo
   getError(fieldName: string, parent?: AbstractControl | null): string {
     const control = parent ? parent.get(fieldName) : this.form.get(fieldName);
     if (!control || !control.errors || !control.touched) {
@@ -171,10 +178,12 @@ export class EditRecipe implements OnDestroy, OnInit {
     return 'Invalid value.';
   }
 
+  // Sirve para obtener los ingredientes del formulario
   get ingredientes(): FormArray<FormGroup> {
     return this.form.get('ingredientes') as FormArray<FormGroup>;
   }
 
+  // Sirve para obtener el mensaje de error de los ingredientes
   getIngredientsErrorMessage(): string {
     if (!this.ingredientes.invalid || !this.ingredientes.touched) {
       return '';
@@ -182,24 +191,29 @@ export class EditRecipe implements OnDestroy, OnInit {
     return 'All ingredient fields must be filled.';
   }
 
+  // Sirve para obtener el número de fotos
   get photoCount(): number {
     return this.photos$.value.length;
   }
 
+  // Sirve para validar si se puede subir más fotos
   get canUploadMorePhotos(): boolean {
     return this.photoCount < this.maxPhotos;
   }
 
+  // Sirve para aplicar el filtro de categorías
   private applyCategoryFilter(): void {
     const q = this.categorySearch.toLowerCase();
     const all = this.categorias$.value;
     this.filteredCategorias = all.filter((c) => c.nombre.toLowerCase().includes(q));
   }
 
+  // Sirve para validar si la categoría está seleccionada
   isCategorySelected(cat: CategoriaItem): boolean {
     return this.selectedCategories.some(c => c.id_categoria === cat.id_categoria);
   }
 
+  // Sirve para crear el grupo de ingredientes
   private createIngredientGroup(initial?: { cantidad?: number; nombre?: string; unidad?: string }): FormGroup {
     return this.fb.group({
       cantidad: [initial?.cantidad ?? null, [Validators.required, Validators.min(0.001)]],
@@ -208,10 +222,12 @@ export class EditRecipe implements OnDestroy, OnInit {
     });
   }
 
+  // Sirve para agregar un ingrediente al formulario
   addIngredient(): void {
     this.ingredientes.push(this.createIngredientGroup());
   }
 
+  // Sirve para eliminar un ingrediente del formulario
   removeIngredient(index: number): void {
     if (this.ingredientes.length === 1) {
       return;
@@ -219,11 +235,13 @@ export class EditRecipe implements OnDestroy, OnInit {
     this.ingredientes.removeAt(index);
   }
 
+  // Sirve para establecer la dificultad de la receta
   setDifficulty(level: DifficultyLevel): void {
     this.selectedDifficulty$.next(level);
     this.form.patchValue({ dificultad: level });
   }
 
+  // Sirve para abrir o cerrar el dropdown de categorías
   toggleCategoryDropdown(): void {
     this.categoryOpen = !this.categoryOpen;
     if (this.categoryOpen) {
@@ -232,10 +250,12 @@ export class EditRecipe implements OnDestroy, OnInit {
     }
   }
 
+  // Sirve para cerrar el dropdown de categorías
   closeCategoryDropdown(): void {
     this.categoryOpen = false;
   }
 
+  // Sirve para cerrar el dropdown de categorías cuando se pierde el foco
   onCategoryFocusOut(event: FocusEvent): void {
     const wrapper = event.currentTarget as HTMLElement | null;
     const next = event.relatedTarget as Node | null;
@@ -243,13 +263,16 @@ export class EditRecipe implements OnDestroy, OnInit {
     this.closeCategoryDropdown();
   }
 
+  // Sirve para buscar una categoría
   onCategorySearch(event: Event): void {
     this.categorySearch = (event.target as HTMLInputElement).value;
     this.applyCategoryFilter();
   }
 
+  // Sirve para seleccionar una categoría
   selectCategory(cat: CategoriaItem): void {
     const exists = this.isCategorySelected(cat);
+
     if (exists) {
       this.selectedCategories = this.selectedCategories.filter(
         c => c.id_categoria !== cat.id_categoria
@@ -257,28 +280,37 @@ export class EditRecipe implements OnDestroy, OnInit {
     } else {
       this.selectedCategories = [...this.selectedCategories, cat];
     }
+
+    // Sirve para actualizar el formulario con las categorías seleccionadas
     this.form.patchValue({
       categoria: this.selectedCategories.map(c => c.id_categoria)
     });
+
     this.form.get('categoria')?.markAsTouched();
     this.closeCategoryDropdown();
   }
 
+  // Sirve para eliminar una categoría
   removeCategory(cat: CategoriaItem): void {
     this.selectedCategories = this.selectedCategories.filter(
       c => c.id_categoria !== cat.id_categoria
     );
+
+    // Sirve para actualizar el formulario con las categorías seleccionadas
     this.form.patchValue({
       categoria: this.selectedCategories.map(c => c.id_categoria)
     });
+
     this.form.get('categoria')?.markAsTouched();
   }
 
+  // Sirve para cerrar el dropdown de categorías cuando se presiona la tecla Escape
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.categoryOpen) this.closeCategoryDropdown();
   }
 
+  // Sirve para seleccionar fotos
   onPhotosSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length || !this.canUploadMorePhotos) {
@@ -301,16 +333,20 @@ export class EditRecipe implements OnDestroy, OnInit {
       return;
     }
 
+    // Sirve para mapear las fotos seleccionadas
     const mapped = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       existingPath: null,
     }));
+
+    // Sirve para actualizar las fotos del formulario
     this.photos$.next([...current, ...mapped]);
     this.photosError$.next(false);
     input.value = '';
   }
 
+  // Sirve para seleccionar la foto principal
   selectCover(index: number): void {
     if (index < 0 || index >= this.photoCount) {
       return;
@@ -318,21 +354,27 @@ export class EditRecipe implements OnDestroy, OnInit {
     this.coverIndex$.next(index);
   }
 
+  // Sirve para validar si la foto es la principal
   isCover(index: number): boolean {
     return this.coverIndex$.value === index;
   }
 
+  // Sirve para eliminar una foto
   removePhoto(index: number): void {
     const current = [...this.photos$.value];
     const target = current[index];
+
+    // Sirve para revocar la URL de la foto
     if (target?.file) {
       URL.revokeObjectURL(target.url);
     }
 
+    // Sirve para eliminar la foto del formulario
     current.splice(index, 1);
     this.photos$.next(current);
 
     const currentCover = this.coverIndex$.value;
+
     if (current.length === 0) {
       this.coverIndex$.next(0);
       return;
@@ -348,6 +390,7 @@ export class EditRecipe implements OnDestroy, OnInit {
     }
   }
 
+  // Sirve para enviar el formulario de la página
   onSubmit(): void {
     if (this.submitting$.value) return;
     if (!this.recipeId) {
@@ -363,6 +406,7 @@ export class EditRecipe implements OnDestroy, OnInit {
     if (this.photoCount === 0) {
       this.photosError$.next(true);
     }
+
     if (this.form.invalid || this.photoCount === 0) {
       return;
     }
@@ -377,6 +421,8 @@ export class EditRecipe implements OnDestroy, OnInit {
       : photos;
 
     const raw = this.form.getRawValue();
+
+    // Sirve para crear el formulario de datos
     const formData = new FormData();
     formData.append('_method', 'PUT');
     formData.append('titulo', String(raw.titulo ?? '').trim());
@@ -387,16 +433,19 @@ export class EditRecipe implements OnDestroy, OnInit {
     formData.append('dificultad', String(raw.dificultad ?? 'easy'));
     formData.append('porciones', String(raw.porciones ?? 1));
 
+    // Sirve para agregar el precio al formulario
     const priceRaw = raw.price;
     if (priceRaw !== null && priceRaw !== undefined && String(priceRaw).trim() !== '') {
       formData.append('price', String(priceRaw).trim());
     }
 
+    // Sirve para agregar las categorías al formulario
     const categorias = Array.isArray(raw.categoria) ? raw.categoria : [];
     categorias.forEach((id: unknown) => {
       formData.append('categorias[]', String(id));
     });
 
+    // Sirve para agregar los ingredientes al formulario
     const ingredientes = Array.isArray(raw.ingredientes) ? raw.ingredientes : [];
     ingredientes.forEach((ing: any, index: number) => {
       formData.append(`ingredientes[${index}][nombre]`, String(ing?.nombre ?? '').trim());
@@ -404,6 +453,7 @@ export class EditRecipe implements OnDestroy, OnInit {
       formData.append(`ingredientes[${index}][unidad]`, String(ing?.unidad ?? 'g'));
     });
 
+    // Sirve para agregar las fotos al formulario
     let newImageIndex = 0;
     orderedPhotos.forEach((photo) => {
       if (photo.file) {
@@ -418,6 +468,7 @@ export class EditRecipe implements OnDestroy, OnInit {
       }
     });
 
+    // Sirve para enviar el formulario al servidor
     this.http.post(`/api/recetas/${this.recipeId}`, formData).subscribe({
       next: () => {
         this.submitSuccess$.next('Recipe updated successfully.');
@@ -433,10 +484,12 @@ export class EditRecipe implements OnDestroy, OnInit {
     });
   }
 
+  // Sirve para cancelar la edición de la receta
   onCancel(): void {
     this.router.navigateByUrl('/profile');
   }
 
+  // Sirve para destruir el componente
   ngOnDestroy(): void {
     for (const item of this.photos$.value) {
       if (item.file) {
@@ -445,7 +498,10 @@ export class EditRecipe implements OnDestroy, OnInit {
     }
   }
 
+  // Sirve para inicializar el componente
   ngOnInit(): void {
+
+    // Sirve para obtener las categorías
     this.categoriaService.getAll().subscribe({
       next: (cats) => {
         this.categorias$.next(cats);
@@ -456,6 +512,7 @@ export class EditRecipe implements OnDestroy, OnInit {
       },
     });
 
+    // Sirve para obtener la receta
     const routeId = Number(this.route.snapshot.paramMap.get('id'));
     if (!Number.isInteger(routeId) || routeId <= 0) {
       this.submitError$.next('Recipe not found.');
@@ -463,6 +520,7 @@ export class EditRecipe implements OnDestroy, OnInit {
       return;
     }
 
+    // Sirve para obtener la receta
     this.recetaDetailsService.getRecipeById(routeId).subscribe({
       next: (recipe) => {
         const currentUser = this.authService.getUser() as Record<string, unknown> | null;
@@ -487,12 +545,14 @@ export class EditRecipe implements OnDestroy, OnInit {
     });
   }
 
+  // Sirve para poblar el formulario con los datos de la receta
   private populateForm(recipe: RecetaOriginal): void {
     this.selectedCategories = (recipe.categorias ?? []).map((category) => ({
       id_categoria: category.id_categoria,
       nombre: category.nombre,
     }));
 
+    // Sirve para crear los grupos de ingredientes
     const ingredientGroups = (recipe.ingredientes?.length ? recipe.ingredientes : [
       { cantidad: undefined, nombre: '', unidad: 'g' },
     ]).map((ingredient) => this.createIngredientGroup({
@@ -501,6 +561,7 @@ export class EditRecipe implements OnDestroy, OnInit {
       unidad: ingredient.unidad,
     }));
 
+    // Sirve para establecer el control de ingredientes
     this.form.setControl('ingredientes', this.fb.array(ingredientGroups));
     this.form.patchValue({
       titulo: recipe.titulo,
@@ -514,6 +575,7 @@ export class EditRecipe implements OnDestroy, OnInit {
       categoria: this.selectedCategories.map((category) => category.id_categoria),
     });
 
+    // Sirve para obtener las imágenes existentes
     const existingImages = [
       recipe.imagen_1,
       recipe.imagen_2,
@@ -521,13 +583,15 @@ export class EditRecipe implements OnDestroy, OnInit {
       recipe.imagen_4,
       recipe.imagen_5,
     ]
+
+    // Sirve para filtrar las imágenes existentes
       .filter((imagePath): imagePath is string => !!imagePath)
       .map((imagePath) => ({
         file: null,
         url: this.authService.getAssetUrl(imagePath, recipe.updated_at ?? undefined),
         existingPath: imagePath,
       }));
-
+      
     this.photos$.next(existingImages);
     this.coverIndex$.next(0);
     this.selectedDifficulty$.next(recipe.dificultad);

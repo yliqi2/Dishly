@@ -75,6 +75,7 @@ export class RecipeDetail implements OnInit {
   private currentUserUpdatedAt: string | null = null;
   private readonly reviewChanges = signal(0);
 
+  // Sirve para obtener la calificación promedio de las reseñas
   readonly reviewAverageSignal = computed(() => {
     this.reviewChanges();
 
@@ -86,6 +87,7 @@ export class RecipeDetail implements OnInit {
     return total / this.reviews.length;
   });
 
+  // Sirve para inicializar el componente
   ngOnInit(): void {
     const user = this.authService.getUser() as {
       id_usuario?: number;
@@ -142,6 +144,7 @@ export class RecipeDetail implements OnInit {
     });
   }
 
+  // Sirve para calcular las miniaturas de la receta
   private computeThumbnails(r: RecetaOriginal): string[] {
     const thumbs: string[] = [];
 
@@ -160,6 +163,7 @@ export class RecipeDetail implements OnInit {
     return thumbs;
   }
 
+  // Sirve para calcular las instrucciones de la receta
   private computeInstructions(text: string): string[] {
     if (!text) return [];
     return text
@@ -168,18 +172,21 @@ export class RecipeDetail implements OnInit {
       .filter(s => s.length > 0);
   }
 
+  // Sirve para obtener el tiempo de preparación de la receta
   getTimeLabel(): string {
     if (!this.recipe) return '';
     const unit = this.recipe.tiempo_preparacion_unidad === 'hours' ? 'h' : 'min';
     return `${this.recipe.tiempo_preparacion} ${unit}`;
   }
 
+  // Sirve para obtener el precio de la receta
   getDisplayPrice(): string {
     if (!this.recipe || this.recipe.price === null || this.recipe.price === undefined) return 'Free';
     const value = Number(this.recipe.price);
     return Number.isFinite(value) && value > 0 ? `${value.toFixed(2)}€` : 'Free';
   }
 
+  // Sirve para obtener la fecha de publicación de la receta
   getPublishedDate(): string {
     if (!this.recipe?.fecha_creacion) return '';
     const date = new Date(this.recipe.fecha_creacion);
@@ -187,6 +194,7 @@ export class RecipeDetail implements OnInit {
     return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  // Sirve para obtener la URL del avatar del autor de la receta
   getAuthorAvatarUrl(): string | null {
     if (this.recipe?.autor_icon_path) {
       return this.authService.getAssetUrl(this.recipe.autor_icon_path, this.recipe.autor_updated_at ?? undefined);
@@ -204,6 +212,7 @@ export class RecipeDetail implements OnInit {
     return null;
   }
 
+  // Sirve para obtener la URL del avatar del autor de la reseña
   getReviewAvatarUrl(review: Review): string | null {
     if (review.autor_icon_path) {
       return this.authService.getAssetUrl(review.autor_icon_path, review.autor_updated_at ?? undefined);
@@ -220,6 +229,7 @@ export class RecipeDetail implements OnInit {
     return null;
   }
 
+  // Sirve para obtener el número de barras de dificultad
   getDifficultyBars(): number {
     if (!this.recipe) return 1;
     switch (this.recipe.dificultad) {
@@ -229,6 +239,7 @@ export class RecipeDetail implements OnInit {
     }
   }
 
+  // Sirve para obtener la etiqueta de dificultad
   getDifficultyLabel(): string {
     if (!this.recipe) return '';
     switch (this.recipe.dificultad) {
@@ -239,16 +250,19 @@ export class RecipeDetail implements OnInit {
     }
   }
 
+  // Sirve para validar si la receta es premium
   isPremium(): boolean {
     if (!this.recipe || this.recipe.price === null || this.recipe.price === undefined) return false;
     const value = Number(this.recipe.price);
     return Number.isFinite(value) && value > 0;
   }
 
+  // Sirve para validar si el usuario es administrador
   isAdminUser(): boolean {
     return this.currentUserRole === 'admin';
   }
 
+  // Sirve para verificar el acceso a la receta
   private checkAccess(id: string): void {
     if (!this.recipe) return;
 
@@ -267,6 +281,7 @@ export class RecipeDetail implements OnInit {
         return;
       }
 
+      // Sirve para validar si la receta está bloqueada
       this.isLocked = true;
       if (this.authService.isAuthenticated()) {
         this.recetaService.checkPurchase(id).subscribe({
@@ -283,10 +298,12 @@ export class RecipeDetail implements OnInit {
     }
   }
 
+  // Sirve para validar si la receta tiene múltiples imágenes
   hasMultipleImages(): boolean {
     return this.thumbnails.length > 1;
   }
 
+  // Sirve para agregar la receta al carrito
   addToCart(): void {
     if (!this.recipe || !this.isPremium()) {
       return;
@@ -321,18 +338,22 @@ export class RecipeDetail implements OnInit {
     });
   }
 
+  // Sirve para obtener las miniaturas visibles
   visibleThumbnails(): string[] {
     return this.hasMultipleImages() ? this.thumbnails.slice(0, 5) : this.thumbnails;
   }
 
+  // Sirve para obtener el número de miniaturas ocultas
   hiddenThumbnailsCount(): number {
     return Math.max(0, this.thumbnails.length - 5);
   }
 
+  // Sirve para validar si la miniatura es la de resumen
   isSummaryThumbnail(index: number): boolean {
     return this.hiddenThumbnailsCount() > 0 && index === 4;
   }
 
+  // Sirve para seleccionar una miniatura
   selectThumbnail(index: number): void {
     if (index === this.selectedThumbnailIndex) return;
     if (!this.hasMultipleImages()) {
@@ -347,6 +368,7 @@ export class RecipeDetail implements OnInit {
     this.startMainImageSlide(from, to, direction);
   }
 
+  // Sirve para seleccionar la imagen anterior
   prevImage(): void {
     if (!this.hasMultipleImages()) {
       return;
@@ -357,6 +379,7 @@ export class RecipeDetail implements OnInit {
     this.startMainImageSlide(from, to, 'prev');
   }
 
+  // Sirve para seleccionar la imagen siguiente
   nextImage(): void {
     if (!this.hasMultipleImages()) {
       return;
@@ -367,6 +390,7 @@ export class RecipeDetail implements OnInit {
     this.startMainImageSlide(from, to, 'next');
   }
 
+  // Sirve para sincronizar las URLs de las imágenes principales
   private syncMainImageSlideUrls(): void {
     const src = this.thumbnails[this.selectedThumbnailIndex] ?? 'assets/icons/DishlyIcon.webp';
     this.mainImageSlideLeftSrc = src;
@@ -375,6 +399,7 @@ export class RecipeDetail implements OnInit {
     this.mainImageSlideNoTransition = true;
   }
 
+  // Sirve para iniciar el slide de la imagen principal
   private startMainImageSlide(from: number, to: number, direction: 'next' | 'prev'): void {
     if (!this.hasMultipleImages() || from === to) {
       return;
@@ -415,6 +440,7 @@ export class RecipeDetail implements OnInit {
     }
   }
 
+  // Sirve para finalizar el slide de la imagen principal
   private finishMainImageSlide(to: number): void {
     this.selectedThumbnailIndex = to;
     const src = this.thumbnails[to] ?? 'assets/icons/DishlyIcon.webp';
@@ -431,10 +457,12 @@ export class RecipeDetail implements OnInit {
   setEditRating(rating: number): void { this.editingRating = rating; }
   setEditHoverRating(rating: number): void { this.editingHoverRating = rating; }
 
+  // Sirve para obtener el número de páginas de reseñas
   get totalReviewPages(): number {
     return Math.max(1, Math.ceil(this.reviews.length / this.reviewsPerPage));
   }
 
+  // Sirve para obtener la calificación promedio de las reseñas
   get reviewAverage(): number {
     this.reviewChanges();
 
@@ -446,6 +474,7 @@ export class RecipeDetail implements OnInit {
     return total / this.reviews.length;
   }
 
+  // Sirve para obtener las reseñas ordenadas
   get sortedReviews(): Review[] {
     const ownReviews: Review[] = [];
     const otherReviews: Review[] = [];
@@ -464,18 +493,22 @@ export class RecipeDetail implements OnInit {
     return [...ownReviews, ...otherReviews];
   }
 
+  // Sirve para comparar las reseñas por el criterio de ordenamiento
   private compareReviewsBySort(a: Review, b: Review): number {
     switch (this.reviewSort) {
+      // Sirve para comparar las reseñas por la puntuación más alta
       case 'highest': {
         const scoreDiff = b.puntuacion - a.puntuacion;
         if (scoreDiff !== 0) return scoreDiff;
         return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
       }
+      // Sirve para comparar las reseñas por la puntuación más baja
       case 'lowest': {
         const scoreDiff = a.puntuacion - b.puntuacion;
         if (scoreDiff !== 0) return scoreDiff;
         return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
       }
+      // Sirve para comparar las reseñas por la fecha más reciente
       case 'latest':
       default: {
         const dateDiff = new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
@@ -485,15 +518,18 @@ export class RecipeDetail implements OnInit {
     }
   }
 
+  // Sirve para obtener las reseñas paginadas
   get paginatedReviews(): Review[] {
     const start = (this.currentReviewPage - 1) * this.reviewsPerPage;
     return this.sortedReviews.slice(start, start + this.reviewsPerPage);
   }
 
+  // Sirve para validar si hay paginación de reseñas
   hasReviewPagination(): boolean {
     return this.reviews.length > this.reviewsPerPage;
   }
 
+  // Sirve para establecer el criterio de ordenamiento de las reseñas
   setReviewSort(value: string): void {
     if (value !== 'latest' && value !== 'highest' && value !== 'lowest') {
       return;
@@ -508,6 +544,7 @@ export class RecipeDetail implements OnInit {
     this.cdr.detectChanges();
   }
 
+  // Sirve para ir a la página de reseñas
   goToReviewPage(page: number): void {
     if (page < 1 || page > this.totalReviewPages || page === this.currentReviewPage) {
       return;
@@ -517,10 +554,12 @@ export class RecipeDetail implements OnInit {
     this.cdr.detectChanges();
   }
 
+  // Sirve para obtener los números de página de reseñas
   reviewPageNumbers(): number[] {
     return Array.from({ length: this.totalReviewPages }, (_, index) => index + 1);
   }
 
+  // Sirve para cargar las reseñas
   loadReviews(): void {
     if (!this.recipe) return;
     this.reviewService.getReviews(this.recipe.id_receta).subscribe({
@@ -539,10 +578,12 @@ export class RecipeDetail implements OnInit {
     });
   }
 
+  // Sirve para validar si la receta es propia
   isOwnRecipe(): boolean {
     return this.currentUserId !== null && this.recipe?.id_autor === this.currentUserId;
   }
 
+  // Sirve para enviar una reseña
   submitReview(): void {
     if (!this.recipe) return;
     if (this.isOwnRecipe()) {
@@ -570,6 +611,7 @@ export class RecipeDetail implements OnInit {
     this.submitError = null;
     this.cdr.detectChanges();
 
+    // Sirve para enviar la reseña
     this.reviewService.submitReview({
       id_receta: this.recipe.id_receta,
       puntuacion: this.userRating,
@@ -591,6 +633,7 @@ export class RecipeDetail implements OnInit {
     });
   }
 
+  // Sirve para iniciar la edición de una reseña
   startEdit(review: Review): void {
     this.editingReviewId = review.id_valoracion;
     this.editingComment = review.comentario;
@@ -599,6 +642,7 @@ export class RecipeDetail implements OnInit {
     this.cdr.detectChanges();
   }
 
+  // Sirve para cancelar la edición de una reseña
   cancelEdit(): void {
     this.editingReviewId = null;
     this.editingComment = '';
@@ -607,6 +651,7 @@ export class RecipeDetail implements OnInit {
     this.cdr.detectChanges();
   }
 
+  // Sirve para guardar la edición de una reseña
   saveEdit(review: Review): void {
     if (!this.editingComment.trim() || !this.editingRating) return;
     this.reviewService.updateReviewWithPuntuacion(review.id_receta, this.editingRating, this.editingComment.trim()).subscribe({
@@ -620,30 +665,35 @@ export class RecipeDetail implements OnInit {
         this.bumpReviewChanges();
         this.cdr.detectChanges();
       },
-      error: () => {}
+      error: () => { }
     });
   }
 
+  // Sirve para abrir el modal de eliminación de una reseña
   openDeleteModal(review: Review): void {
     this.reviewToDelete = review;
   }
 
+  // Sirve para cerrar el modal de eliminación de una reseña
   closeDeleteModal(): void {
     this.reviewToDelete = null;
     this.isDeletingReview = false;
   }
 
+  // Sirve para confirmar la eliminación de una reseña
   confirmDeleteReview(): void {
     if (!this.reviewToDelete) return;
     this.isDeletingReview = true;
     this.deleteReview(this.reviewToDelete);
   }
 
+  // Sirve para eliminar una reseña
   deleteReview(review: Review): void {
     this.reviewService.deleteReview(review.id_valoracion).subscribe({
       next: () => {
         this.reviews = this.reviews.filter(r => r.id_valoracion !== review.id_valoracion);
         this.currentReviewPage = Math.min(this.currentReviewPage, this.totalReviewPages);
+        // Sirve para actualizar el contador de cambios de reseñas
         this.bumpReviewChanges();
         this.reviewToDelete = null;
         this.isDeletingReview = false;
@@ -655,19 +705,23 @@ export class RecipeDetail implements OnInit {
     });
   }
 
+  // Sirve para validar si la reseña es propia
   isOwnReview(review: Review): boolean {
     return this.currentUserId !== null && review.id_usuario === this.currentUserId;
   }
 
+  // Sirve para validar si se puede eliminar una reseña
   canDeleteReview(review: Review): boolean {
     return this.isOwnReview(review) || this.isAdminUser();
   }
 
+  // Sirve para formatear la fecha de una reseña
   formatDate(dateStr: string): string {
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  // Sirve para obtener las iniciales de un nombre
   getInitials(name: string): string {
     if (!name) return '??';
     const parts = name.split(' ');
@@ -675,6 +729,7 @@ export class RecipeDetail implements OnInit {
     return name.substring(0, 2).toUpperCase();
   }
 
+  // Sirve para actualizar el contador de cambios de reseñas
   private bumpReviewChanges(): void {
     this.reviewChanges.update((value) => value + 1);
   }

@@ -9,10 +9,13 @@ export class AuthGuard implements CanActivate {
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
 
+  // Sirve para verificar si el usuario está autenticado
   canActivate(): boolean | UrlTree {
     if (!isPlatformBrowser(this.platformId)) {
       return true;
     }
+
+    // Sirve para verificar si el usuario está autenticado
     if (this.auth.isAuthenticated()) {
       return true;
     }

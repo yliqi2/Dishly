@@ -7,7 +7,8 @@ import { lastValueFrom } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 import { RecipeChatbotService } from '../../../Services/recipe-chatbot.service';
 import { AuthServices } from '../../../Core/Services/Auth/auth-services';
-import { SpoonacularRecipe, SpoonacularService } from '../../../Core/Services/Spoonacular/spoonacular.service';
+import { SpoonacularService } from '../../../Core/Services/Spoonacular/spoonacular.service';
+import { SpoonacularRecipe } from '../../../Core/Interfaces/Spoonacular';
 import { ChatMessage, InternetSearchResult, RecetaData } from '../../../Models/recipe-chatbot.model';
 
 @Component({
@@ -35,6 +36,7 @@ export class RecipeChatbot implements OnInit {
   showClearModal = false;
   isLoading = signal<boolean>(false);
 
+  // Sirve para definir las sugerencias de recetas
   sugerencias: string[] = [
     'Generate a smash burger recipe with crispy onions',
     'Create a quick 20-minute dinner recipe with chicken and rice',
@@ -44,11 +46,13 @@ export class RecipeChatbot implements OnInit {
     'Generate a vegetarian pasta recipe under 30 minutes'
   ];
 
+  // Sirve para obtener el nombre de usuario
   protected get currentUserName(): string {
     const user = this.authService.getUser() as Record<string, unknown> | null;
     return String(user?.['nombre'] ?? user?.['name'] ?? 'User');
   }
 
+  // Sirve para obtener la URL del avatar del usuario
   protected get currentUserAvatarUrl(): string | null {
     const user = this.authService.getUser() as Record<string, unknown> | null;
     const iconPath = user?.['icon_path'];
@@ -61,10 +65,12 @@ export class RecipeChatbot implements OnInit {
     return this.authService.getAssetUrl(iconPath, typeof updatedAt === 'string' ? updatedAt : undefined);
   }
 
+  // Sirve para obtener la inicial del usuario
   protected get currentUserInitial(): string {
     return this.currentUserName.charAt(0).toUpperCase();
   }
 
+  // Sirve para obtener la URL de la imagen de la receta
   protected getRecipeImageUrl(path: string | null | undefined): string {
     if (!path) {
       return 'assets/icons/DishlyIcon.webp';
@@ -73,6 +79,7 @@ export class RecipeChatbot implements OnInit {
     return this.authService.getAssetUrl(path);
   }
 
+  // Sirve para obtener las imágenes visibles de la receta
   protected getVisibleImages(receta: RecetaData): string[] {
     const rawImages = Array.isArray(receta.imagenes) ? receta.imagenes : [];
     const cleaned = rawImages.filter((path) => typeof path === 'string' && path.trim().length > 0);
@@ -84,10 +91,12 @@ export class RecipeChatbot implements OnInit {
     return [this.getRecipeImageUrl(receta.imagen_principal)];
   }
 
+  // Sirve para inicializar el componente
   ngOnInit() {
     this.addWelcomeMessage();
   }
 
+  // Sirve para agregar el mensaje de bienvenida
   addWelcomeMessage() {
     this.messages.push({
       id: Date.now(),
@@ -99,6 +108,7 @@ export class RecipeChatbot implements OnInit {
     this.scrollToBottom();
   }
 
+  // Sirve para enviar el mensaje
   async sendMessage() {
     if (!this.newMessage.trim() || this.isLoading()) return;
 
@@ -116,6 +126,7 @@ export class RecipeChatbot implements OnInit {
     this.isLoading.set(true);
     this.scrollToBottom();
 
+    // Sirve para extraer la consulta de internet
     const internetQuery = this.extractInternetQuery(textToSend);
     if (internetQuery) {
       await this.sendInternetRecipe(internetQuery);
@@ -125,7 +136,7 @@ export class RecipeChatbot implements OnInit {
       return;
     }
 
-    // Indicador de escritura
+    // Sirve para agregar el indicador de escritura
     const typingIndicator: ChatMessage = {
       id: Date.now() + 1,
       role: 'assistant',
@@ -134,16 +145,20 @@ export class RecipeChatbot implements OnInit {
       receta: null,
       isTyping: true
     };
+
+    // Sirve para agregar el indicador de escritura
     this.messages.push(typingIndicator);
     this.scrollToBottom();
 
+    // Sirve para enviar la consulta al chatbot
     try {
       const response = await lastValueFrom(this.chatbotService.buscarReceta(textToSend));
 
-      // Remover indicador de escritura
+      // Sirve para remover el indicador de escritura
       this.messages = this.messages.filter(m => !m.isTyping);
 
       if (response?.status === 'success') {
+        // Sirve para agregar el mensaje del asistente
         const assistantMessage: ChatMessage = {
           id: Date.now(),
           role: 'assistant',
@@ -151,8 +166,10 @@ export class RecipeChatbot implements OnInit {
           timestamp: new Date(),
           receta: response.receta ?? null
         };
+
         this.messages.push(assistantMessage);
       } else {
+        // Sirve para agregar el mensaje de error
         this.messages.push({
           id: Date.now(),
           role: 'assistant',
@@ -165,6 +182,7 @@ export class RecipeChatbot implements OnInit {
       console.error('Error in chatbot service:', error);
       this.messages = this.messages.filter(m => !m.isTyping);
 
+      // Sirve para obtener el mensaje de error del backend
       const backendMessage = this.getErrorMessage(error);
       this.messages.push({
         id: Date.now(),
@@ -174,31 +192,38 @@ export class RecipeChatbot implements OnInit {
         receta: null
       });
     } finally {
+      // Sirve para actualizar el estado de carga
       this.isLoading.set(false);
       this.scrollToBottom();
       setTimeout(() => this.messageInput?.nativeElement?.focus(), 100);
     }
   }
 
+  // Sirve para usar una sugerencia de receta
   usarSugerencia(sugerencia: string) {
     this.newMessage = sugerencia.replace(/^[^\p{L}\p{N}]+/u, '').trim();
     this.sendMessage();
   }
 
+  // Sirve para limpiar el chat
   limpiarChat() {
     this.showClearModal = true;
   }
 
+  // Sirve para cancelar la limpieza del chat
   cancelClearChat() {
     this.showClearModal = false;
   }
 
+  // Sirve para confirmar la limpieza del chat
   confirmClearChat() {
     this.messages = [];
+    // Sirve para agregar el mensaje de bienvenida
     this.addWelcomeMessage();
     this.showClearModal = false;
   }
 
+  // Sirve para scrollar al final del chat
   private scrollToBottom(): void {
     setTimeout(() => {
       if (this.messagesContainer) {
@@ -207,6 +232,7 @@ export class RecipeChatbot implements OnInit {
     }, 100);
   }
 
+  // Sirve para manejar el presionamiento de la tecla Enter
   handleKeyPress(event: KeyboardEvent) {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -214,14 +240,17 @@ export class RecipeChatbot implements OnInit {
     }
   }
 
+  // Sirve para obtener el mensaje de error
   private getErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
       const apiMessage = error.error?.message;
 
+      // Sirve para verificar si el mensaje de error es una cadena de texto
       if (typeof apiMessage === 'string' && apiMessage.trim().length > 0) {
         return apiMessage;
       }
 
+      // Sirve para verificar si el estado de la respuesta es 0
       if (error.status === 0) {
         return 'I could not reach the AI service just now. Please try again in a moment.';
       }
@@ -230,27 +259,34 @@ export class RecipeChatbot implements OnInit {
     return 'Something went wrong while processing your message. Please try again.';
   }
 
+  // Sirve para extraer la consulta de internet
   private extractInternetQuery(message: string): string | null {
+    // Sirve para verificar si la consulta de internet es válida
     if (!RecipeChatbot.INTERNET_SEARCH_TRIGGER.test(message)) {
       return null;
     }
 
+    // Sirve para normalizar la consulta de internet
     const normalizedMessage = message.trim();
+    
     const englishQuery = normalizedMessage.match(/\bsearch\b([\s\S]*?)\bon internet\b/iu);
     const spanishQuery = normalizedMessage.match(/\bbusca\b([\s\S]*?)\ben internet\b/iu);
     const extractedQuery = (englishQuery?.[1] ?? spanishQuery?.[1] ?? '')
       .replace(/\s+/g, ' ')
       .trim();
 
+    // Sirve para retornar la consulta de internet
     return extractedQuery || 'easy recipe';
   }
 
+  // Sirve para enviar la consulta de internet
   private async sendInternetRecipe(query: string): Promise<void> {
     try {
       const response = await lastValueFrom(this.spoonacularService.searchRecipes(query, 1));
       const recipe = response.results?.[0];
 
       if (!recipe) {
+        // Sirve para agregar el mensaje de error
         this.messages.push({
           id: Date.now(),
           role: 'assistant',
@@ -261,6 +297,7 @@ export class RecipeChatbot implements OnInit {
         return;
       }
 
+      // Sirve para agregar el mensaje del asistente
       this.messages.push({
         id: Date.now(),
         role: 'assistant',
@@ -270,6 +307,7 @@ export class RecipeChatbot implements OnInit {
         receta: null
       });
     } catch {
+      // Sirve para agregar el mensaje de error
       this.messages.push({
         id: Date.now(),
         role: 'assistant',
@@ -280,10 +318,14 @@ export class RecipeChatbot implements OnInit {
     }
   }
 
+  // Sirve para construir el resultado de la búsqueda de internet
   private buildInternetResult(recipe: SpoonacularRecipe): InternetSearchResult {
+    // Sirve para remover el HTML del resumen
     const summary = this.removeHtml(recipe.summary ?? '').trim();
+    // Sirve para obtener la URL de la fuente
     const source = recipe.sourceUrl || 'https://spoonacular.com/food-api';
 
+    // Sirve para retornar el resultado de la búsqueda de internet
     return {
       title: recipe.title,
       timeText: `${recipe.readyInMinutes || 'N/A'} min`,
@@ -293,6 +335,7 @@ export class RecipeChatbot implements OnInit {
     };
   }
 
+  // Sirve para remover el HTML de un valor
   private removeHtml(value: string): string {
     return value.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
   }

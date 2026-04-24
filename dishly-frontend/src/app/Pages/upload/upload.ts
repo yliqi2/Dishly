@@ -49,6 +49,7 @@ export class Upload implements OnDestroy, OnInit {
   categorySearch = '';
   filteredCategorias: CategoriaItem[] = [];
 
+  // Sirve para combinar los observables de las fotos y el índice de la foto cubierta
   readonly vm$ = combineLatest([this.photos$, this.coverIndex$]).pipe(
     map(([photos, coverIndex]) => {
       const nonCoverItems = photos
@@ -60,17 +61,20 @@ export class Upload implements OnDestroy, OnInit {
       return { photos, coverIndex, nonCoverItems, placeholders };
     })
   );
+
   readonly photosError$ = new BehaviorSubject<boolean>(false);
   readonly submitting$ = new BehaviorSubject<boolean>(false);
   readonly submitError$ = new BehaviorSubject<string | null>(null);
   readonly submitSuccess$ = new BehaviorSubject<string | null>(null);
 
+  // Sirve para validar que el valor sea un número entero
   private readonly integerValidator = (control: AbstractControl): ValidationErrors | null => {
     const v = control.value;
     if (v === null || v === '') return null;
     return Number.isInteger(Number(v)) ? null : { integer: true };
   };
 
+  // Sirve para validar que el valor sea un número decimal con hasta 2 decimales
   private readonly priceValidator = (control: AbstractControl): ValidationErrors | null => {
     const v = control.value;
     if (v === null || v === '') return null;
@@ -87,6 +91,7 @@ export class Upload implements OnDestroy, OnInit {
 
   readonly form: FormGroup;
 
+  // Sirve para crear el formulario de la página
   constructor(private readonly fb: FormBuilder) {
     this.form = this.fb.group({
       titulo: ['', [Validators.required, Validators.maxLength(255)]],
@@ -102,11 +107,13 @@ export class Upload implements OnDestroy, OnInit {
     });
   }
 
+  // Sirve para validar si un campo del formulario es inválido
   isFieldInvalid(fieldName: string, parent?: AbstractControl | null): boolean {
     const control = parent ? parent.get(fieldName) : this.form.get(fieldName);
     return !!(control && control.invalid && control.touched);
   }
 
+  // Sirve para obtener el mensaje de error de un campo del formulario
   getError(fieldName: string, parent?: AbstractControl | null): string {
     const control = parent ? parent.get(fieldName) : this.form.get(fieldName);
     if (!control || !control.errors || !control.touched) {
@@ -158,10 +165,12 @@ export class Upload implements OnDestroy, OnInit {
     return 'Invalid value.';
   }
 
+  // Sirve para obtener el array de ingredientes del formulario
   get ingredientes(): FormArray<FormGroup> {
     return this.form.get('ingredientes') as FormArray<FormGroup>;
   }
 
+  // Sirve para obtener el mensaje de error de los ingredientes del formulario
   getIngredientsErrorMessage(): string {
     if (!this.ingredientes.invalid || !this.ingredientes.touched) {
       return '';
@@ -169,24 +178,29 @@ export class Upload implements OnDestroy, OnInit {
     return 'All ingredient fields must be filled.';
   }
 
+  // Sirve para obtener el número de fotos del formulario
   get photoCount(): number {
     return this.photos$.value.length;
   }
 
+  // Sirve para validar si se puede subir más fotos
   get canUploadMorePhotos(): boolean {
     return this.photoCount < this.maxPhotos;
   }
 
+  // Sirve para aplicar el filtro de categorías
   private applyCategoryFilter(): void {
     const q = this.categorySearch.toLowerCase();
     const all = this.categorias$.value;
     this.filteredCategorias = all.filter((c) => c.nombre.toLowerCase().includes(q));
   }
 
+  // Sirve para validar si una categoría está seleccionada
   isCategorySelected(cat: CategoriaItem): boolean {
     return this.selectedCategories.some(c => c.id_categoria === cat.id_categoria);
   }
 
+  // Sirve para crear un grupo de ingredientes
   private createIngredientGroup(): FormGroup {
     return this.fb.group({
       cantidad: [null, [Validators.required, Validators.min(0.001)]],
@@ -195,10 +209,12 @@ export class Upload implements OnDestroy, OnInit {
     });
   }
 
+  // Sirve para agregar un ingrediente al formulario
   addIngredient(): void {
     this.ingredientes.push(this.createIngredientGroup());
   }
 
+  // Sirve para eliminar un ingrediente del formulario
   removeIngredient(index: number): void {
     if (this.ingredientes.length === 1) {
       return;
@@ -206,20 +222,24 @@ export class Upload implements OnDestroy, OnInit {
     this.ingredientes.removeAt(index);
   }
 
+  // Sirve para crear un grupo de pasos
   private createStepGroup(): FormGroup {
     return this.fb.group({
       paso: ['', [Validators.required]],
     });
   }
 
+  // Sirve para obtener el array de pasos del formulario
   get instruccionesArray(): FormArray<FormGroup> {
     return this.form.get('instrucciones') as FormArray<FormGroup>;
   }
 
+  // Sirve para agregar un paso al formulario
   addStep(): void {
     this.instruccionesArray.push(this.createStepGroup());
   }
 
+  // Sirve para eliminar un paso del formulario
   removeStep(index: number): void {
     if (this.instruccionesArray.length === 1) {
       return;
@@ -227,11 +247,13 @@ export class Upload implements OnDestroy, OnInit {
     this.instruccionesArray.removeAt(index);
   }
 
+  // Sirve para establecer la dificultad de la receta
   setDifficulty(level: DifficultyLevel): void {
     this.selectedDifficulty$.next(level);
     this.form.patchValue({ dificultad: level });
   }
 
+  // Sirve para alternar el estado del dropdown de categorías
   toggleCategoryDropdown(): void {
     this.categoryOpen = !this.categoryOpen;
     if (this.categoryOpen) {
@@ -240,10 +262,12 @@ export class Upload implements OnDestroy, OnInit {
     }
   }
 
+  // Sirve para cerrar el dropdown de categorías
   closeCategoryDropdown(): void {
     this.categoryOpen = false;
   }
 
+  // Sirve para validar si el foco está fuera del dropdown de categorías
   onCategoryFocusOut(event: FocusEvent): void {
     const wrapper = event.currentTarget as HTMLElement | null;
     const next = event.relatedTarget as Node | null;
@@ -251,11 +275,13 @@ export class Upload implements OnDestroy, OnInit {
     this.closeCategoryDropdown();
   }
 
+  // Sirve para buscar una categoría
   onCategorySearch(event: Event): void {
     this.categorySearch = (event.target as HTMLInputElement).value;
     this.applyCategoryFilter();
   }
 
+  // Sirve para seleccionar una categoría
   selectCategory(cat: CategoriaItem): void {
     const exists = this.isCategorySelected(cat);
     if (exists) {
@@ -272,6 +298,7 @@ export class Upload implements OnDestroy, OnInit {
     this.closeCategoryDropdown();
   }
 
+  // Sirve para eliminar una categoría
   removeCategory(cat: CategoriaItem): void {
     this.selectedCategories = this.selectedCategories.filter(
       c => c.id_categoria !== cat.id_categoria
@@ -282,11 +309,13 @@ export class Upload implements OnDestroy, OnInit {
     this.form.get('categoria')?.markAsTouched();
   }
 
+  // Sirve para validar si se presionó la tecla escape
   @HostListener('document:keydown.escape')
   onEscape(): void {
     if (this.categoryOpen) this.closeCategoryDropdown();
   }
 
+  // Sirve para seleccionar fotos
   onPhotosSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length || !this.canUploadMorePhotos) {
@@ -315,6 +344,7 @@ export class Upload implements OnDestroy, OnInit {
     input.value = '';
   }
 
+  // Sirve para seleccionar la foto cubierta
   selectCover(index: number): void {
     if (index < 0 || index >= this.photoCount) {
       return;
@@ -322,10 +352,12 @@ export class Upload implements OnDestroy, OnInit {
     this.coverIndex$.next(index);
   }
 
+  // Sirve para validar si la foto es la cubierta
   isCover(index: number): boolean {
     return this.coverIndex$.value === index;
   }
 
+  // Sirve para eliminar una foto
   removePhoto(index: number): void {
     const current = [...this.photos$.value];
     const target = current[index];
@@ -352,6 +384,7 @@ export class Upload implements OnDestroy, OnInit {
     }
   }
 
+  // Sirve para enviar el formulario
   onSubmit(): void {
     if (this.submitting$.value) return;
 
@@ -425,10 +458,12 @@ export class Upload implements OnDestroy, OnInit {
     });
   }
 
+  // Sirve para cancelar la subida de la receta
   onCancel(): void {
     this.router.navigateByUrl('/recipes');
   }
 
+  // Sirve para resetear el formulario después de una subida exitosa
   private resetFormAfterSuccess(): void {
     for (const item of this.photos$.value) {
       URL.revokeObjectURL(item.url);
@@ -454,12 +489,14 @@ export class Upload implements OnDestroy, OnInit {
     this.form.setControl('instrucciones', this.fb.array([this.createStepGroup()]));
   }
 
+  // Sirve para destruir el componente
   ngOnDestroy(): void {
     for (const item of this.photos$.value) {
       URL.revokeObjectURL(item.url);
     }
   }
 
+  // Sirve para inicializar el componente
   ngOnInit(): void {
     this.categoriaService.getAll().subscribe({
       next: (cats) => {

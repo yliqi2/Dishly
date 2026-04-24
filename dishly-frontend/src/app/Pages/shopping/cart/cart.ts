@@ -17,25 +17,31 @@ import { Breadcrumbs } from '../../../Core/Components/breadcrumbs/breadcrumbs';
 export class Cart implements OnInit {
   private readonly cartService = inject(CartService);
 
+  // Sirve para obtener los items del carrito
   protected readonly items = toSignal(this.cartService.items$, {
     initialValue: this.cartService.getItems(),
   });
 
+  // Sirve para calcular el total del carrito
   protected readonly total = computed(() => {
     return this.items().reduce((sum, item) => sum + item.price, 0);
   });
 
+  // Sirve para obtener el número de items del carrito
   protected readonly itemCount = computed(() => this.items().length);
   protected readonly taxes = computed(() => Number((this.total() * 0.21).toFixed(2)));
 
+  // Sirve para inicializar el componente
   ngOnInit(): void {
     this.cartService.loadCart().subscribe();
   }
 
+  // Sirve para eliminar un item del carrito
   protected removeItem(recipeId: number): void {
     this.cartService.removeRecipe(recipeId).subscribe();
   }
 
+  // Sirve para limpiar el carrito
   protected clearCart(): void {
     this.cartService.clearCart().subscribe();
   }

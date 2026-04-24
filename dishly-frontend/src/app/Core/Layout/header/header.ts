@@ -23,8 +23,11 @@ type AuthUser = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Header {
+  // Sirve para definir el tiempo de cooldown para cambiar el idioma
   private static readonly LANGUAGE_SWITCH_COOLDOWN_MS = 2000;
+  // Sirve para definir el tiempo de reintento para sincronizar el idioma con Google Translate
   private static readonly GOOGLE_SYNC_RETRY_MS = 350;
+  // Sirve para definir el número máximo de reintentos para sincronizar el idioma con Google Translate
   private static readonly GOOGLE_SYNC_MAX_RETRIES = 3;
 
   private authService = inject(AuthServices);
@@ -36,21 +39,30 @@ export class Header {
   protected readonly currentLanguage = signal<'en' | 'es' | 'ca'>('en');
   protected readonly languageCooldownActive = signal(false);
 
+  // Sirve para obtener el usuario autenticado
   private readonly user = toSignal<AuthUser | null>(this.authService.user$, { initialValue: null });
+  // Sirve para obtener los items del carrito
   private readonly cartItems = toSignal(this.cartService.items$, { initialValue: [] });
 
   protected readonly isAuthenticated = computed(() => !!this.user());
+  // Sirve para obtener el número de items del carrito
   protected readonly cartCount = computed(() => this.cartItems().length);
+  // Sirve para obtener el texto del badge del carrito
   protected readonly cartBadgeText = computed(() => this.cartCount() > 99 ? '99+' : String(this.cartCount()));
+  // Sirve para obtener el nombre de usuario
   protected readonly displayName = computed(() => this.user()?.nombre || this.user()?.name || 'User');
+  // Sirve para verificar si el usuario es chef
   protected readonly chef = computed(() => this.user()?.chef ?? false);
+  // Sirve para obtener la inicial del usuario
   protected readonly userInitial = computed(() => this.displayName().charAt(0).toUpperCase());
+  // Sirve para obtener la URL del icono del usuario
   protected readonly iconUrl = computed(() => {
     const u = this.user() ?? (this.authService.getUser() as AuthUser | null);
     if (!u?.icon_path) return null;
     return this.authService.getAssetUrl(u.icon_path, u.updated_at);
   });
 
+  // Sirve para obtener los items del menú
   protected readonly navItems = [
     { label: 'Home', route: '/' },
     { label: 'Recipes', route: '/my-recipes' },
@@ -59,13 +71,16 @@ export class Header {
   ];
 
   constructor() {
+    // Sirve para sincronizar el idioma con Google Translate
     this.syncCurrentLanguageWithGoogleTranslate();
   }
 
+  // Sirve para abrir el menú
   protected toggleMenu(): void {
     this.menuOpen.update(value => !value);
   }
 
+  // Sirve para cerrar el menú
   protected closeMenu(): void {
     this.menuOpen.set(false);
   }
@@ -154,6 +169,8 @@ export class Header {
   }
 
   private isSupportedLanguage(language: string): language is 'en' | 'es' | 'ca' {
-    return language === 'en' || language === 'es' || language === 'ca';
+    return language === 'en'
+      || language === 'es'
+      || language === 'ca';
   }
 }

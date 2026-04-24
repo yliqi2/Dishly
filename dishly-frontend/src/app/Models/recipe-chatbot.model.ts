@@ -1,5 +1,6 @@
 // recipe-chatbot.model.ts
 
+// Sirve para definir la interfaz de un mensaje de chat
 export interface ChatMessage {
   id: number;
   role: 'user' | 'assistant';
@@ -10,6 +11,7 @@ export interface ChatMessage {
   isTyping?: boolean;
 }
 
+// Sirve para definir la interfaz de un resultado de búsqueda de internet
 export interface InternetSearchResult {
   title: string;
   timeText: string;
@@ -18,6 +20,7 @@ export interface InternetSearchResult {
   sourceUrl: string;
 }
 
+// Sirve para definir la interfaz de una respuesta de receta
 export interface RecetaResponse {
   status: string;
   source?: string;
@@ -25,6 +28,7 @@ export interface RecetaResponse {
   message?: string;
 }
 
+// Sirve para definir la interfaz de los datos de una receta
 export interface RecetaData {
   id_receta: number;
   titulo: string;
@@ -46,6 +50,7 @@ export interface RecetaData {
   mensaje_chat: string;
 }
 
+// Sirve para definir la interfaz de un ingrediente
 export interface IngredienteResponse {
   nombre: string;
   cantidad: string | number;

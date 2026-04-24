@@ -29,19 +29,23 @@ export class Profile {
   private authService = inject(AuthServices);
   private profileService = inject(ProfileService);
 
+  // Sirve para obtener el usuario autenticado
   protected readonly user = toSignal<User | null>(this.authService.user$, { initialValue: null });
   protected readonly isLoggingOut = signal(false);
+  // Sirve para obtener el ID del usuario autenticado
   protected readonly currentUserId = computed(() => {
     const user = this.user() as Record<string, unknown> | null;
     return Number(user?.['id_usuario'] ?? 0);
   });
 
+  // Sirve para obtener la URL del icono del usuario
   protected readonly iconUrl = computed(() => {
     const u = this.user() ?? (this.authService.getUser() as User | null);
     if (!u?.icon_path) return null;
     return this.authService.getAssetUrl(u.icon_path, u.updated_at);
   });
 
+  // Sirve para obtener el nombre de usuario
   protected get displayName(): string {
     const u = this.user();
     return (u?.nombre ?? u?.name ?? 'User') as string;
@@ -51,16 +55,20 @@ export class Profile {
   protected readonly acquiredRecipesCount = toSignal(this.profileService.getCountAcquiredRecipes(), { initialValue: 0 });
   protected readonly myRecipes = toSignal(this.profileService.getMyRecipes(), { initialValue: [] });
   protected readonly hiddenRecipeIds = signal<number[]>([]);
+
+  // Sirve para obtener las recetas visibles
   protected readonly visibleRecipes = computed(() => {
     const hiddenIds = this.hiddenRecipeIds();
     return this.myRecipes().filter((recipe) => !hiddenIds.includes(recipe.id_receta));
   });
 
+  // Sirve para obtener la fecha de membresía
   protected get memberSince(): string {
     const u = this.user();
     const dateStr = (u as Record<string, unknown>)?.['created_at'] ?? (u as Record<string, unknown>)?.['fecha_registro'];
     if (dateStr && typeof dateStr === 'string') {
       const date = new Date(dateStr);
+      // Sirve para validar si la fecha es válida
       if (!Number.isNaN(date.getTime())) {
         const formatted = date.toLocaleDateString('en-US', {
           year: 'numeric',
@@ -73,6 +81,7 @@ export class Profile {
     return 'Member since —';
   }
 
+  // Sirve para cerrar la sesión
   protected logout(): void {
     this.isLoggingOut.set(true);
     this.authService.logout().subscribe({
@@ -80,6 +89,7 @@ export class Profile {
     });
   }
 
+  // Sirve para desactivar una receta
   protected onRecipeDeactivated(recipeId: number): void {
     this.hiddenRecipeIds.update((ids) => ids.includes(recipeId) ? ids : [...ids, recipeId]);
   }

@@ -8,24 +8,22 @@ import { Review } from '../../Interfaces/Review';
 })
 export class ReviewService extends ApiBaseService {
   
+  // Sirve para obtener las reseñas de una receta
   getReviews(recipeId: number): Observable<Review[]> {
     return this.http.get<Review[]>(`${this.apiUrl}/recipes/${recipeId}/reviews`);
   }
 
+  // Sirve para enviar una reseña
   submitReview(data: { id_receta: number; puntuacion: number; comentario: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/recetas/valorar`, data);
   }
 
+  // Sirve para actualizar una reseña
   updateReview(reviewId: number, comentario: string): Observable<any> {
-    // Actually our backend for update is the same as insert, but wait, we need id_receta and puntuacion for setValoracion.
-    // Instead of duplicating setValoracion logic in frontend for updates, actually wait...
-    // The previous implementation used PUT /api/reviews/{id}.
-    // But since we reverted the backend, let's just make updateReview use the POST /api/recetas/valorar IF IT HAS RECIPE ID.
-    // However, updateReview signature is (reviewId, comentario). It doesnt have id_receta!
-    // Since we are creating a fresh ReviewService, let's fix it.
     throw new Error("Plesae use updateReviewWithPuntuacion instead.");
   }
   
+  // Sirve para actualizar una reseña con puntuación
   updateReviewWithPuntuacion(id_receta: number, puntuacion: number, comentario: string): Observable<any> {
       return this.http.post(`${this.apiUrl}/recetas/valorar`, {
           id_receta,
@@ -34,6 +32,7 @@ export class ReviewService extends ApiBaseService {
       });
   }
 
+  // Sirve para eliminar una reseña
   deleteReview(reviewId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/recetas/valorar/${reviewId}`);
   }

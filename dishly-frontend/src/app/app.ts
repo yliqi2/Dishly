@@ -25,6 +25,7 @@ export class App {
   protected readonly showHeader = signal(true);
   protected readonly isGlobalLoading = this.loadingService.isLoading;
 
+  // Sirve para reaccionar a cambios de ruta, actualizar meta tags y gestionar el foco accesible
   constructor() {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -43,6 +44,7 @@ export class App {
       });
   }
 
+  // Sirve para actualizar los metadatos de la ruta actual
   private updateRouteMeta(currentUrl: string): void {
     const route = this.getDeepestRoute(this.activatedRoute);
     const routeTitle = route.snapshot.title ?? 'Dishly';
@@ -59,6 +61,7 @@ export class App {
     this.metaService.updateTag({ property: 'og:url', content: `${origin}${currentUrl}` });
   }
 
+  // Sirve para obtener la ruta más profunda del árbol de rutas
   private getDeepestRoute(route: ActivatedRoute): ActivatedRoute {
     let current = route;
     while (current.firstChild) {

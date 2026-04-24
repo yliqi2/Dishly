@@ -10,11 +10,8 @@ import { RecetaResponse } from '../Models/recipe-chatbot.model';
 export class RecipeChatbotService extends ApiBaseService {
   // El endpoint base viene de ApiBaseService (protected readonly apiUrl = '/api')
   
-  /**
-   * Busca una receta enviando un mensaje al chatbot
-   * @param mensaje El mensaje o pregunta del usuario
-   * @returns Observable con la respuesta del chatbot y la receta
-   */
+
+  // Sirve para buscar una receta enviando un mensaje al chatbot
   buscarReceta(mensaje: string): Observable<RecetaResponse> {
     return this.http.post<RecetaResponse>(`${this.apiUrl}/chatbot/receta/buscar`, { mensaje });
   }

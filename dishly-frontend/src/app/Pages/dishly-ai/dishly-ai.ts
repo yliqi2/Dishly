@@ -7,6 +7,8 @@ import { Breadcrumbs } from '../../Core/Components/breadcrumbs/breadcrumbs';
   selector: 'app-dishly-ai',
   standalone: true,
   imports: [CommonModule, RouterOutlet, Breadcrumbs],
+
+  // Este template se usa como layout de la seccion Dishly AI y define el router-outlet donde se renderiza la ruta hija (el chatbot).
   template: `
     <section class="page-header page-container mb-4">
       <div class="page-header__inner">

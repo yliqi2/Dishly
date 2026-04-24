@@ -25,6 +25,7 @@ export class PaymentMethod {
   protected readonly purchasedItems = signal<PurchasedItemSummary[]>([]);
   protected readonly invoiceTotal = signal<number>(0);
 
+  // Sirve para establecer el formulario de la página
   protected form: FormGroup = this.fb.group({
     cardNumber: ['', [Validators.required, Validators.pattern(/^\d{4} \d{4} \d{4} \d{4}$/)]],
     cardHolder: ['', [Validators.required, Validators.minLength(2)]],
@@ -32,6 +33,7 @@ export class PaymentMethod {
     cvv: ['', [Validators.required, Validators.pattern(/^\d{3}$/)]]
   });
 
+  // Sirve para validar que la fecha de expiración no sea pasada
   private expiryNotPast(control: AbstractControl): { [key: string]: boolean } | null {
     const value: string = control.value;
     if (!value || !/^(0[1-9]|1[0-2])\/\d{2}$/.test(value)) return null;
@@ -43,24 +45,29 @@ export class PaymentMethod {
       : null;
   }
 
+  // Sirve para obtener el número de tarjeta mostrado
   protected get displayNumber(): string {
     const v = this.form.get('cardNumber')?.value || '';
     return v || '•••• •••• •••• ••••';
   }
 
+  // Sirve para obtener el nombre del titular mostrado
   protected get displayHolder(): string {
     return this.form.get('cardHolder')?.value || 'YOUR NAME';
   }
 
+  // Sirve para obtener la fecha de expiración mostrada
   protected get displayExpiry(): string {
     return this.form.get('expiry')?.value || 'MM/YY';
   }
 
+  // Sirve para obtener el CVV mostrado
   protected get displayCvv(): string {
     const v = this.form.get('cvv')?.value || '';
     return v ? '•'.repeat(v.length) : '•••';
   }
 
+  // Sirve para manejar el input del número de tarjeta
   protected onCardNumberInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     let digits = input.value.replace(/\D/g, '').slice(0, 16);
@@ -70,6 +77,7 @@ export class PaymentMethod {
     input.value = formatted;
   }
 
+  // Sirve para manejar el input de la fecha de expiración
   protected onExpiryInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     let digits = input.value.replace(/\D/g, '').slice(0, 4);
@@ -80,14 +88,17 @@ export class PaymentMethod {
     input.value = formatted;
   }
 
+  // Sirve para manejar el focus del CVV
   protected onCvvFocus(): void {
     this.flipped.set(true);
   }
 
+  // Sirve para manejar el blur del CVV
   protected onCvvBlur(): void {
     this.flipped.set(false);
   }
 
+  // Sirve para enviar el formulario
   protected submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -112,6 +123,7 @@ export class PaymentMethod {
     });
   }
 
+  // Sirve para validar si un campo del formulario tiene un error
   protected hasError(field: string, error?: string): boolean {
     const ctrl = this.form.get(field);
     if (!ctrl || !ctrl.touched) return false;

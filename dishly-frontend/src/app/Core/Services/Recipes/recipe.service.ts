@@ -12,20 +12,24 @@ export class RecipeService extends ApiBaseService {
   private auth = inject(AuthServices);
   private readonly ingredientsCache$ = new BehaviorSubject<string[] | null>(null);
 
+  // Sirve para obtener las recetas
   getRecipes(): Observable<RecetaCard[]> {
     return this.http.get<RecetaCard[]>(`${this.apiUrl}/recipes`);
   }
 
+  // Sirve para obtener las recetas adquiridas
   getAcquiredRecipes(): Observable<RecetaOriginal[]> {
     if (!this.auth.isAuthenticated()) return of([]);
     return this.http.get<RecetaOriginal[]>(`${this.apiUrl}/owned-recipes`);
   }
 
+  // Sirve para obtener todas las recetas admin
   getAllRecipesAdmin(): Observable<RecetaCard[]> {
     if (!this.auth.isAuthenticated()) return of([]);
     return this.http.get<RecetaCard[]>(`${this.apiUrl}/admin/recipes`);
   }
 
+  // Sirve para obtener los ingredientes
   getIngredients(forceRefresh = false): Observable<string[]> {
     const cached = this.ingredientsCache$.value;
     if (!forceRefresh && cached) {
@@ -33,6 +37,7 @@ export class RecipeService extends ApiBaseService {
     }
 
     return this.http.get<string[]>(`${this.apiUrl}/recetas/ingredientes`).pipe(
+      // Sirve para actualizar el cache de ingredientes
       tap((ingredients) => this.ingredientsCache$.next(ingredients)),
     );
   }

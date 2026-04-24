@@ -12,7 +12,8 @@ import { SearchingBar } from '../../Components/searching-bar/searching-bar';
 export class HeroHome {
   private router = inject(Router);
 
-  onSearch(query: string) {
+  // Sirve para buscar una receta
+  onSearch(query: string): void {
     this.router.navigate(['/recipes'], { queryParams: { q: query } });
   }
 }

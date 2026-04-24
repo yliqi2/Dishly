@@ -134,7 +134,7 @@
                             [attr.aria-expanded]="menuOpen()"
                             aria-controls="user-dropdown"
                         >
-                            <span class="avatar" aria-hidden="true">
+                            <span class="avatar" [class.avatar--with-image]="!!iconUrl()" aria-hidden="true">
                                 @if (iconUrl(); as url) {
                                     <img [src]="url" alt="Profile icon" />
                                 } @else {

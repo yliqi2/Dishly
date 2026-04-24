@@ -36,12 +36,14 @@ export class BoughtRecipes implements OnInit {
   selectedIngredients = signal<string[]>([]);
   selectedPersons = signal<string[]>([]);
 
+  // Sirve para obtener las categorías de las recetas
   categories = computed(() => {
     const cats = new Set<string>();
     this.recipes().forEach(r => r.categorias?.forEach(c => cats.add(c.nombre)));
     return Array.from(cats).sort();
   });
 
+  // Sirve para obtener las dificultades de las recetas
   difficultyOptions = computed<SelectOption[]>(() => {
     const levels = Array.from(
       new Set(
@@ -60,11 +62,13 @@ export class BoughtRecipes implements OnInit {
     ];
   });
 
+  // Sirve para obtener las categorías de las recetas
   categoryOptions = computed<SelectOption[]>(() => [
     { value: '', label: 'All Categories' },
     ...this.categories().map(c => ({ value: c, label: c })),
   ]);
 
+  // Sirve para obtener los ingredientes de las recetas
   ingredientOptions = computed<SelectOption[]>(() => {
     return [
       { value: '', label: 'Select ingredient...' },
@@ -74,6 +78,7 @@ export class BoughtRecipes implements OnInit {
     ];
   });
 
+  // Sirve para obtener las personas de las recetas
   personsOptions = computed<SelectOption[]>(() => {
     const portions = Array.from(
       new Set(
@@ -99,6 +104,7 @@ export class BoughtRecipes implements OnInit {
     ];
   });
 
+  // Sirve para obtener las etiquetas de las recetas
   tagsOptions = computed<SelectOption[]>(() => {
     return [
       { value: '', label: 'Select tag...' },
@@ -108,6 +114,7 @@ export class BoughtRecipes implements OnInit {
     ];
   });
 
+  // Sirve para filtrar las recetas
   filteredRecipes = computed(() => {
     const q = this.searchQuery().toLowerCase();
     const cat = this.selectedCategory();
@@ -135,6 +142,7 @@ export class BoughtRecipes implements OnInit {
       });
 
       let matchesPersons = true;
+      // Sirve para validar si las personas coinciden con la receta
       if (personsList.length > 0) {
         matchesPersons = personsList.includes(String(r.porciones)) || (personsList.includes('4+') && r.porciones >= 4);
       }
@@ -143,11 +151,13 @@ export class BoughtRecipes implements OnInit {
     });
   });
 
+  // Sirve para validar si hay filtros activos
   hasActiveFilters = computed(() =>
     !!this.searchQuery() || !!this.selectedCategory() || !!this.selectedDifficulty() ||
     this.selectedTags().length > 0 || this.selectedIngredients().length > 0 || this.selectedPersons().length > 0
   );
 
+  // Sirve para limpiar los filtros
   clearFilters(): void {
     this.searchQuery.set('');
     this.selectedCategory.set('');
@@ -160,41 +170,49 @@ export class BoughtRecipes implements OnInit {
     this.personsPickerValue.set('');
   }
 
+  // Sirve para agregar una etiqueta
   addTag(t: string): void {
     if (!t) return;
     if (!this.selectedTags().includes(t)) this.selectedTags.update(arr => [...arr, t]);
     this.tagsPickerValue.set('');
   }
 
+  // Sirve para eliminar una etiqueta
   removeTag(t: string): void {
     this.selectedTags.update(arr => arr.filter(x => x !== t));
   }
 
+  // Sirve para agregar un ingrediente
   addIngredient(i: string): void {
     if (!i) return;
     if (!this.selectedIngredients().includes(i)) this.selectedIngredients.update(arr => [...arr, i]);
     this.ingredientPickerValue.set('');
   }
 
+  // Sirve para eliminar un ingrediente
   removeIngredient(i: string): void {
     this.selectedIngredients.update(arr => arr.filter(x => x !== i));
   }
 
+  // Sirve para agregar una persona
   addPerson(p: string): void {
     if (!p) return;
     if (!this.selectedPersons().includes(p)) this.selectedPersons.update(arr => [...arr, p]);
     this.personsPickerValue.set('');
   }
 
+  // Sirve para eliminar una persona
   removePerson(p: string): void {
     this.selectedPersons.update(arr => arr.filter(x => x !== p));
   }
 
+  // Sirve para validar si el usuario es administrador
   isAdminUser(): boolean {
     const user = this.authService.getUser() as { rol?: string } | null;
     return user?.rol === 'admin';
   }
 
+  // Sirve para iniciar el componente
   ngOnInit(): void {
     this.loadIngredients();
     if (this.isAdminUser()) {
@@ -222,6 +240,7 @@ export class BoughtRecipes implements OnInit {
     }
   }
 
+  // Sirve para cargar los ingredientes
   private loadIngredients(): void {
     this.recipeService.getIngredients().subscribe({
       next: (data) => {
