@@ -19,7 +19,8 @@ import { ChatMessage, InternetSearchResult, RecetaData } from '../../../Models/r
   styleUrls: ['./recipe-chatbot.css']
 })
 export class RecipeChatbot implements OnInit {
-  private static readonly INTERNET_SEARCH_TRIGGER = /\b(?:search\b[\s\S]*?\bon internet\b|busca\b[\s\S]*?\ben internet\b)\b/iu;
+  private static readonly ENGLISH_INTERNET_TRIGGER = /\bsearch\s+(.+?)\s+on\s+internet\b/iu;
+  private static readonly SPANISH_INTERNET_TRIGGER = /\bbusca\s+(.+?)\s+en\s+internet\b/iu;
 
   // ViewChilds
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
@@ -261,27 +262,20 @@ export class RecipeChatbot implements OnInit {
 
   // Sirve para extraer la consulta de internet
   private extractInternetQuery(message: string): string | null {
-    // Sirve para verificar si la consulta de internet es válida
-    if (!RecipeChatbot.INTERNET_SEARCH_TRIGGER.test(message)) {
-      return null;
-    }
+    const englishMatch = RecipeChatbot.ENGLISH_INTERNET_TRIGGER.exec(message);
+    const spanishMatch = RecipeChatbot.SPANISH_INTERNET_TRIGGER.exec(message);
 
-    // Sirve para normalizar la consulta de internet
-    const normalizedMessage = message.trim();
-    
-    const englishQuery = normalizedMessage.match(/\bsearch\b([\s\S]*?)\bon internet\b/iu);
-    const spanishQuery = normalizedMessage.match(/\bbusca\b([\s\S]*?)\ben internet\b/iu);
-    const extractedQuery = (englishQuery?.[1] ?? spanishQuery?.[1] ?? '')
+    const extracted = (englishMatch?.[1] ?? spanishMatch?.[1] ?? '')
       .replace(/\s+/g, ' ')
       .trim();
 
-    // Sirve para retornar la consulta de internet
-    return extractedQuery || 'easy recipe';
+    return extracted || null;
   }
 
   // Sirve para enviar la consulta de internet
   private async sendInternetRecipe(query: string): Promise<void> {
     try {
+      console.log(query);
       const response = await lastValueFrom(this.spoonacularService.searchRecipes(query, 1));
       const recipe = response.results?.[0];
 
