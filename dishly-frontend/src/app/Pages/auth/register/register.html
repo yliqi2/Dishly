@@ -16,9 +16,6 @@
 		</div>
 
 		<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="form">
-			@if (errorMessage()) {
-				<p id="register-error-general" class="error-message" role="alert" aria-live="polite"><span class="error-prefix">Error:</span> {{ errorMessage() }}</p>
-			}
 			<div class="form-group">
 				<label for="register-username" class="label">Username</label>
 				<input
@@ -116,9 +113,7 @@
 			</div>
 
 			@if (errorMessage()) {
-				<div class="error-message">
-					{{ errorMessage() }}
-				</div>
+				<div class="error-message"><span class="error-prefix">Error:</span> {{ errorMessage() }}</div>
 			}
 
 			<div class="form-footer">
