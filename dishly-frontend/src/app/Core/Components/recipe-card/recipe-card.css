@@ -6,6 +6,7 @@
 /* ── Card shell ──────────────────────────────── */
 .recipe-card {
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: var(--secondaryWhite);
@@ -208,13 +209,15 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: calc(1.6em * 3);
+  margin: 0;
 }
 
 .recipe-card hr {
-	border: 0;
-	border-top: 1px solid var(--neutral-black);
-	opacity: 1;
-	color: var(--neutral-black);
+  border: 0;
+  border-top: 1px solid var(--neutral-black);
+  opacity: 1;
+  color: var(--neutral-black);
+  margin-top: 0;
 }
 
 .recipe-card .text-secondary {
@@ -266,4 +269,3 @@
 .btn-recipe-deactivate {
   min-height: 52px;
 }
-
