@@ -69,6 +69,7 @@ export const routes: Routes = [
   {
     path: 'dishly-ai',
     component: DishlyAi,
+    canActivate: [AuthGuard],
     title: 'Dishly AI',
     children: [
       { path: '', redirectTo: 'chatbot', pathMatch: 'full' },
@@ -78,6 +79,7 @@ export const routes: Routes = [
   {
     path: 'forum',
     component: Forum,
+    canActivate: [AuthGuard],
     title: 'Forum',
   },
   {
