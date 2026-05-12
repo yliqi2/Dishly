@@ -37,7 +37,7 @@ export class Breadcrumbs implements OnInit, OnDestroy {
     'cookies': 'Cookies',
     'terms-and-conditions': 'Terms and Conditions',
     'termsa-and-conditions': 'Terms and Conditions',
-    'bought-recipes': 'Adquired Recipes',
+    'bought-recipes': 'Acquired Recipes',
     'search-recipes': 'Search Recipes',
     'recipe-detail': 'Recipe Detail',
   };
