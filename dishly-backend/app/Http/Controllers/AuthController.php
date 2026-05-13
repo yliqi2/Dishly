@@ -256,7 +256,7 @@ class AuthController extends Controller
 
     private function frontendVerificationUrl(string $email, string $code): string
     {
-        $frontendUrl = rtrim((string) config('app.frontend_url', 'https://https://stanchly-dulotic-sherri.ngrok-free.dev'), '/');
+        $frontendUrl = rtrim((string) config('app.frontend_url', 'https://stanchly-dulotic-sherri.ngrok-free.dev'), '/');
 
         return $frontendUrl
             .'/verifyEmail?email='.urlencode($email)
@@ -265,7 +265,7 @@ class AuthController extends Controller
 
     private function verificationRedirectUrl(string $status): string
     {
-        $frontendUrl = rtrim((string) config('app.frontend_url', 'https://https://stanchly-dulotic-sherri.ngrok-free.dev'), '/');
+        $frontendUrl = rtrim((string) config('app.frontend_url', 'https://stanchly-dulotic-sherri.ngrok-free.dev'), '/');
 
         return $frontendUrl.'/login?verification='.urlencode($status);
     }
