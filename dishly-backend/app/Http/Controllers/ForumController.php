@@ -11,6 +11,7 @@ use Throwable;
 
 class ForumController extends Controller
 {
+    // Sirve para listar todos los foros con resumen de actividad
     public function index(Request $request): JsonResponse
     {
         $user = $request->user('api');
@@ -27,6 +28,7 @@ class ForumController extends Controller
         return response()->json($forums);
     }
 
+    // Sirve para obtener un foro con sus comentarios paginados
     public function show(Request $request, int $forumId): JsonResponse
     {
         $user = $request->user('api');
@@ -68,6 +70,7 @@ class ForumController extends Controller
         ]);
     }
 
+    // Sirve para crear un nuevo hilo de foro
     public function store(Request $request): JsonResponse
     {
         try {
@@ -117,6 +120,7 @@ class ForumController extends Controller
         }
     }
 
+    // Sirve para añadir un comentario a un foro
     public function storeComment(Request $request, int $forumId): JsonResponse
     {
         try {
@@ -158,6 +162,7 @@ class ForumController extends Controller
         }
     }
 
+    // Sirve para editar el título o descripción de un foro
     public function update(Request $request, int $forumId): JsonResponse
     {
         try {
@@ -216,6 +221,7 @@ class ForumController extends Controller
         }
     }
 
+    // Sirve para eliminar un foro
     public function destroy(Request $request, int $forumId): JsonResponse
     {
         try {
@@ -246,6 +252,7 @@ class ForumController extends Controller
         }
     }
 
+    // Sirve para editar un comentario de foro
     public function updateComment(Request $request, int $forumId, int $commentId): JsonResponse
     {
         try {
@@ -292,6 +299,7 @@ class ForumController extends Controller
         }
     }
 
+    // Sirve para eliminar un comentario de foro
     public function destroyComment(Request $request, int $forumId, int $commentId): JsonResponse
     {
         try {
@@ -325,6 +333,7 @@ class ForumController extends Controller
         }
     }
 
+    // Sirve para comprobar si el usuario puede editar o borrar un comentario
     private function canManageComment(?object $user, LineaForo $comment): bool
     {
         if (!$user) {
@@ -334,6 +343,7 @@ class ForumController extends Controller
         return (int) $user->id_usuario === (int) $comment->id_usuario || ($user->rol ?? null) === 'admin';
     }
 
+    // Sirve para comprobar si el usuario puede editar o borrar un foro
     private function canManageForum(?object $user, Foro $forum): bool
     {
         if (!$user) {
@@ -343,6 +353,7 @@ class ForumController extends Controller
         return (int) $user->id_usuario === (int) $forum->id_usuario;
     }
 
+    // Sirve para mapear un foro al formato de listado
     private function mapForumSummary(object $forum, ?object $user): array
     {
         $owner = $forum->propietario ?? null;
@@ -366,6 +377,7 @@ class ForumController extends Controller
         ];
     }
 
+    // Sirve para mapear un foro al formato de detalle con comentarios
     private function mapForumDetail(object $forum, ?object $user, iterable $comments): array
     {
         return [
@@ -374,6 +386,7 @@ class ForumController extends Controller
         ];
     }
 
+    // Sirve para mapear un comentario al formato de API
     private function mapComment(object $comment, ?object $user): array
     {
         $author = $comment->autor ?? null;
@@ -396,6 +409,7 @@ class ForumController extends Controller
         ];
     }
 
+    // Sirve para normalizar el título de un foro antes de guardarlo
     private function normalizeForumTitle(string $title): string
     {
         $collapsed = preg_replace('/\s+/', ' ', trim($title)) ?? '';

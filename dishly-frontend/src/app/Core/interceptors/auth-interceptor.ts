@@ -5,6 +5,7 @@ import { finalize, throwError } from 'rxjs';
 import { AuthServices } from '../Services/Auth/auth-services';
 import { LoadingService } from '../Services/loading.service';
 
+// Sirve para adjuntar el token JWT, gestionar el loading y redirigir si la sesión expira
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthServices);
   const loadingService = inject(LoadingService);

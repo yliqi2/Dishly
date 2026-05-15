@@ -10,6 +10,7 @@ import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 export class SearchingBar {
   searchQuery = output<string>();
 
+  // Sirve para emitir la consulta de búsqueda al componente padre
   onSearch(query: string) {
     this.searchQuery.emit(query);
   }

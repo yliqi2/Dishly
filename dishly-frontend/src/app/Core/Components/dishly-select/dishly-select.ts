@@ -26,20 +26,24 @@ export class DishlySelectComponent {
 
   constructor(private el: ElementRef) {}
 
+  // Sirve para mostrar la etiqueta de la opción seleccionada
   get selectedLabel(): string {
     const opt = this.options.find(o => o.value === this.value);
     return opt ? opt.label : this.placeholder;
   }
 
+  // Sirve para saber si se muestra el placeholder
   get isPlaceholderShown(): boolean {
     return this.value === '' || this.value === null || this.value === undefined;
   }
 
+  // Sirve para abrir o cerrar el desplegable
   toggle(): void {
     this.isOpen.update(v => !v);
     this.requestTranslateRefresh();
   }
 
+  // Sirve para seleccionar una opción y emitir el valor
   select(option: SelectOption): void {
     this.valueChange.emit(option.value);
     this.isOpen.set(false);
@@ -47,11 +51,13 @@ export class DishlySelectComponent {
     this.requestTranslateRefresh();
   }
 
+  // Sirve para devolver el foco al combobox tras seleccionar
   private focusCombobox(): void {
     const root = (this.el.nativeElement as HTMLElement).querySelector<HTMLElement>('.dishly-select');
     queueMicrotask(() => root?.focus({ preventScroll: true }));
   }
 
+  // Sirve para manejar teclado en el contenedor del select
   onContainerKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape' && this.isOpen()) {
       event.preventDefault();
@@ -69,6 +75,7 @@ export class DishlySelectComponent {
     }
   }
 
+  // Sirve para seleccionar una opción con Enter o espacio
   onOptionKeydown(event: KeyboardEvent, option: SelectOption): void {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
@@ -76,6 +83,7 @@ export class DishlySelectComponent {
     this.select(option);
   }
 
+  // Sirve para cerrar el desplegable al perder el foco
   onRootFocusOut(event: FocusEvent): void {
     if (!this.isOpen()) return;
     const next = event.relatedTarget as Node | null;
@@ -85,12 +93,14 @@ export class DishlySelectComponent {
   }
 
   @HostListener('document:click', ['$event'])
+  // Sirve para cerrar el desplegable al hacer clic fuera
   onOutsideClick(event: MouseEvent): void {
     if (!this.el.nativeElement.contains(event.target)) {
       this.isOpen.set(false);
     }
   }
 
+  // Sirve para refrescar Google Translate tras cambiar la selección
   private requestTranslateRefresh(): void {
     queueMicrotask(() => {
       const doc = globalThis.document;

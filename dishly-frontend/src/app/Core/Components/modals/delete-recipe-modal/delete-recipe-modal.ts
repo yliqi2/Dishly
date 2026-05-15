@@ -15,14 +15,17 @@ export class DeleteRecipeModal implements AfterViewInit {
 
   @ViewChild('dialogRoot') dialogRoot?: ElementRef<HTMLElement>;
 
+  // Sirve para enfocar el primer elemento del modal al abrirlo
   ngAfterViewInit(): void {
     queueMicrotask(() => this.focusFirstElement());
   }
 
+  // Sirve para cancelar al hacer clic en el fondo
   onBackdropClick(): void {
     this.cancelled.emit();
   }
 
+  // Sirve para manejar Escape y atrapar el foco con Tab
   onModalKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       this.cancelled.emit();
@@ -32,6 +35,7 @@ export class DeleteRecipeModal implements AfterViewInit {
     this.trapFocus(event);
   }
 
+  // Sirve para enfocar el primer elemento enfocable del modal
   private focusFirstElement(): void {
     const root = this.dialogRoot?.nativeElement;
     if (!root) return;
@@ -39,6 +43,7 @@ export class DeleteRecipeModal implements AfterViewInit {
     (focusable[0] ?? root).focus();
   }
 
+  // Sirve para mantener el foco dentro del modal al tabular
   private trapFocus(event: KeyboardEvent): void {
     const root = this.dialogRoot?.nativeElement;
     if (!root) return;
@@ -51,6 +56,7 @@ export class DeleteRecipeModal implements AfterViewInit {
     else if (!event.shiftKey && active === last) { event.preventDefault(); first.focus(); }
   }
 
+  // Sirve para obtener los elementos enfocables del modal
   private getFocusableElements(root: HTMLElement): HTMLElement[] {
     const selector = [
       'a[href]', 'button:not([disabled])', 'textarea:not([disabled])',

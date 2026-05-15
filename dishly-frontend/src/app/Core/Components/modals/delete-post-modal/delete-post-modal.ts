@@ -11,10 +11,12 @@ export class DeletePostModal {
   readonly onCancel = output<void>();
   readonly onConfirm = output<void>();
 
+  // Sirve para cancelar la eliminación del post
   protected cancel(): void {
     this.onCancel.emit();
   }
 
+  // Sirve para confirmar la eliminación del post
   protected confirm(): void {
     if (this.isProcessing()) {
       return;

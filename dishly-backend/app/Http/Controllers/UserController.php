@@ -13,6 +13,7 @@ use Throwable;
 
 class UserController extends Controller
 {
+    // Sirve para obtener el perfil público de un usuario con sus recetas
     public function showPublicProfile(int $id)
     {
         try {
@@ -107,6 +108,7 @@ class UserController extends Controller
         }
     }
 
+    // Sirve para actualizar el nombre y email del usuario autenticado
     public function updatePersonalInfo(Request $request)
     {
         try {
@@ -159,6 +161,7 @@ class UserController extends Controller
         }
     }
 
+    // Sirve para cambiar la contraseña del usuario autenticado
     public function updatePassword(Request $request)
     {
         try {
@@ -200,6 +203,7 @@ class UserController extends Controller
         }
     }
 
+    // Sirve para desactivar la cuenta del usuario y cerrar sesión
     public function deactivateAccount(Request $request)
     {
         try {

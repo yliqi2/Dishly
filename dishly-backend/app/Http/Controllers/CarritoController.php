@@ -17,6 +17,7 @@ use Throwable;
 
 class CarritoController extends Controller
 {
+    // Sirve para obtener el carrito del usuario con sus items y total
     public function getCarrito(Request $request): JsonResponse
     {
         try {
@@ -78,6 +79,7 @@ class CarritoController extends Controller
         }
     }
 
+    // Sirve para añadir una receta de pago al carrito
     public function addToCart(Request $request): JsonResponse
     {
         try {
@@ -144,6 +146,7 @@ class CarritoController extends Controller
         }
     }
 
+    // Sirve para eliminar una receta del carrito
     public function removeFromCart(Request $request, int $idReceta): JsonResponse
     {
         try {
@@ -187,6 +190,7 @@ class CarritoController extends Controller
         }
     }
 
+    // Sirve para vaciar el carrito del usuario
     public function clearCart(Request $request): JsonResponse
     {
         try {
@@ -223,6 +227,7 @@ class CarritoController extends Controller
         }
     }
 
+    // Sirve para obtener o crear el carrito de un usuario
     protected function resolveUserCart(int $userId, bool $createIfMissing = false): ?Carrito
     {
         $carrito = Carrito::query()
@@ -241,6 +246,7 @@ class CarritoController extends Controller
         return $carrito;
     }
 
+    // Sirve para quitar del carrito recetas inactivas o inexistentes
     protected function removeUnavailableCartItems(int $cartId): void
     {
         $invalidRecipeIds = RecetaOriginal::query()
@@ -262,6 +268,7 @@ class CarritoController extends Controller
             ->delete();
     }
 
+    // Sirve para procesar el pago, facturar y transferir recetas adquiridas
     public function pagar(Request $request): JsonResponse
     {
         try {
@@ -340,6 +347,7 @@ class CarritoController extends Controller
         }
     }
 
+    // Sirve para obtener las líneas del carrito que se pueden pagar
     protected function getPurchasableCartItems(int $cartId): Collection
     {
         return LineaCarrito::query()
@@ -355,6 +363,7 @@ class CarritoController extends Controller
             ->get();
     }
 
+    // Sirve para crear la factura con el total del carrito
     protected function createInvoiceFromCartItems(int $userId, Collection $cartItems): Factura
     {
         $factura = new Factura();
@@ -366,6 +375,7 @@ class CarritoController extends Controller
         return $factura;
     }
 
+    // Sirve para crear las líneas de factura a partir del carrito
     protected function createInvoiceLinesFromCartItems(int $invoiceId, Collection $cartItems): void
     {
         $groupedItems = $cartItems->groupBy(fn ($item): string => ((int) $item->id_receta) . '|' . ((float) $item->precio_unitario));
@@ -384,6 +394,7 @@ class CarritoController extends Controller
         }
     }
 
+    // Sirve para registrar las recetas compradas en receta_adquirida
     protected function transferCartItemsToAcquiredRecipes(int $userId, Collection $cartItems): int
     {
         if ($cartItems->isEmpty()) {

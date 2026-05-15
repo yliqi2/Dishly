@@ -59,6 +59,7 @@ export class RecipeCardComponent {
     return null;
   });
 
+  // Sirve para mostrar el badge de adquirida solo si no es el autor
   protected readonly shouldShowAcquiredBadge = computed(() => {
     const r = this.receta();
     if (!r.purchased) {
@@ -94,6 +95,7 @@ export class RecipeCardComponent {
     };
   });
 
+  // Sirve para formatear la media de valoraciones de la receta
   protected readonly mediaValoraciones = computed(() => {
     const media = this.receta().media_valoraciones;
     const numericMedia = Number(media);
@@ -115,6 +117,7 @@ export class RecipeCardComponent {
     return this.receta().autor_nombre;
   });
 
+  // Sirve para saber si el usuario puede editar o eliminar la receta
   protected readonly canManageRecipe = computed(() => {
     const user = this.currentUser();
     const currentUserId = Number(user?.['id_usuario'] ?? 0);
@@ -127,16 +130,19 @@ export class RecipeCardComponent {
     return currentUserRole === 'admin' || currentUserId === this.receta().id_autor;
   });
 
+  // Sirve para abrir el modal de confirmación de borrado
   protected openDeleteModal(): void {
     if (!this.isDeactivating()) {
       this.showDeleteModal.set(true);
     }
   }
 
+  // Sirve para cerrar el modal de borrado sin eliminar
   protected cancelDelete(): void {
     this.showDeleteModal.set(false);
   }
 
+  // Sirve para desactivar la receta en el backend
   protected confirmDelete(): void {
     this.showDeleteModal.set(false);
     this.isDeactivating.set(true);

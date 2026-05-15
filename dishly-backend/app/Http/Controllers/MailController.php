@@ -13,6 +13,7 @@ use Throwable;
 
 class MailController extends Controller
 {
+    // Sirve para enviar el código de recuperación de contraseña por email
     public function send(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -56,6 +57,7 @@ class MailController extends Controller
         }
     }
 
+    // Sirve para restablecer la contraseña con el código de recuperación
     public function resetPassword(Request $request): JsonResponse
     {
         try {

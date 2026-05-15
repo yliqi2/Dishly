@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RequireRole
 {
+    // Sirve para comprobar que el usuario autenticado tiene uno de los roles permitidos
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         $user = $request->user('api');

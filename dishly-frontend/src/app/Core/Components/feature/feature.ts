@@ -17,6 +17,7 @@ export class Feature implements OnInit {
 
   protected readonly recipes = signal<RecetaCard[]>([]);
 
+  // Sirve para cargar las recetas destacadas de la homepage
   ngOnInit(): void {
     this.homepageService.getRecipes().subscribe({
       next: (data) => {
@@ -26,6 +27,7 @@ export class Feature implements OnInit {
     });
   }
 
+  // Sirve para quitar una receta desactivada de la lista destacada
   protected onRecipeDeactivated(recipeId: number): void {
     this.recipes.update((recipes) => recipes.filter((recipe) => recipe.id_receta !== recipeId));
   }

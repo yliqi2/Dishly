@@ -16,6 +16,7 @@ use Throwable;
 
 class AuthController extends Controller
 {
+    // Sirve para registrar un nuevo usuario y enviar el email de verificación
     public function register(Request $request)
     {
         try {
@@ -78,6 +79,7 @@ class AuthController extends Controller
         }
     }
 
+    // Sirve para autenticar un usuario y devolver el token JWT
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -117,6 +119,7 @@ class AuthController extends Controller
         ]);
     }
 
+    // Sirve para cerrar la sesión del usuario autenticado
     public function logout(Request $request)
     {
         Auth::guard('api')->logout();
@@ -126,6 +129,7 @@ class AuthController extends Controller
         ]);
     }
 
+    // Sirve para redirigir al frontend con los datos de verificación de email
     public function verifyEmail(Request $request): RedirectResponse
     {
         $email = (string) $request->query('email', '');
@@ -134,6 +138,7 @@ class AuthController extends Controller
         return redirect()->away($this->frontendVerificationUrl($email, $code));
     }
 
+    // Sirve para verificar el email del usuario mediante código
     public function verifyEmailApi(Request $request)
     {
         $email = (string) $request->query('email', $request->input('email', ''));
@@ -175,6 +180,7 @@ class AuthController extends Controller
         ]);
     }
 
+    // Sirve para actualizar el nombre, email y contraseña del perfil
     public function updateProfile(Request $request)
     {
         $user = $request->user();
@@ -202,6 +208,7 @@ class AuthController extends Controller
         ]);
     }
 
+    // Sirve para subir y guardar el icono del usuario en formato WebP
     public function uploadIcon(Request $request)
     {
         try {
@@ -254,6 +261,7 @@ class AuthController extends Controller
         }
     }
 
+    // Sirve para construir la URL de verificación del frontend
     private function frontendVerificationUrl(string $email, string $code): string
     {
         $frontendUrl = rtrim((string) config('app.frontend_url', 'https://stanchly-dulotic-sherri.ngrok-free.dev'), '/');
@@ -263,6 +271,7 @@ class AuthController extends Controller
             .'&code='.urlencode($code);
     }
 
+    // Sirve para construir la URL de redirección tras verificar el email
     private function verificationRedirectUrl(string $status): string
     {
         $frontendUrl = rtrim((string) config('app.frontend_url', 'https://stanchly-dulotic-sherri.ngrok-free.dev'), '/');
@@ -270,6 +279,7 @@ class AuthController extends Controller
         return $frontendUrl.'/login?verification='.urlencode($status);
     }
 
+    // Sirve para convertir y guardar una imagen como WebP
     private function saveImageAsWebp(string $sourcePath, string $targetPath): void
     {
         $detectedMime = mime_content_type($sourcePath) ?: 'unknown';

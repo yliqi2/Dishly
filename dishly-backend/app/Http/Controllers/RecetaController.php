@@ -16,6 +16,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class RecetaController extends Controller
 {
+    // Sirve para listar todas las categorías de recetas
     public function getCategorias()
     {
         $categorias = DB::table('categoria')->select('id_categoria', 'nombre')->get();
@@ -23,6 +24,7 @@ class RecetaController extends Controller
         return response()->json($categorias);
     }
 
+    // Sirve para listar los nombres de ingredientes disponibles
     public function getIngredientes()
     {
         $ingredientes = DB::table('ingrediente')
@@ -34,6 +36,7 @@ class RecetaController extends Controller
         return response()->json($ingredientes);
     }
 
+    // Sirve para crear una nueva receta con imágenes, categorías e ingredientes
     public function store(Request $request)
     {
         try {
@@ -148,6 +151,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para actualizar una receta existente
     public function update(Request $request, $id)
     {
         $newImagePaths = [];
@@ -297,6 +301,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para obtener o crear el id de un ingrediente por nombre
     private function resolveIngredientId(string $name): int
     {
         $normalized = trim($name);
@@ -319,6 +324,7 @@ class RecetaController extends Controller
         ]);
     }
 
+    // Sirve para guardar las imágenes subidas y devolver sus rutas
     private function storeUploadedImages(Request $request, string $field = 'imagenes'): array
     {
         $files = $request->file($field, []);
@@ -343,6 +349,7 @@ class RecetaController extends Controller
         return $storedPaths;
     }
 
+    // Sirve para convertir y guardar una imagen como WebP
     private function saveImageAsWebp(string $sourcePath, string $targetPath): void
     {
         $detectedMime = mime_content_type($sourcePath) ?: 'unknown';
@@ -363,6 +370,7 @@ class RecetaController extends Controller
         ]);
     }
 
+    // Sirve para extraer las rutas de imágenes de una receta
     private function extractRecipeImagePaths(object $recipe): array
     {
         return array_values(array_filter([
@@ -374,6 +382,7 @@ class RecetaController extends Controller
         ]));
     }
 
+    // Sirve para calcular el orden final de imágenes tras una actualización
     private function resolveUpdatedImageOrder(array $imageOrder, array $currentImagePaths, array $newImagePaths): array
     {
         $resolved = [];
@@ -437,12 +446,14 @@ class RecetaController extends Controller
         return array_values($resolved);
     }
 
+    // Sirve para borrar del disco las imágenes que ya no usa la receta
     private function deleteRemovedRecipeImages(array $currentImagePaths, array $finalImagePaths): void
     {
         $removedPaths = array_diff($currentImagePaths, $finalImagePaths);
         $this->deleteStoredImages($removedPaths);
     }
 
+    // Sirve para eliminar archivos de imagen del almacenamiento
     private function deleteStoredImages(array $paths): void
     {
         foreach ($paths as $path) {
@@ -457,6 +468,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para listar las recetas publicadas por el usuario autenticado
     public function getMyRecipes()
     {
         try {
@@ -522,6 +534,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para contar las recetas publicadas por el usuario
     public function getCountRecipes()
     {
         try {
@@ -543,6 +556,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para contar las recetas adquiridas por el usuario
     public function getCountAcquiredRecipes()
     {
         try {
@@ -563,6 +577,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para listar las recetas activas en formato tarjeta
     public function getAllRecetas()
     {
         try {
@@ -577,6 +592,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para listar todas las recetas incluyendo inactivas (admin)
     public function getAllRecetasAdmin()
     {
         try {
@@ -594,6 +610,7 @@ class RecetaController extends Controller
     /**
      * @return array<int, mixed>|Collection<int, mixed>
      */
+    // Sirve para construir la lista de recetas en formato tarjeta
     private function buildRecetasCardList(bool $onlyActive)
     {
         $query = DB::table('receta_original')->orderByDesc('fecha_creacion');
@@ -658,6 +675,7 @@ class RecetaController extends Controller
         return $recetasConDatos->sortByDesc('fecha_creacion')->values();
     }
 
+    // Sirve para obtener el detalle completo de una receta por id
     public function getRecetaById($id)
     {
         try {
@@ -717,6 +735,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para obtener las valoraciones del usuario autenticado
     public function getValoraciones()
     {
         try {
@@ -749,6 +768,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para obtener la media de valoraciones de las recetas del usuario
     public function getMediaValoraciones()
     {
         try {
@@ -771,6 +791,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para crear o actualizar la valoración de una receta
     public function setValoracion(Request $request)
     {
         try {
@@ -825,6 +846,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para desactivar una receta (borrado lógico)
     public function desactivarReceta($id)
     {
         try {
@@ -859,6 +881,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para listar las reseñas de una receta
     public function getReviewsForRecipe($id)
     {
         try {
@@ -883,6 +906,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para eliminar una valoración del usuario autenticado
     public function deleteValoracion($id)
     {
         try {
@@ -917,6 +941,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para comprobar si el usuario ha comprado una receta
     public function checkPurchase($id)
     {
         try {
@@ -946,6 +971,7 @@ class RecetaController extends Controller
         }
     }
 
+    // Sirve para determinar si una receta está comprada o es gratuita para el usuario
     private function resolveRecipePurchaseStatus(object $recipe, ?object $user): bool
     {
         if (! $user) {
@@ -966,6 +992,7 @@ class RecetaController extends Controller
             ->exists();
     }
 
+    // Sirve para obtener el usuario JWT si hay token válido en la petición
     private function optionalJwtApiUser(): ?object
     {
         try {

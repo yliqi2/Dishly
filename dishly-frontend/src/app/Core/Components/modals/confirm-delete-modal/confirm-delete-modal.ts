@@ -18,14 +18,17 @@ export class ConfirmDeleteModal implements AfterViewInit {
   @Output() closeModal = new EventEmitter<void>();
   @ViewChild('dialogRoot') dialogRoot?: ElementRef<HTMLElement>;
 
+  // Sirve para enfocar el primer elemento del modal al abrirlo
   ngAfterViewInit(): void {
     queueMicrotask(() => this.focusFirstElement());
   }
 
+  // Sirve para cerrar el modal al hacer clic en el fondo
   onBackdropClick(): void {
     this.closeModal.emit();
   }
 
+  // Sirve para manejar Escape y atrapar el foco con Tab
   onModalKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       this.closeModal.emit();
@@ -35,6 +38,7 @@ export class ConfirmDeleteModal implements AfterViewInit {
     this.trapFocus(event);
   }
 
+  // Sirve para enfocar el primer elemento enfocable del modal
   private focusFirstElement(): void {
     const root = this.dialogRoot?.nativeElement;
     if (!root) return;
@@ -42,6 +46,7 @@ export class ConfirmDeleteModal implements AfterViewInit {
     (focusable[0] ?? root).focus();
   }
 
+  // Sirve para mantener el foco dentro del modal al tabular
   private trapFocus(event: KeyboardEvent): void {
     const root = this.dialogRoot?.nativeElement;
     if (!root) return;
@@ -63,6 +68,7 @@ export class ConfirmDeleteModal implements AfterViewInit {
     }
   }
 
+  // Sirve para obtener los elementos enfocables del modal
   private getFocusableElements(root: HTMLElement): HTMLElement[] {
     const selector = [
       'a[href]',

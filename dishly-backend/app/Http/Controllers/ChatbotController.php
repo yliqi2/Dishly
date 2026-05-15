@@ -57,6 +57,7 @@ class ChatbotController extends Controller
         'italiano' => ['italian'],
     ];
 
+    // Sirve para buscar o generar una respuesta de receta según el mensaje del usuario
     public function buscar(Request $request): JsonResponse
     {
         try {
@@ -91,6 +92,7 @@ class ChatbotController extends Controller
         }
     }
 
+    // Sirve para devolver el catálogo de recetas disponible para el chatbot
     public function catalog()
     {
         $recipes = RecetaOriginal::with(['ingredientes', 'autor'])
@@ -133,6 +135,7 @@ class ChatbotController extends Controller
         return response()->json($recipes);
     }
 
+    // Sirve para enviar el mensaje al workflow de n8n y obtener la respuesta
     private function requestN8n(string $mensaje, ?int $userId): ?array
     {
         foreach ($this->getN8nUrls() as $n8nUrl) {
@@ -216,6 +219,7 @@ class ChatbotController extends Controller
         return null;
     }
 
+    // Sirve para responder cuando n8n no está disponible
     private function fallbackResponse(string $mensaje)
     {
         $fallbackRecipe = $this->findRecipeFallback($mensaje);
@@ -235,6 +239,7 @@ class ChatbotController extends Controller
         ]);
     }
 
+    // Sirve para obtener las URLs configuradas de n8n
     private function getN8nUrls(): array
     {
         $configuredUrl = config('services.n8n.chatbot_recipe_url');
@@ -247,6 +252,7 @@ class ChatbotController extends Controller
         return array_values(array_unique(array_merge($urls, self::DEFAULT_N8N_URLS)));
     }
 
+    // Sirve para extraer el mensaje del usuario de la petición
     private function extractMessage(Request $request): string
     {
         $mensaje = $request->input('mensaje');
@@ -271,6 +277,7 @@ class ChatbotController extends Controller
         return $mensaje;
     }
 
+    // Sirve para registrar logs del chatbot sin romper el flujo
     private function safeLog(string $level, string $message, array $context = []): void
     {
         try {
@@ -279,6 +286,7 @@ class ChatbotController extends Controller
         }
     }
 
+    // Sirve para buscar una receta en base de datos como respaldo
     private function findRecipeFallback(string $mensaje): ?RecetaOriginal
     {
         $recipes = RecetaOriginal::with(['ingredientes', 'autor'])
@@ -337,6 +345,7 @@ class ChatbotController extends Controller
         return $bestScore >= self::MINIMUM_FALLBACK_SCORE ? $bestRecipe : null;
     }
 
+    // Sirve para dividir el mensaje en tokens para la búsqueda
     private function tokenize(string $message): array
     {
         $normalized = $this->normalizeText($message);
@@ -359,6 +368,7 @@ class ChatbotController extends Controller
         return array_values(array_unique($tokens));
     }
 
+    // Sirve para comprobar si algún token coincide con las palabras clave
     private function containsAny(array $tokens, array $needles): bool
     {
         foreach ($needles as $needle) {
@@ -370,6 +380,7 @@ class ChatbotController extends Controller
         return false;
     }
 
+    // Sirve para construir una respuesta conversacional sin receta
     private function buildConversationalReply(string $mensaje): ?array
     {
         $normalizedMessage = $this->normalizeText($mensaje);
@@ -422,6 +433,7 @@ class ChatbotController extends Controller
         return null;
     }
 
+    // Sirve para generar el mensaje cuando no hay receta coincidente
     private function buildNoMatchReply(string $mensaje): string
     {
         if ($this->looksLikeRecipeIntent($mensaje)) {
@@ -431,6 +443,7 @@ class ChatbotController extends Controller
         return 'Of course. I am here to chat about food and cooking too. Ask me for an idea, tell me what ingredients you have, or describe what you feel like eating and I will help you shape it.';
     }
 
+    // Sirve para detectar si el usuario pide una receta
     private function looksLikeRecipeIntent(string $mensaje): bool
     {
         $normalizedMessage = $this->normalizeText($mensaje);
@@ -444,6 +457,7 @@ class ChatbotController extends Controller
         return false;
     }
 
+    // Sirve para normalizar texto para comparaciones
     private function normalizeText(?string $text): string
     {
         $value = mb_strtolower((string) $text, 'UTF-8');
@@ -452,6 +466,7 @@ class ChatbotController extends Controller
         return $transliterated === false ? $value : mb_strtolower($transliterated, 'UTF-8');
     }
 
+    // Sirve para formatear una receta para la respuesta del chatbot
     private function formatRecipe(RecetaOriginal $recipe, string $userMessage, ?string $chatMessage = null): array
     {
         $ingredients = $recipe->ingredientes->map(function ($ingredient) {
@@ -488,6 +503,7 @@ class ChatbotController extends Controller
         ];
     }
 
+    // Sirve para recopilar las URLs de imágenes de una receta
     private function collectImagePaths(RecetaOriginal $recipe): array
     {
         return array_values(array_filter([
@@ -499,6 +515,7 @@ class ChatbotController extends Controller
         ]));
     }
 
+    // Sirve para dividir las instrucciones en pasos numerados
     private function splitInstructions(string $instructions): array
     {
         $lines = preg_split('/\r\n|\r|\n/', $instructions) ?: [];
@@ -514,6 +531,7 @@ class ChatbotController extends Controller
         return array_values(array_filter(array_map('trim', preg_split('/(?<=[.!?])\s+/', $instructions) ?: [])));
     }
 
+    // Sirve para construir el mensaje del asistente con la receta encontrada
     private function buildAssistantMessage(RecetaOriginal $recipe, string $userMessage, array $ingredients, array $steps): string
     {
         $topIngredients = collect($ingredients)
@@ -537,6 +555,7 @@ class ChatbotController extends Controller
             "I am also leaving you a reference image. If you want, I can reshape it into something quicker, lighter, or more indulgent.";
     }
 
+    // Sirve para traducir la dificultad al texto mostrado
     private function difficultyLabel(string $difficulty): string
     {
         return match ($difficulty) {
@@ -546,11 +565,13 @@ class ChatbotController extends Controller
         };
     }
 
+    // Sirve para traducir la unidad de tiempo al texto mostrado
     private function timeUnitLabel(string $unit): string
     {
         return $unit === 'hours' ? 'hours' : 'minutes';
     }
 
+    // Sirve para traducir la unidad de ingrediente al texto mostrado
     private function unitLabel(string $unit): string
     {
         return match ($unit) {

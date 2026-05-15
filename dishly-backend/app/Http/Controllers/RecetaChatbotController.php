@@ -12,9 +12,7 @@ class RecetaChatbotController extends Controller
 {
     protected $n8nWebhookUrl = 'http://localhost:5678/webhook/api/chatbot/receta';
 
-    /**
-     * Buscar receta por mensaje natural usando IA
-     */
+    // Sirve para buscar una receta por mensaje natural usando n8n
     public function buscarReceta(Request $request)
     {
         $request->validate([
@@ -69,9 +67,7 @@ class RecetaChatbotController extends Controller
         }
     }
 
-    /**
-     * Obtener receta por ID directamente (sin IA)
-     */
+    // Sirve para obtener una receta por id
     public function getRecetaById($id)
     {
         $receta = RecetaOriginal::with(['ingredientes', 'autor'])

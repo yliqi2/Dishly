@@ -44,6 +44,7 @@ export class Breadcrumbs implements OnInit, OnDestroy {
 
   constructor(private router: Router) {}
 
+  // Sirve para construir las migas de pan al cargar y al navegar
   ngOnInit(): void {
     this.previousUrl = sessionStorage.getItem(Breadcrumbs.PREVIOUS_URL_KEY);
     this.buildBreadcrumb(this.router.url);
@@ -58,10 +59,12 @@ export class Breadcrumbs implements OnInit, OnDestroy {
       });
   }
 
+  // Sirve para cancelar la suscripción a eventos de ruta
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
   }
 
+  // Sirve para generar los items de migas de pan según la URL actual
   private buildBreadcrumb(url: string): void {
     const pathOnly = url.split('?')[0];
     const segments = pathOnly.split('/').filter(s => s);
@@ -110,6 +113,7 @@ export class Breadcrumbs implements OnInit, OnDestroy {
     this.items = pathItems;
   }
 
+  // Sirve para saber si un item de migas de pan es el último
   isLast(index: number): boolean {
     return index === this.items.length - 1;
   }

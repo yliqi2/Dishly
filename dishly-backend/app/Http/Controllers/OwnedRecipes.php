@@ -8,6 +8,7 @@ use Throwable;
 
 class OwnedRecipes extends Controller
 {
+    // Sirve para listar las recetas adquiridas por el usuario autenticado
     public function index(Request $request)
     {
         try {
